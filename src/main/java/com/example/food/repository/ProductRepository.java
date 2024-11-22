@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.food.domain.AppUser;
 
 public interface ProductRepository extends JpaRepository<AppUser, String> {
-
+    //Intenger --> String수정
     // 유저 ID를 바탕으로 유저 정보를 가져온다.
     AppUser findByUsername(String userId);
 
