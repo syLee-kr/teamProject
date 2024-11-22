@@ -1,3 +1,4 @@
+/*
 package com.example.food.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,3 +22,4 @@ public interface ProductRepository extends JpaRepository<AppUser, String> {
     @Query("UPDATE AppUser m SET m.password = :password WHERE m.username = :username")
     void changePassword(@Param("username") String username, @Param("password") String password);
 }
+*/
