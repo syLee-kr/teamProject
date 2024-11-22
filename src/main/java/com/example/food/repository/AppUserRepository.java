@@ -15,6 +15,7 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
     // 유저 이메일과 아이디를 바탕으로 유저 정보를 알려준다.
     AppUser findByEmail(String userId, String email);
 
+    //  유저 아이디와 신규 비밀번호를 전달받고 비밀번호를 변경
     @Transactional
     @Modifying
     @Query("UPDATE AppUser m SET m.password = :password WHERE m.username = :username")
