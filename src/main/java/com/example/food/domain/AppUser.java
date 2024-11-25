@@ -34,6 +34,13 @@ public class AppUser {
     @Column(columnDefinition = "varchar2(255) default 'images/default.png'")
     private String profileImage;   //  프로필 이미지
 
+    @OneToOne(cascade = {CascadeType.ALL, CascadeType.REMOVE}, orphanRemoval = true)
+    @JoinColumn(name = "diabetes_id", referencedColumnName = "id", nullable = false)
+    private Diabetes diabetes;
+
+
+
+
     @Column(nullable = false, columnDefinition = "varchar(255) default 'ROLE_USER'")
     private String role;            //  유저 상태 -> 일반 유저인지 관리자인지 구분하는 로직. 기본값은 ROLE_USER, 관리자는 ADMIN
 }
