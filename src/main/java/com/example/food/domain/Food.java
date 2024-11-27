@@ -6,31 +6,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "food") // 테이블 이름 설정
+@Table(name = "food")
 public class Food {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;            // 음식 고유 ID
+    private int foodSeq; // 음식의 고유 번호 (기본 키)
 
-    private String mainfood;    // 메인음식
-    @ElementCollection // 사이드 메뉴 리스트
-    @CollectionTable(name = "food_side_dishes", joinColumns = @JoinColumn(name = "food_id"))
-    @Column(name = "side_dish")
-    private List<String> sideDishes; // 사이드 메뉴 리스트
-    private String dessert;     // 디저트
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser appUser; // 해당 음식을 저장한 유저
 
-    private String meal;        // 아침, 점심, 저녁 카테고리
-    private String category;    // 음식 카테고리 (예: 한식, 중식, 양식 등)
-    private int calories;       // 칼로리
-    private double protein;     // 단백질(g)
-    private double carbohydrates; // 탄수화물(g)
-    private double fat;         // 지방(g)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fseq", nullable = false)
+    private SaveFood saveFood; // SaveFood 참조
 }
