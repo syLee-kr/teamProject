@@ -26,8 +26,8 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pseq;           //  게시글 번호
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", nullable = false)
     private AppUser appUser;    //  유저 정보
 
     @Column(columnDefinition = "varchar2(255) default null")
