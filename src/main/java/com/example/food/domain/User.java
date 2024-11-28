@@ -2,9 +2,11 @@ package com.example.food.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import java.util.List;
 @DynamicUpdate
 @Data
 @Entity
-public class AppUser {
+public class User {
 
     @Id
     private String userId;          // 유저 아이디
@@ -28,7 +30,15 @@ public class AppUser {
     private double height;          // 키
     private double weight;          // 체중
     private Date birthday;          // 생일
-    private int gender;             // 성별 (1: 남자, 2: 여자)
+
+    // Gender Enum 추가
+    public enum Gender {
+        MALE, FEMALE
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender; // 성별
 
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions; // 유저가 작성한 질문 리스트
@@ -36,14 +46,19 @@ public class AppUser {
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers; // 관리자가 작성한 답변 리스트
 
-    // 기존 코드 유지
-    @Temporal(value = TemporalType.TIMESTAMP)
+    @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
-    private Date regdate = new Date(); // 유저 가입일
+    private LocalDateTime regdate;
 
     @Column(columnDefinition = "varchar2(255) default 'images/default.png'")
     private String profileImage; // 프로필 이미지
 
+    // Role Enum 추가
+    public enum Role {
+        ROLE_USER, ROLE_ADMIN
+    }
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "varchar(255) default 'ROLE_USER'")
-    private String role; // 유저 상태 (기본값: ROLE_USER, 관리자: ADMIN)
+    private Role role; // 유저 상태 (기본값: ROLE_USER, 관리자: ROLE_ADMIN)
 }
