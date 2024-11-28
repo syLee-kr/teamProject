@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -21,16 +23,22 @@ import java.util.List;
 public class SaveFood {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int fseq; // 저장된 음식의 고유 번호
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "savefood_seq_generator")
+    @SequenceGenerator(
+            name = "savefood_seq_generator",   // 시퀀스 생성기의 이름
+            sequenceName = "savefood_seq",     // 실제 데이터베이스 시퀀스 이름
+            initialValue = 1,                // 시작 값
+            allocationSize = 1               // 증가 크기
+    )
+    private Long sfSeq; // 저장된 음식의 고유 번호
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
-    private AppUser appUser; // 유저 정보
+    private User appUser; // 유저 정보
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
-    private Date saveDate; // 저장 날짜
+    private LocalDateTime saveDate; // 저장 날짜
 
     private String mealType; // 식사 유형: 아침, 점심, 저녁
 
@@ -48,8 +56,4 @@ public class SaveFood {
     private double carbohydrates; // 탄수화물(g)
     private double fat; // 지방(g)
 
-    @PrePersist
-    protected void onCreate() {
-        this.saveDate = new Date(); // 저장 시 현재 시간 설정
-    }
 }
