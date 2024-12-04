@@ -34,7 +34,7 @@ public class SaveFood {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
-    private User appUser; // 유저 정보
+    private Users user; // 유저 정보
 
     @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
@@ -55,5 +55,4 @@ public class SaveFood {
     private double protein; // 단백질(g)
     private double carbohydrates; // 탄수화물(g)
     private double fat; // 지방(g)
-
 }

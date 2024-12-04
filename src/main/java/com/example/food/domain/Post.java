@@ -11,7 +11,6 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.time.LocalDateTime;
 @Data
@@ -36,7 +35,7 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId", nullable = false)
-    private User appUser;    //  유저 정보
+    private Users user;    //  유저 정보
 
     @Column(columnDefinition = "varchar2(255) default null")
     private String imagePath;   //  게시물 이미지
@@ -46,7 +45,7 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // 부모 필드
-    private List<Comment> comments = new ArrayList<>();
+    private List<Comments> comments = new ArrayList<>();
 
     @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
@@ -54,5 +53,4 @@ public class Post {
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private int priority;                 // 공지 여부 (0: 일반 게시글, 1: 공지 게시물)
-
 }
