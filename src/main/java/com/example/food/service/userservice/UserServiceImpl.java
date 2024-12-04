@@ -1,6 +1,6 @@
 package com.example.food.service.userservice;
 
-import com.example.food.domain.User;
+import com.example.food.domain.Users;
 import com.example.food.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,21 +18,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUser(String userId) {
-        return UserRepo.findByUsername(userId);
+    public Users getUser(String userId) {
+        return UserRepo.findByUserId(userId);
     }
 
     @Override
-    public void changeUserRole(User user, String newRole) {
+    public void changeUserRole(Users user, String newRole) {
         // 1. 데이터베이스에서 사용자 확인
-        User changeRole = UserRepo.findByUsername(user.getUserId());
+        Users changeRole = UserRepo.findByUserId(user.getUserId());
         if (changeRole == null) {
             throw new IllegalArgumentException("아이디를 찾을 수 없습니다: " + user.getUserId());
         }
 
         // 2. Enum 검증 및 역할 변경
         try {
-            User.Role roleEnum = User.Role.valueOf(newRole);
+            Users.Role roleEnum = Users.Role.valueOf(newRole);
             if (roleEnum.equals(changeRole.getRole())) {
                 throw new IllegalArgumentException("기존과 동일한 세팅입니다.");
             }
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String findMyPassword(String userId, String email) {
-        User appUser = UserRepo.findByEmail(userId, email);
+        Users appUser = UserRepo.findByEmail(userId, email);
         if (appUser != null) {
             // 비밀번호 직접 반환 대신, 별도 복구 프로세스를 구현하도록 리팩토링 필요
             return "비밀번호 복구 프로세스를 완료하세요.";
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changeUserPassword(String userId, String newPassword) {
         // 사용자 조회
-        User user = UserRepo.findByUsername(userId);
+        Users user = UserRepo.findByUserId(userId);
         if (user == null) {
             throw new IllegalArgumentException("유저 정보를 찾을 수 없습니다: " + userId);
         }
@@ -69,10 +69,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void newUser(User user) {
+    public void newUser(Users user) {
         // 1. 역할 기본값 설정
         if (user.getRole() == null) {
-            user.setRole(User.Role.ROLE_USER);
+            user.setRole(Users.Role.ROLE_USER);
         }
 
         // 2. 데이터 저장
@@ -80,12 +80,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(User user) {
+    public void deleteUser(Users user) {
         UserRepo.delete(user);
     }
 
     @Override
-    public void changeUser(User updatedUser) {
+    public void changeUser(Users updatedUser) {
         //  대부분의 검증 로직은 컨트롤러와 JS에서 작업할 예정
         UserRepo.save(updatedUser);
     }

@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @DynamicUpdate
 @Entity
 //  댓글 객체
-public class Comment {
+public class Comments {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "comment_seq_generator")
@@ -43,7 +43,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User appUser;
+    private Users user;
 
     @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
