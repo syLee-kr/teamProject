@@ -31,7 +31,7 @@ public class Question {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User appUser; // 질문을 한 유저
+    private Users user; // 질문을 한 유저
 
     private String title;   // 질문 제목
     private String content; // 질문 내용

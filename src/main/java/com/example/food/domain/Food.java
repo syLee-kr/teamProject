@@ -26,7 +26,7 @@ public class Food {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User appUser; // 해당 음식을 저장한 유저
+    private Users user; // 해당 음식을 저장한 유저
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sfSeq", nullable = false)
