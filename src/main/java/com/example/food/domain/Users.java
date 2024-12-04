@@ -17,7 +17,7 @@ import java.util.List;
 @DynamicUpdate
 @Data
 @Entity
-public class User {
+public class Users {
 
     @Id
     private String userId;          // 유저 아이디
@@ -40,7 +40,7 @@ public class User {
     @Column(nullable = false)
     private Gender gender; // 성별
 
-    @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions; // 유저가 작성한 질문 리스트
 
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)

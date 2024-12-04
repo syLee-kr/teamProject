@@ -34,7 +34,7 @@ public class Answer {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id", nullable = false)
-    private User admin; // 답변을 작성한 관리자
+    private Users admin; // 답변을 작성한 관리자
 
     private String content; // 답변 내용
 
