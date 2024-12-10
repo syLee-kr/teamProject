@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -13,8 +14,10 @@ import com.example.food.domain.Post;
 import com.example.food.domain.Users;
 import com.example.food.service.postservice.PostService;
 
+@Service
 @Controller
 public class PostController {
+	
 	
 	@Autowired
 	private PostService postservice;
@@ -38,7 +41,7 @@ public class PostController {
 			post.setContent("글내용 " + i);
 			post.setPostdate(LocalDateTime.now());
 			post.setPriority(i);
-			post.setCnt((long) i);
+			post.setCnt(0L);
 			postList.add(post);
 			
 		}
