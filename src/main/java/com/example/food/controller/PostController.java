@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.food.domain.Post;
@@ -57,7 +58,27 @@ public class PostController {
 		postList.sort(Comparator.comparing(Post::getPriority).reversed());
 		
 		model.addAttribute("postList", postList);
-		return "testPostList";
+		return "post/testPostList";
 	}
+	
+	/*
+	 * 게시판 목록
+	 */
+	@GetMapping({"", "/PostList"})
+	public String PostList(Model model, @RequestParam(value="page", defaultValue="1") Integer pageNum){
+		List<PostDTO> postList= PostService.getPostList(pageNum);
+		
+		model.addAttribute("postList", postList);
+		return "getPostList";
+
+	}
+	/*
+	 * writer
+	 */
+	@RequestMapping("/insertPost")
+	public String insertPost() {
+		return "insertPost";
+	}
+	
 	
 }
