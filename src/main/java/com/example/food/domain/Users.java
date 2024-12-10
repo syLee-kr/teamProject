@@ -6,7 +6,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +32,17 @@ public class Users {
 
     private double height;          // 키
     private double weight;          // 체중
+
     private Date birthday;          // 생일
+
+    public int getAge() {
+        if (this.birthday == null) {
+            return 0; // 생일 정보가 없으면 나이를 0으로 처리하거나 예외 처리
+        }
+        LocalDate birthDate = this.birthday.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate now = LocalDate.now();
+        return Period.between(birthDate, now).getYears();
+    }
 
     // Gender Enum 추가
     public enum Gender {
@@ -61,4 +74,5 @@ public class Users {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "varchar(255) default 'ROLE_USER'")
     private Role role; // 유저 상태 (기본값: ROLE_USER, 관리자: ROLE_ADMIN)
+
 }

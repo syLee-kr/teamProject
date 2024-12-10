@@ -1,10 +1,7 @@
 package com.example.food.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -36,9 +33,9 @@ public class SaveFood {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user; // 유저 정보
 
-    @CreationTimestamp              //  자동으로 시간을 적용
+    @Setter
     @Column(updatable = false)
-    private LocalDateTime saveDate; // 저장 날짜
+    private LocalDateTime saveDate;
 
     private String mealType; // 식사 유형: 아침, 점심, 저녁
 
