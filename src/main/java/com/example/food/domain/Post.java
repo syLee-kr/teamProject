@@ -53,4 +53,7 @@ public class Post {
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private int priority;                 // 공지 여부 (0: 일반 게시글, 1: 공지 게시물)
+    
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Long cnt; // 조회수
 }

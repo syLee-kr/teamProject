@@ -3,12 +3,6 @@
          xmlns="https://jakarta.ee/xml/ns/jakartaee" 
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd" 
          id="WebApp_ID" version="5.0">
-
-    <!-- JSP 서블릿 설정 -->
-<context-param>
-    <param-name>INIT_PARM</param-name>
-    <param-value>web.xml에 저장한 초기화 매개변수</param-value>
-  </context-param>
   <context-param>
     <param-name>OracleDriver</param-name>
     <param-value>oracle.jdbc.driver.OracleDriver</param-value>
@@ -33,5 +27,5 @@
     <param-name>PAGES_PER_BLOCK</param-name>
     <param-value>5</param-value>
   </context-param>
-
+ 
 </web-app>

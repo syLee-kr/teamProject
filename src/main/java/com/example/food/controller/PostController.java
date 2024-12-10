@@ -1,0 +1,49 @@
+package com.example.food.controller;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.example.food.domain.Post;
+import com.example.food.domain.Users;
+import com.example.food.service.postservice.PostService;
+
+@Controller
+public class PostController {
+	
+	@Autowired
+	private PostService postservice;
+	
+	/*
+	 *테스트용 게시판 
+	 */
+	@RequestMapping("/testPostList")
+	public String testPostList(Model model){
+		List<Post> postList= new ArrayList<Post>();
+		
+		//임시 게시물
+		for (int i =0; i <9; i++) {
+			Post post = new Post();
+			post.setPSeq((long) i);
+			post.setTitle("제목   " +i);
+			
+			Users user = new Users();
+			post.setUser(user);
+			
+			post.setContent("글내용 " + i);
+			post.setPostdate(LocalDateTime.now());
+			post.setPriority(i);
+			post.setCnt((long) i);
+			postList.add(post);
+			
+		}
+		model.addAttribute("postList", postList);
+		return "testPostList";
+	}
+	
+}
