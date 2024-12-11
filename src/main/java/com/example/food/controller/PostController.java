@@ -72,6 +72,10 @@ public class PostController {
 	@GetMapping({"", "/list"})
 	public String PostList(Model model, @RequestParam(value="page", defaultValue="1") Integer pageNum){
 		List<PostDTO> postList= postService.getPostList(pageNum);
+		
+		// 우선순위 내림차순 정렬(공지글 먼저)
+		postList.sort(Comparator.comparing(PostDTO::getPriority).reversed());
+		
 		Integer[] pageList = postService.getPageList(pageNum);
 		model.addAttribute("postList", postList);
 		model.addAttribute("pageList", pageList);
