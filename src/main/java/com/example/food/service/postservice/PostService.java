@@ -23,5 +23,7 @@ public interface PostService {
 	Integer[] getPageList(Integer pageNum);
 
 	PostDTO getPostById(Long pSeq);
+
+	Post getPost(Long pSeq);
 	
 }

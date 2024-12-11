@@ -93,6 +93,7 @@ public class PostController {
 	@PostMapping("/write")
 	public String write(PostDTO postDto) {
 		postService.savePost(postDto);
+		
 		return "redirect:post/list";
 	}
 	
@@ -101,8 +102,12 @@ public class PostController {
 	 */
 	@GetMapping("/detail/{pSeq}")
 	public String detail(@PathVariable("pSeq") Long pSeq, Model model) {
-		PostDTO postDto = postService.getPostById(pSeq);
+		
+		Post post = postService.getPost(pSeq);
+		
+		PostDTO postDto = new PostDTO(post);
 		model.addAttribute("postDto", postDto);
+		
 		return "post/detail";
 	}
 	
@@ -124,6 +129,7 @@ public class PostController {
 	@PostMapping("/delete/{pSeq}")
 	public String delete(@PathVariable("pSeq") Long pSeq) {
 		postService.deletePost(pSeq);
+		
 		return "redirect:/post/list";
 	}
 }
