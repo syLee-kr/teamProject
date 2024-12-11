@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.food.post.*;
+import com.example.food.PostDTO;
 import com.example.food.domain.Post;
 import com.example.food.domain.Users;
 import com.example.food.service.postservice.PostService;

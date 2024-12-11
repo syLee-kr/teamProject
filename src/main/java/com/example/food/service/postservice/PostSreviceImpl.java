@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.example.food.PostDTO;
 import com.example.food.domain.Post;
-import com.example.food.post.PostDTO;
 import com.example.food.repository.PostRepository;
 
 import lombok.AllArgsConstructor;

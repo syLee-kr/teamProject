@@ -1,4 +1,4 @@
-package com.example.food.post;
+package com.example.food;
 
 import java.time.LocalDateTime;
 
