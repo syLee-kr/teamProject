@@ -5,34 +5,39 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.food.post.*;
 import com.example.food.domain.Post;
 import com.example.food.domain.Users;
 import com.example.food.service.postservice.PostService;
 
+import lombok.AllArgsConstructor;
+
 @Service
 @Controller
+@AllArgsConstructor
+@RequestMapping("post")
 public class PostController {
 	
-	
-	@Autowired
-	private PostService postservice;
+	private PostService postService;
 	
 	/*
-	 *테스트용 게시판 
+	 *test list 
 	 */
-	@RequestMapping("/testPostList")
+	@GetMapping("/testPostList")
 	public String testPostList(Model model){
 		List<Post> postList= new ArrayList<Post>();
 		
 		
-		//임시 게시물
+		//temporal post
 		for (int i =0; i <9; i++) {
 			Post post = new Post();
 			post.setPSeq((long) i);
@@ -62,23 +67,63 @@ public class PostController {
 	}
 	
 	/*
-	 * 게시판 목록
+	 * post list
 	 */
-	@GetMapping({"", "/PostList"})
+	@GetMapping({"", "/list"})
 	public String PostList(Model model, @RequestParam(value="page", defaultValue="1") Integer pageNum){
-		List<PostDTO> postList= PostService.getPostList(pageNum);
-		
+		List<PostDTO> postList= postService.getPostList(pageNum);
+		Integer[] pageList = postService.getPageList(pageNum);
 		model.addAttribute("postList", postList);
-		return "getPostList";
+		model.addAttribute("pageList", pageList);
+		
+		return "post/list";
 
 	}
 	/*
-	 * writer
+	 * writer page
 	 */
-	@RequestMapping("/insertPost")
-	public String insertPost() {
-		return "insertPost";
+	@GetMapping("/write")
+	public String write() {
+		return "post/write";
 	}
 	
+	/*
+	 * writer process
+	 */
+	@PostMapping("/write")
+	public String write(PostDTO postDto) {
+		postService.savePost(postDto);
+		return "redirect:post/list";
+	}
 	
+	/*
+	 * post detail
+	 */
+	@GetMapping("/detail/{pSeq}")
+	public String detail(@PathVariable("pSeq") Long pSeq, Model model) {
+		PostDTO postDto = postService.getPostById(pSeq);
+		model.addAttribute("postDto", postDto);
+		return "post/detail";
+	}
+	
+	/*
+	 * post edit
+	 */
+	@GetMapping("/edit/{pSeq}")
+	public String edit(@PathVariable("pSeq") Long pSeq, PostDTO postDto) {
+		postDto.setPSeq(pSeq);
+		postService.updatePost(postDto);
+		
+		return "redirect:/post/list";
+		
+	}
+	
+	/*
+	 * post delete
+	 */
+	@PostMapping("/delete/{pSeq}")
+	public String delete(@PathVariable("pSeq") Long pSeq) {
+		postService.deletePost(pSeq);
+		return "redirect:/post/list";
+	}
 }
