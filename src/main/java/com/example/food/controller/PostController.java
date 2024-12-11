@@ -77,6 +77,15 @@ public class PostController {
 		PostDTO postDto = new PostDTO(post);
 		model.addAttribute("postDto", postDto);
 		
+		return "detail";
+		//return "post/detail";
+	}
+	
+	/*
+	 * test detail
+	 */
+	@GetMapping("/detail")
+	public String detail() {
 		return "post/detail";
 	}
 	
