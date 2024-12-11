@@ -1,5 +1,12 @@
 package com.example.food.post;
 
-public class PostDTO {
+import lombok.NoArgsConstructor;
+
+
+@NoArgsConstructor
+public class PostDTO {public void setPSeq(Long pSeq) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
