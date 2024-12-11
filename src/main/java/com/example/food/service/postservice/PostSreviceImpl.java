@@ -67,7 +67,7 @@ public class PostSreviceImpl implements PostService{
 		postRepository.save(post);
 	}
 	
-	// Paging process
+	// Pagination process
 	@Override
 	public List<PostDTO> getPostList(Integer pageNum) {
 		int pageSize = 10; // 페이지당 게시물 수 10개
@@ -78,16 +78,17 @@ public class PostSreviceImpl implements PostService{
 									.map(post -> new PostDTO(post)) // post entity를 postDTO로 변환
 									.collect(Collectors.toList());	// List<PostDTO>로 return
 	}
-
+	
+	// PageList return
 	@Override
-	public Integer[] getPageList(Integer pageNum) {
+	public Integer[] getPageList() {
 		
 		int pageSize = 10;
-		int totalPosts = (int)postRepository.count(); // 전체게시물
-		int totalPages = (int)Math.ceil((double) totalPosts/pageSize); // 전체 페이지 수(올림처리) 
+		int totalPosts = (int)postRepository.count(); // 전체게시물 수
+		int totalPages = (int)Math.ceil((double) totalPosts/pageSize); // 전체 페이지 수 계산(올림처리) 
 		
 		Integer[] pageList = new Integer[totalPages]; // 페이지 수만큼 배열
-		for (int i =0; i < totalPages; i++) { // 전체 페이지 수만큼 반복
+		for (int i = 0; i < totalPages; i++) { // 전체 페이지 수만큼 반복
 			pageList[i] = i + 1; // 페이지 번호 1부터 시작
 		}
 		return pageList;

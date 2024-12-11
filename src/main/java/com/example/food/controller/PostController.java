@@ -30,43 +30,6 @@ public class PostController {
 	private PostService postService;
 	
 	/*
-	 *test list 
-	 */
-	@GetMapping("/testPostList")
-	public String testPostList(Model model){
-		List<Post> postList= new ArrayList<Post>();
-		
-		
-		//temporal post
-		for (int i =0; i <9; i++) {
-			Post post = new Post();
-			post.setPSeq((long) i);
-			post.setTitle("제목   " +i);
-			
-			Users user = new Users();
-			post.setUser(user);
-			
-			post.setContent("글내용 " + i);
-			post.setPostdate(LocalDateTime.now());
-			
-			if(i == 0) {
-				post.setPriority(1); // 공지	
-			}else {
-				post.setPriority(0); // 일반
-			}
-			
-			post.setCnt(0L);
-			postList.add(post);
-			
-		}
-		// priority 내림차순 정렬
-		postList.sort(Comparator.comparing(Post::getPriority).reversed());
-		
-		model.addAttribute("postList", postList);
-		return "post/testPostList";
-	}
-	
-	/*
 	 * post list
 	 */
 	@GetMapping({"", "/list"})
@@ -76,7 +39,9 @@ public class PostController {
 		// 우선순위 내림차순 정렬(공지글 먼저)
 		postList.sort(Comparator.comparing(PostDTO::getPriority).reversed());
 		
-		Integer[] pageList = postService.getPageList(pageNum);
+		// 페이지 번호 목록
+		Integer[] pageList = postService.getPageList();
+		
 		model.addAttribute("postList", postList);
 		model.addAttribute("pageList", pageList);
 		
@@ -135,5 +100,42 @@ public class PostController {
 		postService.deletePost(pSeq);
 		
 		return "redirect:/post/list";
+	}
+	
+	/*
+	 *test list 
+	 */
+	@GetMapping("/testPostList")
+	public String testPostList(Model model){
+		List<Post> postList= new ArrayList<Post>();
+		
+		
+		//temporal post
+		for (int i =0; i <9; i++) {
+			Post post = new Post();
+			post.setPSeq((long) i);
+			post.setTitle("제목   " +i);
+			
+			Users user = new Users();
+			post.setUser(user);
+			
+			post.setContent("글내용 " + i);
+			post.setPostdate(LocalDateTime.now());
+			
+			if(i == 0) {
+				post.setPriority(1); // 공지	
+			}else {
+				post.setPriority(0); // 일반
+			}
+			
+			post.setCnt(0L);
+			postList.add(post);
+			
+		}
+		// priority 내림차순 정렬
+		postList.sort(Comparator.comparing(Post::getPriority).reversed());
+		
+		model.addAttribute("postList", postList);
+		return "post/testPostList";
 	}
 }
