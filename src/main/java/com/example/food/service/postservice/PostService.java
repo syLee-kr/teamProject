@@ -20,8 +20,8 @@ public interface PostService {
 	// 게시물 저장
 	void savePost(PostDTO postDto);
 
-	// 페이지 네이션 리스트
-	Integer[] getPageList(Integer pageNum);
+	// 전체 게시물 페이지 수 반환
+	Integer[] getPageList();
 
 	// 게시물 상세
 	PostDTO getPostById(Long pSeq);
@@ -29,7 +29,7 @@ public interface PostService {
 	// 게시물 조회
 	Post getPost(Long pSeq);
 	
-	//test
+	//testPostList
 	static List<Post> postList(Integer pageNum) { 
 		return null;
 	}
