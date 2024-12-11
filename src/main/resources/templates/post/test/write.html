@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시물 작성</title>
+</head>
+<body>
+    <h1>새 글 작성</h1>
+    <form action="/post/write" method="post">
+        <div>
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div>
+            <label for="content">내용</label>
+            <textarea id="content" name="content" required></textarea>
+        </div>
+        <div>
+            <label for="priority">우선순위</label>
+            <input type="number" id="priority" name="priority" required>
+        </div>
+        <div>
+            <label for="cnt">조회수</label>
+            <input type="number" id="cnt" name="cnt" value="0" required>
+        </div>
+        <button type="submit">작성 완료</button>
+    </form>
+</body>
+</html>
