@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시물 상세</title>
+</head>
+<body>
+    <h1 th:text="${postDto.title}"></h1>
+    <p>작성자: <span th:text="${postDto.userId}"></span></p>
+    <p>작성일: <span th:text="${postDto.postdate}"></span></p>
+    <p th:text="${postDto.content}"></p>
+    
+    <a href="/post/edit/{pSeq}">수정</a>
+    <form action="/post/delete/{pSeq}" method="post">
+        <button type="submit">삭제</button>
+    </form>
+</body>
+</html>

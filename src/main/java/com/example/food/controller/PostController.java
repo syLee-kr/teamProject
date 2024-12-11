@@ -136,6 +136,6 @@ public class PostController {
 		postList.sort(Comparator.comparing(Post::getPriority).reversed());
 		
 		model.addAttribute("postList", postList);
-		return "post/testPostList";
+		return "post/test/testPostList";
 	}
 }
