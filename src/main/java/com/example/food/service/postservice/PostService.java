@@ -14,7 +14,6 @@ public interface PostService {
 	void updatePost(PostDTO postDto);
 	
 	// 게시물 삭제
-	
 	void deletePost(Long pSeq);
 	
 	// 게시물 저장
