@@ -36,6 +36,15 @@ public class Post {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId", nullable = false)
     private Users user;    //  유저 정보
+    
+    public String getUserId() {
+    	return user != null ? user.getUserId() : ""; // user id
+    }
+    
+    public String getName() {
+    	return user != null ? user.getName() : ""; // user name
+    }
+   
 
     @Column(columnDefinition = "varchar2(255) default null")
     private String imagePath;   //  게시물 이미지
