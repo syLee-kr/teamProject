@@ -33,10 +33,19 @@ public class PostController {
 	 * post list
 	 */
 	@GetMapping({"", "/list"})
-	public String PostList(Model model, @RequestParam(value="page", defaultValue="1") Integer pageNum){
-		List<PostDTO> postList= postService.getPostList(pageNum);
+	public String PostList(Model model, @RequestParam(value="page", defaultValue="1") Integer pageNum,
+										@RequestParam(value="noticeOnly", defaultValue="false") boolean noticeOnly){
+		List<PostDTO> postList;
 		
-		// 우선순위 내림차순 정렬(공지글 먼저)
+		if (noticeOnly) {
+			// 공지글만 조회
+			postList = postService.findNotices(pageNum);
+		}else {
+			// 모든 게시글 조회
+			postList = postService.getPostList(pageNum);
+		}
+		
+		// 우선순위 내림차순 정렬
 		postList.sort(Comparator.comparing(PostDTO::getPriority).reversed());
 		
 		// 페이지 번호 목록
@@ -44,6 +53,7 @@ public class PostController {
 		
 		model.addAttribute("postList", postList);
 		model.addAttribute("pageList", pageList);
+		model.addAttribute("noticeOnly", noticeOnly);
 		
 		return "post/list";
 

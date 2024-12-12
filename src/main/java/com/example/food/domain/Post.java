@@ -50,9 +50,12 @@ public class Post {
     @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
     private LocalDateTime postdate; // 게시글 작성 시간
+    
+    @Column(nullable = false)
+    private boolean isNotice; // 공지 여부
 
-    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
-    private int priority;                 // 공지 여부 (0: 일반 게시글, 1: 공지 게시물)
+    @Column(nullable = false)
+    private int priority;    // 게시물 우선순위(isNotice가 true인 경우 공지글 우선순위/ false인 경우 일반 게시글 우선순위) 
     
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Long cnt; // 조회수

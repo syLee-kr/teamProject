@@ -35,6 +35,13 @@ public class PostSreviceImpl implements PostService{
 		return postRepository.findById(pSeq).orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
 	}
 	
+	
+	@Override
+	public List<PostDTO> findNotices(Integer pageNum) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	// Post update
 	@Override
 	public void updatePost(PostDTO postDto) {
