@@ -28,9 +28,14 @@ public interface PostService {
 	// 게시물 조회
 	Post getPost(Long pSeq);
 	
+	// 
+	List<PostDTO> findNotices(Integer pageNum);
+	
 	//testPostList
 	static List<Post> postList(Integer pageNum) { 
 		return null;
 	}
+
+	
 	
 }
