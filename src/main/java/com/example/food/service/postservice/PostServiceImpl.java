@@ -16,37 +16,32 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class PostSreviceImpl implements PostService{
+public class PostServiceImpl implements PostService{
 	
 	private final PostRepository postRepository;
 	
-	// DTO return
+	// 게시물 상세조회(화면표시)
 	@Override 
 	public PostDTO getPostById(Long pSeq) {
 		
-		Post post = postRepository.findById(pSeq).orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
+		Post post = postRepository.findById(pSeq)
+								  .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
 		
 		return new PostDTO(post);
 	}
 	
-	// Entity return
+	// 게시물 수정/삭제/조회 등에 사용(데이터)
 	@Override 
 	public Post getPost(Long pSeq) {
-		return postRepository.findById(pSeq).orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
+		return postRepository.findById(pSeq)
+							 .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
 	}
 	
-	
-	@Override
-	public List<PostDTO> findNotices(Integer pageNum) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	// Post update
+	// 게시물 수정
 	@Override
 	public void updatePost(PostDTO postDto) {
 		Post post = postRepository.findById(postDto.getPSeq())
-				.orElseThrow(()-> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
+								  .orElseThrow(()-> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
 		post.setTitle(postDto.getTitle());
 		post.setContent(postDto.getContent());
 		post.setPriority(postDto.getPriority());
@@ -55,14 +50,14 @@ public class PostSreviceImpl implements PostService{
 		postRepository.save(post);
 	}
 	
-	// Post del
+	// 게시물 삭제
 	@Override
 	public void deletePost(Long pSeq) {
 		postRepository.deleteById(pSeq);
 		
 	}
 	
-	// Post save
+	// 게시물 저장
 	@Override
 	public void savePost(PostDTO postDto) {
 		Post post = new Post();
@@ -74,19 +69,21 @@ public class PostSreviceImpl implements PostService{
 		postRepository.save(post);
 	}
 	
-	// Pagination process
+	// 페이징 처리
 	@Override
 	public List<PostDTO> getPostList(Integer pageNum) {
 		int pageSize = 10; // 페이지당 게시물 수 10개
 		Pageable pageable = PageRequest.of(pageNum -1, pageSize);
-		Page<Post> postPage = postRepository.findAll(pageable); // 페이지 요청해서 게시물 목록 가저옴
 		
-		return postPage.getContent().stream()						// 페이지에서 게시물 목록 가져와
-									.map(post -> new PostDTO(post)) // post entity를 postDTO로 변환
+		// 일반(isNotice = false)만 필터링하고 페이지 요청해서 게시물 목록 가저옴
+		Page<Post> postPage = postRepository.findByIsNoticeFalse(pageable); 
+		
+		return postPage.getContent().stream()						// 페이지(page<post>)에서 게시물 목록 가져와(추출)
+									.map(post -> new PostDTO(post)) // post 객체를 postDTO 객체로 변환
 									.collect(Collectors.toList());	// List<PostDTO>로 return
 	}
 	
-	// PageList return
+	// 전체 페이지 번호 처리
 	@Override
 	public Integer[] getPageList() {
 		
@@ -99,6 +96,19 @@ public class PostSreviceImpl implements PostService{
 			pageList[i] = i + 1; // 페이지 번호 1부터 시작
 		}
 		return pageList;
+	}
+	
+	// 공지사항 페이징 처리
+	@Override
+	public List<PostDTO> findNotices(Integer pageNum) {
+		int pageSize = 10; // 페이지당 게시물 수 10개
+		Pageable pageable = PageRequest.of(pageNum -1, pageSize);
+		// 공지(isNotice = True)만 필터링하고 페이지 요청해서 게시물 목록 가저옴
+		Page<Post> postPage = postRepository.findByIsNoticeTrue(pageable); 
+		
+		return postPage.getContent().stream()						// 페이지(page<post>)에서 게시물 목록 가져와(추출)
+									.map(post -> new PostDTO(post)) // post 객체를 postDTO 객체로 변환
+									.collect(Collectors.toList());	// List<PostDTO>로 return
 	}
 
 }
