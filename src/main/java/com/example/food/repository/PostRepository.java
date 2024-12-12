@@ -15,7 +15,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	List<Post> findByIsNoticeTrueOrderByPriorityDesc();
 	
 	// 일반글 우선순위 순 조회
-	List<Post> findByIsNoitceFalseOrderByPriorityDesc();
+	List<Post> findByIsNoticeFalseOrderByPriorityDesc();
 	
 	// 제목에서 'keyword'가 포함된 게시글을 찾는 메서드
 	List<Post> findByTitleContaining(String keyword);

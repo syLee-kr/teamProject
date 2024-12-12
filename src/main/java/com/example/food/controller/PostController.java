@@ -30,7 +30,7 @@ public class PostController {
 	private PostService postService;
 	
 	/*
-	 * post list
+	 * 게시물 목록
 	 */
 	@GetMapping({"", "/list"})
 	public String PostList(Model model, @RequestParam(value="page", defaultValue="1") Integer pageNum,
@@ -59,7 +59,7 @@ public class PostController {
 
 	}
 	/*
-	 * writer page
+	 * 게시물 작성 페이지
 	 */
 	@GetMapping("/write")
 	public String write() {
@@ -67,7 +67,7 @@ public class PostController {
 	}
 	
 	/*
-	 * writer process
+	 * 게시물 작성 처리
 	 */
 	@PostMapping("/write")
 	public String write(PostDTO postDto) {
@@ -77,7 +77,7 @@ public class PostController {
 	}
 	
 	/*
-	 * post detail
+	 * 게시물 상세보기
 	 */
 	@GetMapping("/detail/{pSeq}")
 	public String detail(@PathVariable("pSeq") Long pSeq, Model model) {
@@ -100,7 +100,7 @@ public class PostController {
 	}
 	
 	/*
-	 * post edit
+	 * 게시물 수정
 	 */
 	@GetMapping("/edit/{pSeq}")
 	public String edit(@PathVariable("pSeq") Long pSeq, PostDTO postDto) {
@@ -112,7 +112,7 @@ public class PostController {
 	}
 	
 	/*
-	 * post delete
+	 * 게시물 삭제
 	 */
 	@PostMapping("/delete/{pSeq}")
 	public String delete(@PathVariable("pSeq") Long pSeq) {
@@ -151,7 +151,7 @@ public class PostController {
 			postList.add(post);
 			
 		}
-		// priority 내림차순 정렬
+		// test priority 내림차순 정렬
 		postList.sort(Comparator.comparing(Post::getPriority).reversed());
 		
 		model.addAttribute("postList", postList);
