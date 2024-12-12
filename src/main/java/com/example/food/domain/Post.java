@@ -13,6 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -52,7 +53,7 @@ public class Post {
     private LocalDateTime postdate; // 게시글 작성 시간
     
     @Column(nullable = false)
-    private boolean isNotice; // 공지 여부
+    private Boolean isNotice; // 공지 여부
 
     @Column(nullable = false)
     private int priority;    // 게시물 우선순위(isNotice가 true인 경우 공지글 우선순위/ false인 경우 일반 게시글 우선순위) 
