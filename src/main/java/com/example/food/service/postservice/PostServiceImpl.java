@@ -69,9 +69,16 @@ public class PostServiceImpl implements PostService{
 		postRepository.save(post);
 	}
 	
+	// 페이지 번호 유효성 검증 메서드
+	// 페이지 번호가 1보다 작은값으로 전달 혹은 총페이지 수 초과 시 문제에 대한 대응
+	private Integer validatePageNum(Integer pageNum) {
+		return (pageNum == null || pageNum < 1) ? 1 : pageNum;
+	}
+	
 	// 페이징 처리
 	@Override
 	public List<PostDTO> getPostList(Integer pageNum) {
+		pageNum = validatePageNum(pageNum); // 검증 로직 호출
 		int pageSize = 10; // 페이지당 게시물 수 10개
 		Pageable pageable = PageRequest.of(pageNum -1, pageSize);
 		
@@ -91,6 +98,10 @@ public class PostServiceImpl implements PostService{
 		int totalPosts = (int)postRepository.count(); // 전체게시물 수
 		int totalPages = (int)Math.ceil((double) totalPosts/pageSize); // 전체 페이지 수 계산(올림처리) 
 		
+		if (totalPages == 0) {
+			totalPages = 1; // 최소 1페이지 유지
+		}
+		
 		Integer[] pageList = new Integer[totalPages]; // 페이지 수만큼 배열
 		for (int i = 0; i < totalPages; i++) { // 전체 페이지 수만큼 반복
 			pageList[i] = i + 1; // 페이지 번호 1부터 시작
@@ -101,6 +112,7 @@ public class PostServiceImpl implements PostService{
 	// 공지사항 페이징 처리
 	@Override
 	public List<PostDTO> findNotices(Integer pageNum) {
+		pageNum = validatePageNum(pageNum); // 검증 로직 호출
 		int pageSize = 10; // 페이지당 게시물 수 10개
 		Pageable pageable = PageRequest.of(pageNum -1, pageSize);
 		// 공지(isNotice = True)만 필터링하고 페이지 요청해서 게시물 목록 가저옴
