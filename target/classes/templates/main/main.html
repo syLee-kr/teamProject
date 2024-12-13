@@ -11,12 +11,13 @@
 </head>
 <body>
 <div class="sidebar">
-    <h1><a th:href="@{/login}">Healthy<br>Table</a></h1>
     <ul class="menu">
         <li><a id="home-button" th:href="@{/main}"><span class="icon"><img th:src="@{/images/home.png}" alt="홈 아이콘"></span> 홈</a></li>
         <li><a th:href="@{/board}"><span class="icon"><img th:src="@{/images/board.png}" alt="게시판 아이콘"></span> 게시판</a></li>
         <li><a th:href="@{/main}"><span class="icon"><img th:src="@{/images/calendar.png}" alt="캘린더 아이콘"></span> 캘린더</a></li>
         <li><a th:href="@{/user}"><span class="icon"><img th:src="@{/images/profile.png}" alt="프로필 아이콘"></span> 프로필</a></li>
+        <li><a th:href="@{/logout}"><span class="icon"><img th:src="@{/images/logout.png}" alt="로그아웃 아이콘"></span> 로그아웃</a></li>
+        <h1><a th:href="@{/login}">Healthy<br>Table</a></h1>
     </ul>
 </div>
 <div class="calendar">
@@ -27,14 +28,14 @@
 <div class="overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
 <!-- 식단 추천 유형 선택 모달 -->
-<div id="mealTypeModal" style="display:none;" class="modal">
+<div id="mealTypeModal" class="modal">
     <p>선택하신 날짜에 맞추어<br>식단을 추천해드립니다.</p>
     <button onclick="selectMealType()">정보 기반 식단 추천</button>
     <button onclick="closeModal('mealTypeModal')">창 닫기</button>
 </div>
 
 <!-- 신체 정보 입력 모달 -->
-<div id="bodyInfoModal" style="display:none;" class="modal">
+<div id="bodyInfoModal" class="modal">
     <h3>신체 정보 입력</h3>
     <input type="number" id="inputHeight" placeholder="키(cm)" value="">
     <input type="number" id="inputWeight" placeholder="체중(kg)" value="">
@@ -90,7 +91,7 @@
 </div>
 
 <!-- 식단 확인(설명) 모달 -->
-<div id="mealDescriptionModal" style="display:none;" class="modal">
+<div id="mealDescriptionModal" class="modal">
     <h3>추천 식단 확인</h3>
     <div id="recommendedMeal"></div>
     <button onclick="closeModal('mealDescriptionModal')">닫기</button>
@@ -98,26 +99,24 @@
 
 <!-- Thymeleaf를 사용하여 서버에서 전달된 데이터를 JavaScript 변수로 주입 -->
 <script th:inline="javascript">
-        /*<![CDATA[*/
-        let user = {
-        userId: '[[${user.userId}]]',  // 문자열 값은 따옴표로 감싸줍니다
-        gender: '[[${user.gender}]]', // 문자열 값은 따옴표로 감싸줍니다
-        birthday: '[[${#dates.format(user.birthday, "yyyy-MM-dd")}]]' , //날짜를 안전하게 포맷
-        height: '[[${user.height != null ? user.height : 0}]]', //null 값 방어
-        weight: '[[${user.weight != null ? user.weight : 0}]]' // null 값 방어
+    let isLoggedIn = [[${isLoggedIn ?}]];
+    console.log('isLoggedIn:', isLoggedIn);
+    let user = {
+        userId: '[[${user?.userId ?: ""}]]',
+        gender: '[[${user?.gender ?: ""}]]',
+        birthday: '[[${user?.birthday != null ? #temporals.format(user.birthday, "yyyy-MM-dd") : ""}]]',
+        height: [[${user?.height != null ? user.height : 0}]],
+        weight: [[${user?.weight != null ? user.weight : 0}]]
     };
 
-        let saveFoods = /*[[${saveFoods != null ? saveFoods : '[]'}]]*/ []; // saveFoods 기본값은 빈 배열
-        /*]]>*/
-</script>
-
+    let saveFoods = /*[[${saveFoods != null ? saveFoods : '[]'}]]*/ [];
 </script>
 
 <script>
     let calendar;
     let selectedDate;
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
         const calendarEl = document.getElementById('calendar');
 
         // 캘린더 초기화
@@ -127,7 +126,7 @@
             events: Array.isArray(saveFoods) ? saveFoods.map(sf => ({
                 id: sf.sfSeq,
                 title: sf.mainFood,
-                start: sf.saveDate,
+                start: new Date(sf.saveDate).toISOString(), // UTC ISO 형식으로 변환
                 color: '#FFA500'
             })) : [],
             eventDisplay: 'block',
@@ -136,12 +135,38 @@
             eventClick: handleEventClick
         });
 
+
+        // 캘린더 렌더링 전에 이벤트를 추가합니다.
+        // SaveFoods 데이터 로드
+        try {
+            const response = await axios.get('/api/users/foodInfo', {
+                withCredentials: true
+            });
+            if (response.data && Array.isArray(response.data)) {
+                saveFoods = response.data;
+                saveFoods.forEach(sf => {
+                    calendar.addEvent({
+                        id: String(sf.sfSeq), // ID는 문자열이어야 합니다.
+                        title: sf.mealType,
+                        start: new Date(sf.saveDate).toISOString(),
+                        color: '#FFA500'
+                    });
+                });
+            } else {
+                console.warn('SaveFoods 데이터가 비어있습니다.');
+            }
+        } catch (error) {
+            console.error('SaveFoods 로드 실패:', error);
+            console.log(FullCalendar);
+        }
+
         // 캘린더 렌더링
         calendar.render();
     });
 
     // 날짜 클릭 이벤트 처리
     function handleDateClick(info) {
+        console.log("handleDateClick 호출됨");
         selectedDate = info.dateStr;
 
         const today = new Date();
@@ -149,21 +174,100 @@
         const todayObj = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
         if (selectedDateObj < todayObj) {
-            // 과거 날짜에는 새로운 식단을 추가할 수 없음을 알림
             alert("과거 날짜에는 새로운 식단을 추가할 수 없습니다.");
         } else {
-            showModal('mealTypeModal');
+            if (!isLoggedIn) {
+                const modalContent = `
+                <div style="text-align: center;">
+                    <p>Healthy Table 만의<br>식단 추천을 받고 싶으신가요?</p>
+                    <button onclick="location.href='/login'" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
+                        로그인
+                    </button>
+                </div>
+            `;
+                showModalWithContent(modalContent);
+            } else {
+                showModal('mealTypeModal');
+            }
         }
     }
+
 
     // 이벤트 클릭 처리
     function handleEventClick(info) {
+        console.log("handleEventClick 호출됨");
         if (confirm(`"${info.event.title}" 식단을 삭제하시겠습니까?`)) {
             deleteMeal(info.event.id);
+        } else {
+            // 이벤트 클릭 시 세부 정보 출력
+            const selectedFood = saveFoods.find(food => food.sfSeq === info.event.id);
+            if (selectedFood) {
+                displayDetailedInfo(selectedFood);
+            }
         }
     }
+    async function deleteMeal(sfSeq) {
+        try {
+            const response = await axios.delete(`/api/users/foodInfo/${sfSeq}`); // sfSeq를 URL에 포함
 
-    // 신체 정보와 선호 식단 제출
+            if (response.status === 200) { // 성공적인 응답(200 OK) 확인
+                // 캘린더에서 이벤트 제거
+                const event = calendar.getEventById(sfSeq);
+                if (event) {
+                    event.remove();
+                    alert("식단이 삭제되었습니다.");
+                    closeModal('mealDescriptionModal'); //삭제 후 모달 닫기
+                } else {
+                    console.error("캘린더에서 이벤트를 찾을 수 없습니다.");
+                    alert("서버에서 식단을 삭제했지만 캘린더 업데이트에 실패했습니다.");
+                }
+            } else {
+                console.error("식단 삭제 실패:", response.status);
+                alert("식단 삭제에 실패했습니다.");
+            }
+        } catch (error) {
+            console.error("식단 삭제 중 오류 발생:", error);
+            alert("식단 삭제 중 오류가 발생했습니다.");
+        }
+    }
+    function displayDetailedInfo(food) {
+        const mealDiv = document.getElementById('recommendedMeal');
+
+        mealDiv.innerHTML = `
+        <h3>추천 식단 상세 정보</h3>
+        <p>저장 날짜: ${new Date(food.saveDate).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}</p>
+        <p>식단 유형: ${food.mealType}</p>
+        <p>메인 음식: ${food.mainFood}</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>메뉴 이름</th>
+                    <th>중량 (g)</th>
+                    <th>단백질 (g)</th>
+                    <th>탄수화물 (g)</th>
+                    <th>지방 (g)</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${food.menus.map(menu => `
+                    <tr>
+                        <td>${menu.name}</td>
+                        <td>${menu.weight}</td>
+                        <td>${menu.protein}</td>
+                        <td>${menu.carbohydrates}</td>
+                        <td>${menu.fat}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+                <p>총 칼로리: ${food.calories} kcal</p>
+                <p>총 단백질: ${food.protein} g</p>
+                <p>총 탄수화물: ${food.carbohydrates} g</p>
+                <p>총 지방: ${food.fat} g</p>
+    `;
+        showModal('mealDescriptionModal');
+    }
+
     async function submitBodyInfo() {
         const inputHeight = parseFloat(document.getElementById('inputHeight').value);
         const inputWeight = parseFloat(document.getElementById('inputWeight').value);
@@ -172,40 +276,56 @@
         const category3 = [document.getElementById('category3').value];
         const category4 = [document.getElementById('category4').value];
 
+
         if (isNaN(inputHeight) || isNaN(inputWeight) || inputHeight <= 0 || inputWeight <= 0) {
             alert("올바른 신체 정보를 입력해주세요.");
             return;
         }
 
         const bmr = calculateBMR({ height: inputHeight, weight: inputWeight, birthday: user.birthday, gender: user.gender });
+        let adjustedBmr = bmr;
+
         const bmi = calculateBMI({ height: inputHeight, weight: inputWeight });
+        if (bmi > 25) {
+            adjustedBmr = bmr * 0.9;
+        } else if (bmi > 23) {
+            adjustedBmr = bmr * 0.95;
+        } else if (bmi < 18.5) {
+            adjustedBmr = bmr * 1.1;
+        }
+
+        const selectedDateISO = new Date(selectedDate).toISOString();
 
         const requestData = {
-            bmr,
-            bmi,
-            category1,
-            category2,
-            category3,
-            category4,
-            selectedDate,
-            userId: user.userId
+            height: inputHeight,
+            weight: inputWeight,
+            bmr: adjustedBmr,
+            category1: [document.getElementById('category1').value],
+            category2: [document.getElementById('category2').value],
+            category3: [document.getElementById('category3').value],
+            category4: [document.getElementById('category4').value],
+            selectedDate: selectedDateISO
         };
 
+        console.log('Request Data:', requestData);
+
         try {
-            const response = await axios.post('/api/users/submit-body-and-food-info', requestData);
+            const response = await axios.post('/api/users/foodInfo', requestData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true // 쿠키 전송 설정
+            });
 
-            if (response.data && response.data.sfSeq) {
-                // 캘린더에 새 이벤트 추가
-                calendar.addEvent({
-                    id: response.data.sfSeq,
-                    title: response.data.mainFood,
-                    start: response.data.saveDate,
-                    color: '#FFA500'
+            if (response.data && response.data.savedFoods && response.data.savedFoods.length > 0) {
+                response.data.savedFoods.forEach(savedFood => {
+                    calendar.addEvent({
+                        id: savedFood.id, // SaveFood 엔티티의 ID 필드명에 따라 다를 수 있습니다.
+                        title: savedFood.mealType,
+                        start: new Date(savedFood.saveDate).toISOString(),
+                        color: '#FFA500'
+                    });
                 });
-
-                // 추천된 식단 정보를 표시
-                displayRecommendedMeal(response.data);
-
                 closeModal('bodyInfoModal');
                 showModal('mealDescriptionModal');
             } else {
@@ -217,19 +337,28 @@
         }
     }
 
+
     // 추천 식단 정보 표시
     function displayRecommendedMeal(data) {
         const mealDiv = document.getElementById('recommendedMeal');
+        const formattedDate = new Date(data.saveDate).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
         mealDiv.innerHTML = `
-                <p>식단 유형: ${data.mealType}</p>
-                <p>메인 음식: ${data.mainFood}</p>
-                <p>사이드: ${data.sideDishes.join(', ')}</p>
-                <p>디저트: ${data.dessert}</p>
-                <p>칼로리: ${data.calories} kcal</p>
-                <p>단백질: ${data.protein} g</p>
-                <p>탄수화물: ${data.carbohydrates} g</p>
-                <p>지방: ${data.fat} g</p>
-            `;
+    <p>저장 날짜: ${formattedDate}</p>
+    <p>식단 유형: ${data.mealType}</p>
+    <ul>
+    ${data.menus.map(menu => `
+        <li>
+            ${menu.name} (${menu.weight}g)
+            <ul>
+                <li>단백질: ${menu.protein}g</li>
+                <li>탄수화물: ${menu.carbohydrates}g</li>
+                <li>지방: ${menu.fat}g</li>
+            </ul>
+        </li>
+    `).join('')}
+    </ul>
+    `;
     }
 
     // BMR 계산
@@ -259,25 +388,58 @@
 
     // 모달 제어 함수
     function showModal(modalId) {
-        document.getElementById(modalId).style.display = 'block';
-        document.getElementById('modalOverlay').style.display = 'block';
+        document.getElementById(modalId).classList.add('active');
+        document.getElementById('modalOverlay').classList.add('active');
     }
 
     function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById(modalId).classList.remove('active');
+        document.getElementById('modalOverlay').classList.remove('active');
     }
 
     function closeAllModals() {
         const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => modal.style.display = 'none');
-        document.getElementById('modalOverlay').style.display = 'none';
+        modals.forEach(modal => modal.classList.remove('active'));
+        document.getElementById('modalOverlay').classList.remove('active');
     }
+
 
     function selectMealType() {
         closeModal('mealTypeModal');
         showModal('bodyInfoModal');
     }
+    function showModalWithContent(content) {
+        // 기존 모달 제거
+        const existingModal = document.getElementById('customModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // 모달 생성
+        const modal = document.createElement('div');
+        modal.id = 'customModal';
+        modal.className = 'modal active'; // 'active' 클래스로 즉시 표시
+
+        modal.innerHTML = `
+        <div class="modal-content">
+            ${content}
+            <button class="close-button" onclick="closeCustomModal()">닫기</button>
+        </div>
+    `;
+
+        // 모달을 DOM에 추가
+        document.body.appendChild(modal);
+        document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeCustomModal() {
+        const modal = document.getElementById('customModal');
+        if (modal) {
+            modal.remove();
+        }
+        document.getElementById('modalOverlay').classList.remove('active');
+    }
+
 </script>
 </body>
 </html>

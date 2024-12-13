@@ -5,12 +5,9 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.util.Date;
+import java.time.*;
 import java.util.List;
 
 @Builder
@@ -33,15 +30,14 @@ public class Users {
     private double height;          // 키
     private double weight;          // 체중
 
-    private Date birthday;          // 생일
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthday;          // 생일
 
     public int getAge() {
         if (this.birthday == null) {
-            return 0; // 생일 정보가 없으면 나이를 0으로 처리하거나 예외 처리
+            return 0;
         }
-        LocalDate birthDate = this.birthday.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate now = LocalDate.now();
-        return Period.between(birthDate, now).getYears();
+        return Period.between(this.birthday, LocalDate.now()).getYears();
     }
 
     // Gender Enum 추가
@@ -61,7 +57,7 @@ public class Users {
 
     @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
-    private LocalDateTime regdate;
+    private OffsetDateTime regdate;
 
     @Column(columnDefinition = "varchar2(255) default 'images/default.png'")
     private String profileImage; // 프로필 이미지
@@ -72,7 +68,7 @@ public class Users {
     }
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'ROLE_USER'")
-    private Role role; // 유저 상태 (기본값: ROLE_USER, 관리자: ROLE_ADMIN)
+    @Builder.Default
+    private Role role = Role.ROLE_USER; // 유저 상태
 
 }
