@@ -34,7 +34,7 @@ public class PostController {
 	 */
 	@GetMapping({"", "/list"})
 	public String PostList(Model model, @RequestParam(value="page", defaultValue="1") Integer pageNum,
-										@RequestParam(value="noticeOnly", defaultValue="false") boolean noticeOnly){
+										@RequestParam(value="noticeOnly", defaultValue="false") Boolean noticeOnly){
 		List<PostDTO> postList;
 		
 		if (noticeOnly) {
@@ -48,7 +48,7 @@ public class PostController {
 		// 우선순위 내림차순 정렬
 		postList.sort(Comparator.comparing(PostDTO::getPriority).reversed());
 		
-		// 페이지 번호 목록
+		// 전체 페이지 번호 생성
 		Integer[] pageList = postService.getPageList();
 		
 		model.addAttribute("postList", postList);
