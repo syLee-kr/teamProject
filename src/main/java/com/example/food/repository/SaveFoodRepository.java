@@ -12,4 +12,5 @@ import java.util.List;
 public interface SaveFoodRepository extends JpaRepository<SaveFood, Long> {
     List<SaveFood> findAllByUser_UserId(String userId);
 
+    void deleteById(Long sfSeq);
 }

@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 @Data
@@ -38,7 +39,7 @@ public class Answer {
 
     private String content; // 답변 내용
 
-    @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
-    private LocalDateTime regDate; // 답변 작성일
+    @CreationTimestamp
+    private OffsetDateTime regDate;
 }

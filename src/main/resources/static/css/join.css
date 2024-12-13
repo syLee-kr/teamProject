@@ -1,0 +1,270 @@
+/* Font Definitions */
+@font-face {
+    font-family: 'SBAggroB';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Godo';
+    font-style: normal;
+    font-weight: 400;
+    src: url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff2') format('woff2'),
+    url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff') format('woff');
+}
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+/* Reset 및 기본 스타일 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+a:hover {
+    text-decoration: none !important;
+}
+
+body {
+    height: 100vh;
+    padding: 20px;
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #ccb1b1;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    gap: 30px; /* Gap을 줄임 */
+    width: 100%;
+    max-width: 900px; /* 전체 컨테이너 너비 조정 */
+}
+
+.form-container, .terms-container {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px; /* Padding을 줄임 */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-container {
+    max-width: 400px; /* Form 컨테이너 너비 줄임 */
+}
+
+.terms-container {
+    max-width: 400px; /* Terms 컨테이너 너비 줄임 */
+    display: flex;
+    flex-direction: column;
+}
+
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Gap을 줄임 */
+}
+
+h1 {
+    font-family: 'SBAggroB', serif;
+    font-size: 32px; /* 폰트 크기 줄임 */
+    text-align: center;
+    color: #975f5f;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+h2 {
+    font-family: 'SBAggroB', serif;
+    font-size: 26px; /* 폰트 크기 줄임 */
+    text-align: center;
+    color: #975f5f;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+input[type='text'],
+input[type='password'],
+input[type='email'],
+input[type='date'] {
+    width: 100%;
+    border: none; /* 모든 테두리 제거 */
+    border-bottom: 1px solid #c59d9d; /* 아래쪽 테두리만 추가 */
+    height: 40px; /* 높이 조정 */
+    padding: 20px; /* 패딩 조정 */
+    outline: none;
+    font-size: 14px; /* 폰트 크기 조정 */
+    background: transparent; /* 배경 투명하게 */
+    transition: border-bottom 0.3s ease; /* 부드러운 전환 효과 */
+    /* border-radius: 0; */ /* 필요 시 border-radius 제거 */
+}
+
+
+.submit {
+    text-align: center;
+    margin-top: 15px; /* Margin-top 줄임 */
+}
+
+.submit input {
+    width: 100%;
+    padding: 8px; /* Padding 줄임 */
+    background-color: #975f5f;
+    color: white;
+    border: none;
+    border-radius: 8px; /* Border-radius 줄임 */
+    cursor: pointer;
+    font-size: 14px; /* 폰트 크기 줄임 */
+}
+
+/* 약관 컨테이너 스타일 */
+.terms-content {
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 8px; /* Padding 줄임 */
+    overflow-y: auto; /* 스크롤을 자동으로 표시 */
+    max-height: 400px; /* 필요에 따라 조정 */
+    margin-bottom: 8px; /* Margin-bottom 줄임 */
+    font-family: 'Pretendard-Regular', sans-serif; /* 원하는 폰트로 변경 */
+    font-size: 14px; /* 폰트 크기 조정 */
+    line-height: 1.6; /* 줄 간격 조정 */
+    color: #333; /* 텍스트 색상 조정 */
+
+    /* Firefox용 스크롤바 스타일링 */
+    scrollbar-color: #975f5f #f1f1f1; /* thumb 색상과 track 색상 설정 */
+}
+
+
+.agreement {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    margin-top: 20px;
+    gap: 7px;
+    font-size: 16px;
+    color: #c59d9d;
+}
+.agreement input {
+    margin-right: 8px; /* Margin-right 줄임 */
+    width: 18px; /* 너비 줄임 */
+    height: 18px; /* 높이 줄임 */
+    accent-color: #975f5f;
+}
+/* 반응형 디자인 */
+@media (max-width: 800px) {
+    .container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-container, .terms-container {
+        max-width: 100%;
+    }
+
+    .terms-content {
+        max-height: 180px; /* 작은 화면에서는 최대 높이를 더 줄임 */
+    }
+
+    h1 {
+        font-size: 28px; /* 작은 화면에서는 폰트 크기 줄임 */
+    }
+
+    input[type='text'],
+    input[type='password'],
+    input[type='email'],
+    input[type='date'] {
+        height: 38px; /* 작은 화면에서는 입력 필드 높이 줄임 */
+        font-size: 13px; /* 작은 화면에서는 폰트 크기 줄임 */
+    }
+
+    .submit input {
+        padding: 7px; /* 작은 화면에서는 버튼 패딩 줄임 */
+        font-size: 13px; /* 작은 화면에서는 폰트 크기 줄임 */
+    }
+}
+/* 드롭다운 컨테이너 스타일 */
+.gender {
+    margin: 15px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: 'Pretendard-Regular', sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 드롭다운 레이블 스타일 */
+.gender label {
+    font-size: 16px;
+    color: #975f5f;
+}
+
+/* 드롭다운 메뉴 기본 스타일 */
+.gender select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+    border: none; /* 모든 테두리 제거 */
+    border-bottom: 1px solid #c59d9d; /* 아래쪽 테두리만 추가 */
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 */
+}
+
+/* 드롭다운 메뉴 호버 및 포커스 스타일 */
+.gender select:hover,
+.gender select:focus {
+    border-color: #975f5f;
+    background-color: #f9f6f6;
+    color: #975f5f;
+}
+
+/* 드롭다운 선택 항목 */
+.gender select option {
+    padding: 8px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+}
+
+/* 비활성화된 드롭다운 스타일 */
+.gender select:disabled {
+    background-color: #f0f0f0;
+    color: #999;
+    cursor: not-allowed;
+    border-color: #ccc;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 800px) {
+    .gender {
+        gap: 10px; /* 작은 화면에서는 간격 조정 */
+    }
+
+    .gender select {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .gender label {
+        font-size: 14px;
+    }
+}
