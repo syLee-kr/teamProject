@@ -12,6 +12,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -47,9 +48,9 @@ public class Comments {
 
     @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @UpdateTimestamp
     @Column(updatable = false)
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 }
