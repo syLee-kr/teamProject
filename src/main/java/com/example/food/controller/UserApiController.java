@@ -1,58 +1,70 @@
 package com.example.food.controller;
 
+import com.example.food.domain.Menu;
+import com.example.food.domain.SaveFood;
 import com.example.food.domain.Users;
 import com.example.food.repository.UserRepository;
+import com.example.food.service.savefood.SaveFoodService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Setter;
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.OffsetDateTime;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserApiController {
 
     private final UserRepository userRepository;
+    private final SaveFoodService saveFoodService;
 
-    public UserApiController(UserRepository userRepository) {
+    @Autowired
+    public UserApiController(UserRepository userRepository, SaveFoodService saveFoodService) {
         this.userRepository = userRepository;
+        this.saveFoodService = saveFoodService;
+    }
+    @GetMapping("/foodInfo")
+    public ResponseEntity<List<SaveFood>> getUserSaveFoods(@SessionAttribute Users user) {
+        List<SaveFood> saveFoods = saveFoodService.getUserFood(user.getUserId());
+        return ResponseEntity.ok(saveFoods);
     }
 
-    @PostMapping("/submit-body-and-food-info")
-    public ResponseEntity<Map<String, Object>> submitBodyAndFoodInfo(@RequestBody BodyAndFoodRequest request,
-                                                                     @SessionAttribute("loginUser") Users loginUser) {
+    @PostMapping("/foodInfo")
+    public ResponseEntity<Map<String, Object>> submitBodyAndFoodInfo(@RequestBody FoodRequest request,
+                                                                     @SessionAttribute Users user) {
         try {
-            // 신체 정보 업데이트
-            Optional<Users> optionalUser = userRepository.findById(loginUser.getUserId());
+            Optional<Users> optionalUser = userRepository.findById(user.getUserId());
             if (!optionalUser.isPresent()) {
                 return ResponseEntity.status(404).body(Map.of("error", "User not found"));
             }
 
-            Users user = optionalUser.get();
-            user.setHeight(request.getHeight());
-            user.setWeight(request.getWeight());
-            userRepository.save(user);
-            System.out.println("user = " + user);
+            Users users = optionalUser.get();
+            users.setHeight(request.getHeight());
+            users.setWeight(request.getWeight());
+            userRepository.save(users);
 
-            // 유저 정보에서 성별, 나이 추출
-            String gender = loginUser.getGender().toString();
-            System.out.println("gender = " + gender);
-            int age = loginUser.getAge();
-            System.out.println("age = " + age);
-            // 전달 받은 식단 선호 정보
+            String gender = users.getGender().toString();
+            int age = users.getAge();
+
             String categoriesJson = String.format(
-                    "{\"categories\": {\"category1\": %s, \"category2\": %s, \"category3\": %s, \"category4\": %s}}",
-                    toJsonArray(request.getCategory1()),
-                    toJsonArray(request.getCategory2()),
-                    toJsonArray(request.getCategory3()),
-                    toJsonArray(request.getCategory4())
+                    "{\"categories\": {\"category1\": \"%s\", \"category2\": \"%s\", \"category3\": \"%s\", \"category4\": \"%s\"}, " +
+                            "\"bmr\": %.2f, \"selectedDate\": \"%s\"}",
+                    request.getCategory1(),
+                    request.getCategory2(),
+                    request.getCategory3(),
+                    request.getCategory4(),
+                    request.getBmr(),
+                    request.getSelectedDate() // 시간 정보 전달
             );
 
             // Python 스크립트 실행
@@ -60,12 +72,10 @@ public class UserApiController {
                     "python", "/scripts/random_food.py", categoriesJson
             );
             processBuilder.redirectErrorStream(true);
-            System.out.println("processBuilder = " + processBuilder);
             Process process = processBuilder.start();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             StringBuilder output = new StringBuilder();
-            System.out.println("output = " + output);
             String line;
             while ((line = reader.readLine()) != null) {
                 output.append(line);
@@ -76,63 +86,83 @@ public class UserApiController {
                 return ResponseEntity.status(500).body(Map.of("error", "Python 스크립트 실행 오류"));
             }
 
-            // 결과에 신체 정보와 나이도 함께 담아서 반환
-            return ResponseEntity.ok(Map.of(
-                    "result", output.toString(),
-                    "gender", gender,
-                    "age", age,
-                    "bmr", request.getBmr(),
-                    "bmi", request.getBmi()
-            ));
+            // Python 결과 처리
+            String result = output.toString();
+
+            // JSON 파싱
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(result);
+
+            List<Map<String, Object>> savedFoodsResponse = new ArrayList<>();
+
+            String[] mealTypes = {"breakfast", "lunch", "dinner"};
+            for (String mealType : mealTypes) {
+                JsonNode mealNode = rootNode.get(mealType);
+                if (mealNode != null && mealNode.isArray()) {
+                    // SaveFood 엔티티 생성
+                    SaveFood saveFood = new SaveFood();
+                    saveFood.setUser(users);
+                    saveFood.setSaveDate(OffsetDateTime.now());
+                    saveFood.setMealType(mealType); // 식사 유형 설정
+
+                    // 각 메뉴 처리
+                    for (JsonNode foodNode : mealNode) {
+                        Menu menu = new Menu();
+                        menu.setName(foodNode.get("식품명").asText());
+                        menu.setWeight(foodNode.get("식품중량").asDouble());
+                        menu.setProtein(foodNode.get("총 단백질(g)").asDouble());
+                        menu.setCarbohydrates(foodNode.get("총 탄수화물(g)").asDouble());
+                        menu.setFat(foodNode.get("총 지방(g)").asDouble());
+                        menu.setSaveFood(saveFood); // 관계 설정
+                        saveFood.getMenus().add(menu); // SaveFood에 메뉴 추가
+                    }
+
+                    SaveFood savedFood = saveFoodService.saveSaveFood(saveFood);
+
+                    Map<String, Object> saveFoodMap = new HashMap<>();
+                    saveFoodMap.put("saveDate", savedFood.getSaveDate());
+                    saveFoodMap.put("mealType", savedFood.getMealType());
+                    saveFoodMap.put("menus", savedFood.getMenus());
+                    savedFoodsResponse.add(saveFoodMap);
+                }
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("savedFoods", savedFoodsResponse);
+            response.put("gender", gender);
+            response.put("age", age);
+            response.put("bmr", request.getBmr());
+
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
-
-    // JSON 배열 변환 유틸리티
-    private String toJsonArray(List<String> list) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(list);
+    @DeleteMapping("/foodInfo/{sfSeq}")
+    @Transactional
+    public ResponseEntity<String> deleteFoodInfo(@PathVariable Long sfSeq) {
+        try {
+            saveFoodService.deleteSaveFood(sfSeq);
+            return ResponseEntity.ok("식단이 삭제되었습니다.");
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("식단 삭제 실패: " + e.getMessage());
+        }
     }
-
-    public static class BodyAndFoodRequest {
+    @Data
+    public static class FoodRequest {
         private double height;
         private double weight;
         private double bmr;
-        private double bmi;
         private List<String> category1;
         private List<String> category2;
         private List<String> category3;
         private List<String> category4;
         private String selectedDate;
 
-        public double getHeight() { return height; }
-        public void setHeight(double height) { this.height = height; }
-
-        public double getWeight() { return weight; }
-        public void setWeight(double weight) { this.weight = weight; }
-
-        public double getBmr() { return bmr; }
-        public void setBmr(double bmr) { this.bmr = bmr; }
-
-        public double getBmi() { return bmi; }
-        public void setBmi(double bmi) { this.bmi = bmi; }
-
-        public List<String> getCategory1() { return category1; }
-        public void setCategory1(List<String> category1) { this.category1 = category1; }
-
-        public List<String> getCategory2() { return category2; }
-        public void setCategory2(List<String> category2) { this.category2 = category2; }
-
-        public List<String> getCategory3() { return category3; }
-        public void setCategory3(List<String> category3) { this.category3 = category3; }
-
-        public List<String> getCategory4() { return category4; }
-        public void setCategory4(List<String> category4) { this.category4 = category4; }
-
-        public String getSelectedDate() { return selectedDate; }
-        public void setSelectedDate(String selectedDate) { this.selectedDate = selectedDate; }
     }
 }
+
