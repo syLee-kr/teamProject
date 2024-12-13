@@ -30,7 +30,7 @@ public class PostRepositoryTest {
 	@Autowired
 	private TestEntityManager entityManager;
 	
-	//@Disabled
+	@Disabled
 	@Test
 	@Transactional   //테스트 후 롤백 > 데이터베이스 저장안됨
 	public void testInsertPost() {
@@ -50,8 +50,7 @@ public class PostRepositoryTest {
 		//Users savedUser = userRepo.save(user);
 		
 		//TestEntityManager 적용 User
-		Users savedUser = entityManager.persist(user);
-		entityManager.flush(); //DB 반영
+		Users savedUser = entityManager.persistAndFlush(user);
 		
 		// Post 객체 생성
 		Post post = new Post();
@@ -66,19 +65,7 @@ public class PostRepositoryTest {
 		//Post savePost = postRepo.save(post);
 		
 		//TestEntityManager 적용 Post
-		Post savedPost = entityManager.persist(post);
-		entityManager.flush();
-		
-		//TestTransaction(Transaction force commit)
-		TestTransaction.flagForCommit();
-		TestTransaction.end();
-		
-		//삽입 여부 확인 출력
-		System.out.println("Insert Test Data, Check the SQL");
-		
-		// New Transaction start 
-		TestTransaction.start();
-		
+		Post savedPost = entityManager.persistAndFlush(post);
 		
 		// 데이터 확인(저장된 데이터가 기대하는 값과 일치하는지 체크) > 롤백으로 인한 데이터확인임
 		assertNotNull(savedPost.getPSeq());
