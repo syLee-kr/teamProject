@@ -1,6 +1,6 @@
 package com.example.food.controller;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -139,7 +139,7 @@ public class PostController {
 			post.setUser(user);
 			
 			post.setContent("글내용 " + i);
-			post.setPostdate(LocalDateTime.now());
+			post.setPostdate(OffsetDateTime.now());
 			
 			if(i == 0) {
 				post.setPriority(1); // 공지	
