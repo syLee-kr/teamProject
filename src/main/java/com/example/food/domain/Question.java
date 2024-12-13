@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class Question {
 
     @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
-    private LocalDateTime regDate;  // 질문 작성일
+    private OffsetDateTime regDate;  // 질문 작성일
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers; // 답변 리스트

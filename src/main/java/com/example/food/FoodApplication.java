@@ -12,8 +12,4 @@ public class FoodApplication {
         SpringApplication.run(FoodApplication.class, args);
     }
 
-    @Bean
-    BCryptPasswordEncoder passwordEncoder() {
-    	return new BCryptPasswordEncoder();
-    }
 }

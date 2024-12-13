@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
@@ -49,7 +50,7 @@ public class Post {
 
     @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
-    private LocalDateTime postdate; // 게시글 작성 시간
+    private OffsetDateTime postdate; // 게시글 작성 시간
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private int priority;                 // 공지 여부 (0: 일반 게시글, 1: 공지 게시물)
