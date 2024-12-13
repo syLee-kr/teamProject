@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.food.domain.Post;
@@ -49,8 +50,8 @@ public class PostRepositoryTest {
 		//Users savedUser = userRepo.save(user);
 		
 		//TestEntityManager 적용 User
-		Users savedUser = entityManager.persistAndFlush(user);
-		
+		Users savedUser = entityManager.persist(user);
+		entityManager.flush(); //DB 반영
 		
 		// Post 객체 생성
 		Post post = new Post();
@@ -65,7 +66,19 @@ public class PostRepositoryTest {
 		//Post savePost = postRepo.save(post);
 		
 		//TestEntityManager 적용 Post
-		Post savedPost = entityManager.persistAndFlush(post);
+		Post savedPost = entityManager.persist(post);
+		entityManager.flush();
+		
+		//TestTransaction(Transaction force commit)
+		TestTransaction.flagForCommit();
+		TestTransaction.end();
+		
+		//삽입 여부 확인 출력
+		System.out.println("Insert Test Data, Check the SQL");
+		
+		// New Transaction start 
+		TestTransaction.start();
+		
 		
 		// 데이터 확인(저장된 데이터가 기대하는 값과 일치하는지 체크) > 롤백으로 인한 데이터확인임
 		assertNotNull(savedPost.getPSeq());
