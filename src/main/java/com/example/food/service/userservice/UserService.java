@@ -7,6 +7,8 @@ public interface UserService {
     //  유저 정보 가져오기
     Users getUser(String userId);
 
+    String findById(String userId);
+
     //  특정 유저에 대한 권한 변경
     void changeUserRole(Users user, String newRole);
 
