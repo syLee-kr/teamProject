@@ -1,6 +1,7 @@
 package com.example.food;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import com.example.food.domain.Post;
 
@@ -15,7 +16,7 @@ public class PostDTO {
 	private Long pSeq;
 	private String title;
 	private String content;
-	private LocalDateTime postdate;
+	private OffsetDateTime postdate;
 	private int priority;
 	private Long cnt;
 	private String userId;
