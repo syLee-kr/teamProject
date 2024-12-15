@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post List</title>
+</head>
+<body>
+    <h1>게시물 목록</h1>
+
+    <div>
+        <a href="/post/write">새 글 작성</a>
+    </div>
+
+    <div>
+        <ul>
+            <!-- 게시물 목록 출력 -->
+            <th:block th:each="post : ${postList}">
+                <li>
+                    <a th:href="@{'/post/detail/' + ${post.pSeq}}"
+                       th:text="${post.title}"></a>
+                    <span th:text="${post.userId}"></span>
+                    <span th:text="${post.postdate}"></span>
+                </li>
+            </th:block>
+        </ul>
+    </div>
+
+    <div>
+        <!-- 페이지네이션 처리 -->
+        <ul>
+            <th:block th:each="page : ${pageList}">
+                <li>
+                    <a th:href="@{'/post/list?page=' + ${page}}"
+                       th:text="${page}"></a>
+                </li>
+            </th:block>
+        </ul>
+    </div>
+</body>
+</html>
