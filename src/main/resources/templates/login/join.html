@@ -16,7 +16,7 @@
     <!-- 회원가입 폼 컨테이너 -->
     <div class="form-container">
         <form th:action="@{/signup}" method="post" th:object="${users}" onsubmit="return validateForm()">
-            <h1><a th:href="@{/main}">Healthy Table</a></h1>
+            <h1><a th:href="@{/login}">Healthy Table</a></h1>
 
             <!-- 아이디 입력 및 중복 확인 메시지 -->
             <div id="idCheckMessage"></div>
