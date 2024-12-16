@@ -113,7 +113,6 @@ input[type='date'] {
     /* border-radius: 0; */ /* 필요 시 border-radius 제거 */
 }
 
-
 .submit {
     text-align: center;
     margin-top: 15px; /* Margin-top 줄임 */
@@ -203,9 +202,9 @@ input[type='date'] {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-family: 'Pretendard-Regular', sans-serif;
     font-size: 14px;
     color: #333;
+    font-family: 'Pretendard-Regular', serif;
 }
 
 /* 드롭다운 레이블 스타일 */
@@ -239,6 +238,7 @@ input[type='date'] {
 
 /* 드롭다운 선택 항목 */
 .gender select option {
+    font-family: 'Pretendard-Regular', serif;
     padding: 8px;
     font-size: 14px;
     color: #333;
