@@ -24,7 +24,7 @@ import lombok.AllArgsConstructor;
 @Service
 @Controller
 @AllArgsConstructor
-@RequestMapping("post")
+@RequestMapping("/post")
 public class PostController {
 	
 	private PostService postService;
@@ -32,7 +32,7 @@ public class PostController {
 	/*
 	 * 게시물 목록
 	 */
-	@GetMapping({"", "/list"})
+	@GetMapping
 	public String PostList(Model model, @RequestParam(value="page", defaultValue="1") Integer pageNum,
 										@RequestParam(value="noticeOnly", defaultValue="false") Boolean noticeOnly){
 		List<PostDTO> postList;
