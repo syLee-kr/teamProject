@@ -1,0 +1,236 @@
+@font-face {
+    font-family: 'Godo';
+    font-style: normal;
+    font-weight: 400;
+    src: url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff2') format('woff2'),
+    url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'TTHakgyoansimSamulhamR';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2402_keris@1.0/TTHakgyoansimSamulhamR.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Godo', Arial, sans-serif; /* 'Godo' 폰트 적용 */
+    background-color: #ffffff; /* 흰색 배경색 */
+    display: flex;
+    overflow: hidden; /* 스크롤바를 완전히 제거 */
+    height: 100vh; /* 화면 높이에 딱 맞게 설정 */
+}
+
+.sidebar {
+    width: 15%;
+    background-color: #c59d9d;
+    color: #ffffff;
+    height: 100vh;
+    padding: 20px;
+}
+
+.sidebar h1 {
+    position: absolute;
+    font-family: 'TTHakgyoansimSamulhamR', serif; /* 'TTHakgyoansimSamulhamR' 폰트 적용 */
+    bottom: 50px;
+    font-size: 40px !important;
+    text-align: center;
+    left: 3.5%;
+    color: rgb(255, 255, 255);
+}
+
+.sidebar ul.menu {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar ul.menu li {
+    margin-bottom: 20px;
+}
+
+.sidebar ul.menu li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar ul.menu li a .icon {
+    margin-right: 10px;
+    font-size: 30px;
+    padding: 10px;
+}
+
+.sidebar ul.menu li a:hover {
+    color: #9c7070; /* 마우스 오버 시 변경 */
+}
+
+.menu .icon img {
+    filter: invert(1);
+    width: 24px;  /* 원하는 너비로 설정 */
+    height: 24px; /* 원하는 높이로 설정 */
+}
+
+
+
+.menu_sidebar {
+    flex: 0 0 250px; /* 고정된 너비 */
+}
+
+.main-container {
+    flex: 1; /* 나머지 공간 차지 */
+    padding: 20px;
+    overflow: hidden; /* 스크롤바 필요 시 추가 */
+}
+
+.profile-container {
+    background-color: #c59d9d;
+    border: 1px solid #c59d9d;
+    border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+    color: #fff;
+    width: 500px;
+    height: 700px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.profile-image {
+    margin-bottom: 20px;
+}
+
+.profile-image .profile-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    object-fit: cover;
+    background-color: white;
+}
+
+.profile-details {
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+}
+
+.profile-details p {
+    margin: 10px 0;
+}
+
+.profile-details strong {
+    color: #ddd;
+}
+
+.edit-profile-button {
+    background-color: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-profile-button:hover {
+    background-color: #ffffff;
+}
+
+/* 레이아웃 조정 (반응형 디자인) */
+@media screen and (max-width: 768px) {
+    .profile-container {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .profile-image .profile-img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .edit-profile-button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}
+
+
+/* 각 입력 필드 그룹 */
+.profile-edit-form div {
+    margin-bottom: 20px;
+}
+
+/* 라벨 스타일 */
+.profile-edit-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 입력 필드 스타일 */
+.profile-edit-form input[type="text"],
+.profile-edit-form input[type="password"],
+.profile-edit-form input[type="date"],
+.profile-edit-form input[type="email"]{
+    width: 90%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* 입력 필드 포커스 스타일 */
+.profile-edit-form input:focus {
+    border-color: #9c7070;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+/* 버튼 스타일 */
+.profile-actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.save-profile-button,
+.cancel-profile-button {
+    background-color: #9c7070;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    margin: 0 10px;
+}
+
+.save-profile-button:hover {
+    background-color: #705151;
+}
+
+.cancel-profile-button {
+    background-color: white;
+    color: #9c7070;
+}
+
+.cancel-profile-button:hover {
+    background-color: #b1abab;
+    color: white;
+}

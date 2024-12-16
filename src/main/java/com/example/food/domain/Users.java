@@ -1,5 +1,6 @@
 package com.example.food.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -55,11 +56,16 @@ public class Users {
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers; // 관리자가 작성한 답변 리스트
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude // 순환 참조 방지
+    @JsonManagedReference // JSON 직렬화 시 순환 참조 방지
+    private List<SaveFood> saveFoods; // 저장된 식단 리스트
+
     @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
     private OffsetDateTime regdate;
 
-    @Column(columnDefinition = "varchar2(255) default 'images/default.png'")
+    @Column(columnDefinition = "varchar2(255) default 'images/profileimg.png'")
     private String profileImage; // 프로필 이미지
 
     // Role Enum 추가

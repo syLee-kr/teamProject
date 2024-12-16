@@ -34,7 +34,6 @@ public class Question {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user; // 질문을 한 유저
 
-    private String title;   // 질문 제목
     private String content; // 질문 내용
 
     @CreationTimestamp              //  자동으로 시간을 적용
