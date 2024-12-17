@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메인 페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/calendar.css}">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div class="sidebar" th:insert="~{main/sidebar :: sidebar}"></div>
+
+<div class="calendar">
+    <div id="calendar-container">
+        <div id="calendar"></div>
+    </div>
+</div>
+<div class="overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<!-- 식단 추천 유형 선택 모달 -->
+<div id="mealTypeModal" class="modal">
+    <p>선택하신 날짜에 맞추어<br>식단을 추천해드립니다.</p>
+    <button onclick="selectMealType()">정보 기반 식단 추천</button>
+    <button onclick="closeModal('mealTypeModal')">창 닫기</button>
+</div>
+
+<!-- 신체 정보 입력 모달 -->
+<div id="bodyInfoModal" class="modal">
+    <h3>신체 정보 입력</h3>
+    <input type="number" id="inputHeight" placeholder="키(cm)" value="">
+    <input type="number" id="inputWeight" placeholder="체중(kg)" value="">
+    <h3>선호 식단 선택</h3>
+    <div class="form-container">
+        <label for="category1">1. 주식류</label>
+        <select id="category1">
+            <option value="밥류">밥류</option>
+            <option value="빵 및 과자류">빵 및 과자류</option>
+            <option value="면 및 만두류">면 및 만두류</option>
+            <option value="죽 및 스프류">죽 및 스프류</option>
+            <option value="국 및 탕류">국 및 탕류</option>
+            <option value="찌개 및 전골류">찌개 및 전골류</option>
+        </select>
+    </div>
+
+    <div class="form-container">
+        <label for="category2">2. 부식류</label>
+        <select id="category2">
+            <option value="찜류">찜류</option>
+            <option value="구이류">구이류</option>
+            <option value="전·적 및 부침류">전·적 및 부침류</option>
+            <option value="볶음류">볶음류</option>
+            <option value="조림류">조림류</option>
+            <option value="튀김류">튀김류</option>
+        </select>
+    </div>
+
+    <div class="form-container">
+        <label for="category3">3. 반찬류</label>
+        <select id="category3">
+            <option value="나물·숙채류">나물·숙채류</option>
+            <option value="생채·무침류">생채·무침류</option>
+            <option value="김치류">김치류</option>
+            <option value="젓갈류">젓갈류</option>
+            <option value="장아찌·절임류">장아찌·절임류</option>
+            <option value="선호 하지 않음">선호하지 않음</option>
+        </select>
+    </div>
+
+    <div class="form-container">
+        <label for="category4">4. 기타</label>
+        <select id="category4">
+            <option value="유제품류 및 빙과류">유제품류 및 빙과류</option>
+            <option value="과일류">과일류</option>
+            <option value="두류, 견과 및 종실류">두류, 견과 및 종실류</option>
+            <option value="선호 하지 않음">선호 하지 않음</option>
+        </select>
+    </div>
+
+    <button onclick="submitBodyInfo()">식단 추천 받기</button>
+    <button onclick="closeModal('bodyInfoModal')">취소</button>
+</div>
+
+<!-- 식단 확인(설명) 모달 -->
+<div id="mealDescriptionModal" class="modal">
+    <h3>추천 식단 확인</h3>
+    <div id="recommendedMeal"></div>
+    <button onclick="closeModal('mealDescriptionModal')">닫기</button>
+</div>
+
+<!-- Thymeleaf를 사용하여 서버에서 전달된 데이터를 JavaScript 변수로 주입 -->
+<script th:inline="javascript">
+    let isLoggedIn = [[${isLoggedIn ? true : false}]];
+    console.log('isLoggedIn:', isLoggedIn);
+    let user = {
+        userId: '[[${user?.userId ?: ""}]]',
+        gender: '[[${user?.gender ?: ""}]]',
+        birthday: '[[${user?.birthday != null ? #temporals.format(user.birthday, "yyyy-MM-dd") : ""}]]',
+        height: [[${user?.height != null ? user.height : 0}]],
+        weight: [[${user?.weight != null ? user.weight : 0}]]
+    };
+
+    let saveFoods = []; // 초기 빈 배열
+</script>
+
+<script>
+    let calendar;
+    let selectedDate;
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        const calendarEl = document.getElementById('calendar');
+
+        // 캘린더 초기화
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ko',
+            events: Array.isArray(saveFoods) ? saveFoods.map(sf => ({
+                id: sf.sfSeq,
+                title: sf.mainFood,
+                start: new Date(sf.saveDate).toISOString(), // UTC ISO 형식으로 변환
+                color: '#FFA500'
+            })) : [],
+            eventDisplay: 'block',
+            dayMaxEvents: true,
+            dateClick: handleDateClick,
+            eventClick: handleEventClick
+        });
+
+
+        // 캘린더 렌더링 전에 이벤트를 추가합니다.
+        // SaveFoods 데이터 로드
+        try {
+            const response = await axios.get('/api/users/foodInfo', {
+                withCredentials: true
+            });
+            if (response.data && Array.isArray(response.data)) {
+                saveFoods = response.data;
+                saveFoods.forEach(sf => {
+                    calendar.addEvent({
+                        id: String(sf.sfSeq), // ID는 문자열이어야 합니다.
+                        title: sf.mealType,
+                        start: new Date(sf.saveDate).toISOString(),
+                        color: '#FFA500'
+                    });
+                });
+            } else {
+                console.warn('SaveFoods 데이터가 비어있습니다.');
+            }
+        } catch (error) {
+            console.error('SaveFoods 로드 실패:', error);
+            console.log(FullCalendar);
+        }
+
+        // 캘린더 렌더링
+        calendar.render();
+    });
+
+    // 날짜 클릭 이벤트 처리
+    function handleDateClick(info) {
+        console.log("handleDateClick 호출됨");
+        selectedDate = info.dateStr;
+
+        const today = new Date();
+        const selectedDateObj = new Date(info.date.getFullYear(), info.date.getMonth(), info.date.getDate());
+        const todayObj = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+        if (selectedDateObj < todayObj) {
+            alert("과거 날짜에는 새로운 식단을 추가할 수 없습니다.");
+        } else {
+            if (!isLoggedIn) {
+                const modalContent = `
+                <div style="text-align: center;">
+                    <p>Healthy Table 만의<br>식단 추천을 받고 싶으신가요?</p>
+                    <button onclick="location.href='/login'" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
+                        로그인
+                    </button>
+                </div>
+            `;
+                showModalWithContent(modalContent);
+            } else {
+                showModal('mealTypeModal');
+            }
+        }
+    }
+
+
+    // 이벤트 클릭 처리
+    function handleEventClick(info) {
+        console.log("handleEventClick 호출됨");
+        if (confirm(`"${info.event.title}" 식단을 삭제하시겠습니까?`)) {
+            deleteMeal(info.event.id);
+        } else {
+            // 이벤트 클릭 시 세부 정보 출력
+            const selectedFood = saveFoods.find(food => food.sfSeq === info.event.id);
+            if (selectedFood) {
+                displayDetailedInfo(selectedFood);
+            }
+        }
+    }
+    async function deleteMeal(sfSeq) {
+        try {
+            const response = await axios.delete(`/api/users/foodInfo/${sfSeq}`); // sfSeq를 URL에 포함
+
+            if (response.status === 200) { // 성공적인 응답(200 OK) 확인
+                // 캘린더에서 이벤트 제거
+                const event = calendar.getEventById(sfSeq);
+                if (event) {
+                    event.remove();
+                    alert("식단이 삭제되었습니다.");
+                    closeModal('mealDescriptionModal'); //삭제 후 모달 닫기
+                } else {
+                    console.error("캘린더에서 이벤트를 찾을 수 없습니다.");
+                    alert("서버에서 식단을 삭제했지만 캘린더 업데이트에 실패했습니다.");
+                }
+            } else {
+                console.error("식단 삭제 실패:", response.status);
+                alert("식단 삭제에 실패했습니다.");
+            }
+        } catch (error) {
+            console.error("식단 삭제 중 오류 발생:", error);
+            alert("식단 삭제 중 오류가 발생했습니다.");
+        }
+    }
+    function displayDetailedInfo(food) {
+        const mealDiv = document.getElementById('recommendedMeal');
+
+        mealDiv.innerHTML = `
+        <h3>추천 식단 상세 정보</h3>
+        <p>저장 날짜: ${new Date(food.saveDate).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}</p>
+        <p>식단 유형: ${food.mealType}</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>메뉴 이름</th>
+                    <th>중량 (g)</th>
+                    <th>단백질 (g)</th>
+                    <th>탄수화물 (g)</th>
+                    <th>지방 (g)</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${food.menus.map(menu => `
+                    <tr>
+                        <td>${menu.name}</td>
+                        <td>${menu.gram}</td>
+                        <td>${menu.protein}</td>
+                        <td>${menu.carbohydrates}</td>
+                        <td>${menu.fat}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        <p>총 칼로리: ${food.calories} kcal</p>
+        <p>총 단백질: ${food.protein} g</p>
+        <p>총 탄수화물: ${food.carbohydrates} g</p>
+        <p>총 지방: ${food.fat} g</p>
+    `;
+        showModal('mealDescriptionModal');
+    }
+
+    async function submitBodyInfo() {
+        const inputHeight = parseFloat(document.getElementById('inputHeight').value);
+        const inputWeight = parseFloat(document.getElementById('inputWeight').value);
+        const category1 = [document.getElementById('category1').value];
+        const category2 = [document.getElementById('category2').value];
+        const category3 = [document.getElementById('category3').value];
+        const category4 = [document.getElementById('category4').value];
+
+        if (isNaN(inputHeight) || isNaN(inputWeight) || inputHeight <= 0 || inputWeight <= 0) {
+            alert("올바른 신체 정보를 입력해주세요.");
+            return;
+        }
+
+        const bmr = calculateBMR({ height: inputHeight, weight: inputWeight, birthday: user.birthday, gender: user.gender });
+        let adjustedBmr = bmr;
+
+        const bmi = calculateBMI({ height: inputHeight, weight: inputWeight });
+        if (bmi > 25) {
+            adjustedBmr = bmr * 0.95;
+        } else if (bmi > 23) {
+            adjustedBmr = bmr;
+        } else if (bmi < 18.5) {
+            adjustedBmr = bmr * 1.05;
+        }
+
+        const selectedDateISO = new Date(selectedDate).toISOString();
+
+        const requestData = {
+            height: inputHeight,
+            weight: inputWeight,
+            bmr: adjustedBmr,
+            category1: document.getElementById('category1').value,
+            category2: document.getElementById('category2').value,
+            category3: document.getElementById('category3').value,
+            category4: document.getElementById('category4').value,
+            selectedDate: new Date(selectedDate).toISOString().split('T')[0],
+        };
+
+        console.log('Request Data:', requestData);
+
+        try {
+            const response = await axios.post('/api/users/foodInfo', requestData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true // 쿠키 전송 설정
+            });
+
+            if (response.data && Array.isArray(response.data.savedFoods)) {
+                response.data.savedFoods.forEach(savedFood => {
+                    calendar.addEvent({
+                        id: String(savedFood.sfSeq), // ID는 문자열이어야 합니다.
+                        title: savedFood.mealType,
+                        start: new Date(savedFood.saveDate).toISOString(),
+                        color: '#FFA500'
+                    });
+                });
+                closeModal('bodyInfoModal');
+                alert("식단이 추천되었습니다.");
+                // 필요한 경우, 상세 정보 모달 표시
+            } else {
+                alert("추천 식단을 가져오는 데 실패했습니다.");
+            }
+        } catch (error) {
+            console.error('식단 추천 실패:', error);
+            alert("식단 추천에 실패했습니다.");
+        }
+    }
+
+
+    // 추천 식단 정보 표시
+    function displayRecommendedMeal(data) {
+        const mealDiv = document.getElementById('recommendedMeal');
+        const formattedDate = new Date(data.saveDate).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+        mealDiv.innerHTML = `
+    <p>저장 날짜: ${formattedDate}</p>
+    <p>식단 유형: ${data.mealType}</p>
+    <ul>
+    ${data.menus.map(menu => `
+        <li>
+            ${menu.name} (${menu.weight}g)
+            <ul>
+                <li>단백질: ${menu.protein}g</li>
+                <li>탄수화물: ${menu.carbohydrates}g</li>
+                <li>지방: ${menu.fat}g</li>
+            </ul>
+        </li>
+    `).join('')}
+    </ul>
+    `;
+    }
+
+    // BMR 계산
+    function calculateBMR({ height, weight, birthday, gender }) {
+        const age = calculateAge(birthday);
+        return gender === "MALE"
+            ? 66.47 + (13.75 * weight) + (5 * height) - (6.76 * age) + 900
+            : 655.1 + (9.56 * weight) + (1.85 * height) - (4.68 * age) + 700;
+    }
+
+    // BMI 계산
+    function calculateBMI({ height, weight }) {
+        return weight / Math.pow(height / 100, 2);
+    }
+
+    // 나이 계산
+    function calculateAge(birthdayStr) {
+        const birthday = new Date(birthdayStr);
+        const today = new Date();
+        let age = today.getFullYear() - birthday.getFullYear();
+        const m = today.getMonth() - birthday.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthday.getDate())) {
+            age--;
+        }
+        return age;
+    }
+
+    // 모달 제어 함수
+    function showModal(modalId) {
+        document.getElementById(modalId).classList.add('active');
+        document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+        document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    function closeAllModals() {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => modal.classList.remove('active'));
+        document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+
+    function selectMealType() {
+        closeModal('mealTypeModal');
+        showModal('bodyInfoModal');
+    }
+    function showModalWithContent(content) {
+        // 기존 모달 제거
+        const existingModal = document.getElementById('customModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // 모달 생성
+        const modal = document.createElement('div');
+        modal.id = 'customModal';
+        modal.className = 'modal active'; // 'active' 클래스로 즉시 표시
+
+        modal.innerHTML = `
+        <div class="modal-content">
+            ${content}
+            <button class="close-button" onclick="closeCustomModal()">닫기</button>
+        </div>
+    `;
+
+        // 모달을 DOM에 추가
+        document.body.appendChild(modal);
+        document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeCustomModal() {
+        const modal = document.getElementById('customModal');
+        if (modal) {
+            modal.remove();
+        }
+        document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+</script>
+</body>
+</html>
