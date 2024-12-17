@@ -31,13 +31,17 @@ public class LoginController {
     }
 
     @GetMapping("/login")
-    public String login (HttpSession session) {
-        Users user = us.getUser(session.getId());
-        if (user != null) {
-            return "main/main";
+    public String login(HttpSession session) {
+        Object loginUser = session.getAttribute("user");
+
+        if (loginUser != null) {
+            // 사용자가 이미 로그인되어 있으면 메인 페이지로 리다이렉트
+            return "redirect:/main";
         }
+        // 사용자가 로그인하지 않았으면 로그인 페이지 표시
         return "login/login";
     }
+
     @PostMapping("/login")
     public String loginAction(
             @RequestParam String userId,
@@ -58,19 +62,11 @@ public class LoginController {
         }
     }
 
-
-    // 약정화면 표시
-    @GetMapping("/contract")
-    public String contractView() {
-        return "login/contract";
-    }
-
     // 회원가입 화면 표시
     @PostMapping("/join")
     public String joinView() {
         return "login/join";
     }
-
 
     // 아이디,비밀번호 찾기 화면 표시
     @GetMapping("/find")
@@ -89,7 +85,6 @@ public class LoginController {
         } else {
             model.addAttribute("message", -1);
         }
-
         return "login/findResult";
     }
 
@@ -116,5 +111,11 @@ public class LoginController {
             model.addAttribute("message", -1);
         }
         return "login/findPwdResult";
+    }
+
+    @GetMapping("/logout")
+    public String logoutSubmit(HttpSession session) {
+        session.invalidate(); // 세션 무효화
+        return "redirect:/login";
     }
 }

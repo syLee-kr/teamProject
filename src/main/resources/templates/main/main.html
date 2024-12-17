@@ -10,16 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-<div class="sidebar">
-    <ul class="menu">
-        <li><a id="home-button" th:href="@{/main}"><span class="icon"><img th:src="@{/images/home.png}" alt="홈 아이콘"></span> 홈</a></li>
-        <li><a th:href="@{/board}"><span class="icon"><img th:src="@{/images/board.png}" alt="게시판 아이콘"></span> 게시판</a></li>
-        <li><a th:href="@{/main}"><span class="icon"><img th:src="@{/images/calendar.png}" alt="캘린더 아이콘"></span> 캘린더</a></li>
-        <li><a th:href="@{/user}"><span class="icon"><img th:src="@{/images/profile.png}" alt="프로필 아이콘"></span> 프로필</a></li>
-        <li><a th:href="@{/logout}"><span class="icon"><img th:src="@{/images/logout.png}" alt="로그아웃 아이콘"></span> 로그아웃</a></li>
-        <h1><a th:href="@{/login}">Healthy<br>Table</a></h1>
-    </ul>
-</div>
+<div class="sidebar" th:insert="~{main/sidebar :: sidebar}"></div>
+
 <div class="calendar">
     <div id="calendar-container">
         <div id="calendar"></div>
@@ -99,7 +91,7 @@
 
 <!-- Thymeleaf를 사용하여 서버에서 전달된 데이터를 JavaScript 변수로 주입 -->
 <script th:inline="javascript">
-    let isLoggedIn = [[${isLoggedIn ?}]];
+    let isLoggedIn = [[${isLoggedIn ? true : false}]];
     console.log('isLoggedIn:', isLoggedIn);
     let user = {
         userId: '[[${user?.userId ?: ""}]]',
@@ -109,7 +101,7 @@
         weight: [[${user?.weight != null ? user.weight : 0}]]
     };
 
-    let saveFoods = /*[[${saveFoods != null ? saveFoods : '[]'}]]*/ [];
+    let saveFoods = []; // 초기 빈 배열
 </script>
 
 <script>
@@ -237,7 +229,6 @@
         <h3>추천 식단 상세 정보</h3>
         <p>저장 날짜: ${new Date(food.saveDate).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}</p>
         <p>식단 유형: ${food.mealType}</p>
-        <p>메인 음식: ${food.mainFood}</p>
         <table>
             <thead>
                 <tr>
@@ -252,7 +243,7 @@
                 ${food.menus.map(menu => `
                     <tr>
                         <td>${menu.name}</td>
-                        <td>${menu.weight}</td>
+                        <td>${menu.gram}</td>
                         <td>${menu.protein}</td>
                         <td>${menu.carbohydrates}</td>
                         <td>${menu.fat}</td>
@@ -260,10 +251,10 @@
                 `).join('')}
             </tbody>
         </table>
-                <p>총 칼로리: ${food.calories} kcal</p>
-                <p>총 단백질: ${food.protein} g</p>
-                <p>총 탄수화물: ${food.carbohydrates} g</p>
-                <p>총 지방: ${food.fat} g</p>
+        <p>총 칼로리: ${food.calories} kcal</p>
+        <p>총 단백질: ${food.protein} g</p>
+        <p>총 탄수화물: ${food.carbohydrates} g</p>
+        <p>총 지방: ${food.fat} g</p>
     `;
         showModal('mealDescriptionModal');
     }
@@ -276,7 +267,6 @@
         const category3 = [document.getElementById('category3').value];
         const category4 = [document.getElementById('category4').value];
 
-
         if (isNaN(inputHeight) || isNaN(inputWeight) || inputHeight <= 0 || inputWeight <= 0) {
             alert("올바른 신체 정보를 입력해주세요.");
             return;
@@ -287,11 +277,11 @@
 
         const bmi = calculateBMI({ height: inputHeight, weight: inputWeight });
         if (bmi > 25) {
-            adjustedBmr = bmr * 0.9;
-        } else if (bmi > 23) {
             adjustedBmr = bmr * 0.95;
+        } else if (bmi > 23) {
+            adjustedBmr = bmr;
         } else if (bmi < 18.5) {
-            adjustedBmr = bmr * 1.1;
+            adjustedBmr = bmr * 1.05;
         }
 
         const selectedDateISO = new Date(selectedDate).toISOString();
@@ -300,11 +290,11 @@
             height: inputHeight,
             weight: inputWeight,
             bmr: adjustedBmr,
-            category1: [document.getElementById('category1').value],
-            category2: [document.getElementById('category2').value],
-            category3: [document.getElementById('category3').value],
-            category4: [document.getElementById('category4').value],
-            selectedDate: selectedDateISO
+            category1: document.getElementById('category1').value,
+            category2: document.getElementById('category2').value,
+            category3: document.getElementById('category3').value,
+            category4: document.getElementById('category4').value,
+            selectedDate: new Date(selectedDate).toISOString().split('T')[0],
         };
 
         console.log('Request Data:', requestData);
@@ -317,17 +307,18 @@
                 withCredentials: true // 쿠키 전송 설정
             });
 
-            if (response.data && response.data.savedFoods && response.data.savedFoods.length > 0) {
+            if (response.data && Array.isArray(response.data.savedFoods)) {
                 response.data.savedFoods.forEach(savedFood => {
                     calendar.addEvent({
-                        id: savedFood.id, // SaveFood 엔티티의 ID 필드명에 따라 다를 수 있습니다.
+                        id: String(savedFood.sfSeq), // ID는 문자열이어야 합니다.
                         title: savedFood.mealType,
                         start: new Date(savedFood.saveDate).toISOString(),
                         color: '#FFA500'
                     });
                 });
                 closeModal('bodyInfoModal');
-                showModal('mealDescriptionModal');
+                alert("식단이 추천되었습니다.");
+                // 필요한 경우, 상세 정보 모달 표시
             } else {
                 alert("추천 식단을 가져오는 데 실패했습니다.");
             }
@@ -365,8 +356,8 @@
     function calculateBMR({ height, weight, birthday, gender }) {
         const age = calculateAge(birthday);
         return gender === "MALE"
-            ? 66.47 + (13.75 * weight) + (5 * height) - (6.76 * age)
-            : 655.1 + (9.56 * weight) + (1.85 * height) - (4.68 * age);
+            ? 66.47 + (13.75 * weight) + (5 * height) - (6.76 * age) + 900
+            : 655.1 + (9.56 * weight) + (1.85 * height) - (4.68 * age) + 700;
     }
 
     // BMI 계산
