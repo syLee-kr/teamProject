@@ -13,7 +13,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -39,9 +38,11 @@ public class Post {
     @JoinColumn(name = "userId", nullable = false)
     private Users user;    //  유저 정보
     
+    @ElementCollection
+    @CollectionTable(name="post_images", joinColumns = @JoinColumn(name="post_id"))
     @Column(columnDefinition = "varchar2(255) default null")
-    private String imagePath;   //  게시물 이미지
-
+    private List<String> imagePaths = new ArrayList<>();   //  게시물 이미지
+    
     private String title;       //  제목
     private String content;     //  본문
 
@@ -51,7 +52,6 @@ public class Post {
 
     @CreationTimestamp              //  자동으로 시간을 적용
     @Column(updatable = false)
-
     private OffsetDateTime postdate; // 게시글 작성 시간
     
     @Column(nullable = false)
