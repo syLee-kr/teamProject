@@ -30,11 +30,6 @@ public interface PostService {
 	
 	// 공지사항만 필터링하여 페이징 처리된 게시물 목록 반환
 	List<PostDTO> findNotices(Integer pageNum);
-	
-	//testPostList
-	static List<Post> postList(Integer pageNum) { 
-		return null;
-	}
 
 	
 	

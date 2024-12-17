@@ -46,6 +46,7 @@ public class PostServiceImpl implements PostService{
 		post.setContent(postDto.getContent());
 		post.setPriority(postDto.getPriority());
 		post.setCnt(postDto.getCnt());
+		post.setImagePaths(postDto.getImagePaths()); // 수정된 이미지경로 추가
 		
 		postRepository.save(post);
 	}
@@ -65,6 +66,7 @@ public class PostServiceImpl implements PostService{
 		post.setContent(postDto.getContent());
 		post.setPriority(postDto.getPriority());
 		post.setCnt(postDto.getCnt());
+		post.setImagePaths(postDto.getImagePaths()); // 이미지경로 포함
 		
 		postRepository.save(post);
 	}
@@ -86,7 +88,7 @@ public class PostServiceImpl implements PostService{
 		Page<Post> postPage = postRepository.findByIsNoticeFalse(pageable); 
 		
 		return postPage.getContent().stream()						// 페이지(page<post>)에서 게시물 목록 가져와(추출)
-									.map(post -> new PostDTO(post)) // post 객체를 postDTO 객체로 변환
+									.map(post -> new PostDTO(post)) // post 객체를 PostDTO 객체로 변환
 									.collect(Collectors.toList());	// List<PostDTO>로 return
 	}
 	
@@ -119,7 +121,7 @@ public class PostServiceImpl implements PostService{
 		Page<Post> postPage = postRepository.findByIsNoticeTrue(pageable); 
 		
 		return postPage.getContent().stream()						// 페이지(page<post>)에서 게시물 목록 가져와(추출)
-									.map(post -> new PostDTO(post)) // post 객체를 postDTO 객체로 변환
+									.map(post -> new PostDTO(post)) // post 객체를 PostDTO 객체로 변환
 									.collect(Collectors.toList());	// List<PostDTO>로 return
 	}
 

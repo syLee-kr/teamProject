@@ -31,43 +31,32 @@ public class MainController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @GetMapping("/main")
-    public String mainPage(HttpSession session, Model model) {
-        Users user = (Users) session.getAttribute("user");
+    private String renderMainPage(Users user, Model model) {
         if (user == null) {
-            return "login/login";
+            model.addAttribute("isLoggedIn", false);
+            return "main/main";
         }
         List<SaveFood> saveFoods = saveFoodService.getUserFood(user.getUserId());
-
         model.addAttribute("isLoggedIn", true);
         model.addAttribute("user", user);
         model.addAttribute("saveFoods", saveFoods);
 
-        return "main/main"; // main.html
+        return "main/main";
+    }
+
+    @GetMapping("/main")
+    public String mainPage(HttpSession session, Model model) {
+        Users user = (Users) session.getAttribute("user");
+        return renderMainPage(user, model);
     }
 
     @PostMapping("/main")
-    public String mainPages(@RequestParam String userId, @RequestParam String password, HttpSession session, Model model){
+    public String mainPages(@RequestParam String userId, @RequestParam String password, HttpSession session, Model model) {
         Users user = userService.getUser(userId);
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             session.setAttribute("user", user);
-            List<SaveFood> saveFoods = saveFoodService.getUserFood(user.getUserId());
-
-            model.addAttribute("isLoggedIn", true);
-            model.addAttribute("user", user);
-            model.addAttribute("saveFoods", saveFoods);
-
-            return "main/main";
-        } else {
-            model.addAttribute("loginFail", true);
-            model.addAttribute("errorMessage", "아이디 또는 비밀번호가 잘못되었습니다.");
-            return "login/login";
         }
+        return renderMainPage(user, model);
     }
 
-    @GetMapping("/logout")
-    public String logoutSubmit(HttpSession session) {
-        session.invalidate(); // 세션 무효화
-        return "redirect:/login";
-    }
 }

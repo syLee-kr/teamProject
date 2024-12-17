@@ -1,6 +1,8 @@
 package com.example.food.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -10,12 +12,12 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
+@Data
 @Entity
 public class SaveFood {
 
@@ -31,6 +33,8 @@ public class SaveFood {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude // 순환 참조 방지
+    @JsonBackReference // JSON 직렬화 시 순환 참조 방지
     private Users user; // 유저 정보
 
     @Setter
@@ -38,8 +42,11 @@ public class SaveFood {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private OffsetDateTime saveDate; // 저장 날짜
 
+    @Column(nullable = false)
     private String mealType; // 식사 유형: 아침, 점심, 저녁
 
     @OneToMany(mappedBy = "saveFood", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude // 순환 참조 방지
+    @JsonManagedReference // JSON 직렬화 시 순환 참조 방지
     private List<Menu> menus = new ArrayList<>(); // 한 끼에 포함된 메뉴 리스트
 }
