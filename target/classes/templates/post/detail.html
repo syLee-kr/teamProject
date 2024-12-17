@@ -3,119 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시물 상세</title>
+    <title>게시판 상세</title>
+    <link rel="stylesheet" href="/css/post.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/post.css">
 </head>
 <body>
-<div class="container mt-5">
-<<<<<<< HEAD
-    <header>
-        <h1 th:text="${post.title}"></h1>
-    </header>
-    <main>
-        <div class="post-content">
-            <p th:text="${post.content}"></p>
-            <p><strong>작성자:</strong> <span th:text="${post.user.name}"></span> (<span th:text="${post.user.userId}"></span>)</p>
-            <p><strong>작성일:</strong> <span th:text="${post.postdate}"></span> | 조회수: <span th:text="${post.cnt}"></span></p>
-            <div th:if="${post.imagePaths?.size() > 0}">
-                <h4>첨부된 이미지</h4>
-                <div class="post-images">
-                    <img th:each="image : ${post.imagePaths}" th:src="@{${image}}" class="img-thumbnail">
-                </div>
-            </div>
+<div class="sidebar" th:insert="~{main/sidebar :: sidebar}"></div>
+<div class="content">
+    <h1 th:text="${post.title}"></h1>
+    <p th:text="${post.content}"></p>
+    <p>
+        <strong>작성자:</strong>
+        <span th:text="${post.user.name}"></span>
+        (<span th:text="${post.user.userId}"></span>)
+    </p>
+    <p>
+        <strong>작성일:</strong>
+        <span th:text="${post.postdate}"></span>
+        | 조회수: <span th:text="${post.cnt}"></span>
+    </p>
+    <div th:if="${post.imagePaths?.size() > 0}">
+        <h4>첨부된 이미지</h4>
+        <div>
+            <img th:each="image : ${post.imagePaths}" th:src="@{${image}}" class="img-thumbnail" alt="첨부 이미지">
         </div>
-        <hr>
-        <section class="comments">
-            <h3>댓글</h3>
-            <ul class="comment-list">
-                <li th:each="comment : ${comments}" class="comment-item">
-                    <p><strong th:text="${comment.userName}"></strong> (<span th:text="${comment.userId}"></span>)</p>
-                    <p th:text="${comment.content}"></p>
-                    <small th:text="${comment.createdAt}"></small>
-                </li>
-            </ul>
-            <form th:action="@{/comments/add}" method="post" class="comment-form">
-                <textarea name="content" placeholder="댓글을 작성하세요" required></textarea>
-                <input type="hidden" name="postId" th:value="${post.pSeq}">
-                <button type="submit" class="btn btn-primary">댓글 작성</button>
-            </form>
-        </section>
-        <a th:href="@{/list}" class="btn btn-secondary">목록으로</a>
-    </main>
+    </div>
+    <hr>
+    <section class="comments">
+        <h3>댓글</h3>
+        <ul class="list-group">
+            <li th:each="comment : ${comments}" class="list-group-item comment-item">
+                <p>
+                    <strong th:text="${comment.userName}" class="comment-author"></strong>
+                    (<span th:text="${comment.userId}"></span>)
+                </p>
+                <p th:text="${comment.content}" class="comment-content"></p>
+                <small th:text="${comment.createdAt}" class="comment-date"></small>
+            </li>
+        </ul>
+        <form th:action="@{/comments/add}" method="post" class="mt-3">
+            <textarea name="content" class="form-control mb-2" rows="3" placeholder="댓글을 작성하세요" required></textarea>
+            <input type="hidden" name="postId" th:value="${post.pSeq}">
+            <button type="submit" class="btn btn-primary">댓글 작성</button>
+        </form>
+    </section>
+    <a th:href="@{/list}" class="btn btn-secondary mt-3">목록으로</a>
 </div>
-=======
-    <h2 th:text="${postDto.title}">제목</h2>
-    <p th:text="${postDto.content}">내용</p>
-    <p><strong>작성자:</strong> <span th:text="${postDto.name}">작성자</span>(<span th:text="${postDto.userId}">아이디</span>)</p>
-    <p><strong>작성일:</strong> <span th:text="${postDto.postdate}">작성일</span></p>
-    
-    <!-- 이미지가 없을 경우 -->
-    <div th:if="${postDto.imagePaths != null and !postDto.imagePaths.isEmpty()}">
-	    <!-- 이미지 출력 -->
-	    <div class="post-images mt-4"> 
-	    	<h4>첨부된 이미지:</h4>
-	    	<div class="row">
-	    		<div class="col-md-4" th:each="imagePath : ${postDto.imagePaths}">
-	    			<img th:src="@{${imagePath}}" class="img-fluid img-thumnail mb-2" alt="게시물이미지">
-	    		</div>
-	    	</div>
-	    </div>
-	    
-		<!-- 댓글 출력 영역 -->
-	    <div class="comments mt-5">
-	        <h4>댓글</h4>
-	        <ul class="list-group">
-	            <li class="list-group-item" th:each="comment : ${comments}">
-	                <p><strong th:text="${comment.userName}">작성자</strong> (<span th:text="${comment.userId}">아이디</span>)</p>
-	                <p th:text="${comment.content}">댓글 내용</p>
-	                <p><small th:text="${comment.createdAt}">작성일</small></p>
-	                <form th:action="@{/comments/delete/{commentId}(commentId=${comment.cSeq})}" method="post">
-	                    <input type="hidden" name="postId" th:value="${postDto.pSeq}" />
-	                    <button type="submit" class="btn btn-danger btn-sm">삭제</button>
-	                </form>
-	            </li>
-	        </ul>
-	
-	        <!-- 댓글 작성 폼 -->
-	        <form th:action="@{/comments/add}" method="post" class="mt-3">
-	            <div class="mb-3">
-	                <label for="commentContent" class="form-label">댓글 작성</label>
-	                <textarea id="commentContent" name="content" class="form-control" rows="3" required></textarea>
-	            </div>
-	            <input type="hidden" name="postId" th:value="${postDto.pSeq}" />
-	            <button type="submit" class="btn btn-primary">댓글 추가</button>
-	        </form>
-	    </div>
-	   
-	    <div class="actions mt-4">
-	        <a href="/write/{id}" th:href="@{/write/{id}(id=${postDto.pSeq})}" class="btn btn-warning">수정</a> <!-- 수정 페이지로 이동 -->
-	       	<a href="/delete/{id}" th:href="@{/delete/{id}(id=${postDto.pSeq})}" class="btn btn-danger" onclick="return confirm('게시물을 삭제하시겠습니까?');">삭제</a> <!-- 삭제 기능 -->
-	        <a href="/list" class =btn btn-secondary>목록</a>
-	    </div>
-	</div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
->>>>>>> refs/heads/develop
 </body>
 </html>
-<<<<<<< HEAD
-=======
-
-
-
-
-
-
-
-<!-- 설명
-1) postDto.imagePaths != null: imagePaths가 null인지 확인.
-2)!postDto.imagePaths.isEmpty(): imagePaths 리스트가 비어 있지 않은지 확인. 
-리스트가 비어 있다면 출력할 이미지가 없으므로 해당 블록을 렌더링하지 않음.
->>
-이미지가 존재할 경우 <div> 블록이 렌더링되어 이미지 출력.
-이미지가 존재 하지않는 경우 <div> 태그와 내부 코드가 DOM에 아예 렌더링 진행 안함
- -->
-
->>>>>>> refs/heads/develop

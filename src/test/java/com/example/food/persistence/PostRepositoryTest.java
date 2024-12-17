@@ -13,8 +13,8 @@ import com.example.food.repository.UserRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
 @SpringBootTest
+
 public class PostRepositoryTest {
 	
 	@Autowired
