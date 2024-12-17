@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>프로필 수정</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/profile.css}">
+
+</head>
+<body>
+    <div class="sidebar" th:insert="~{main/sidebar :: sidebar}"></div>
+    <div id="main-container" class="main-container">
+        <div class="profile-container">
+            <form th:action="@{/edit-profile}" method="post" enctype="multipart/form-data" class="profile-edit-form">
+              <!-- 프로필 이미지 -->
+              <div class="profile-image">
+                <img th:src="${user.profileImage}"
+                     alt="Profile Image"
+                     class="profile-img">
+              </div>
+                <div class="profile-details">
+                  <p><strong>아이디:</strong> <span th:text="${user.userId}"></span></p>
+                  <p><strong>이 름:</strong> <span th:text="${user.name}"></span></p>
+                  <div>
+                    <input type="text" id="phone" name="phone" th:value="${user.phone}" placeholder="전화번호 수정" required>
+                  </div>
+                  <div class="address">
+                    <input type="text" id="address" name="address" th:value="${user.address}" placeholder="주소 검색" required readonly onclick="openDaumPostcode()">
+                    <br>
+                    <input type="text" id="detailAddress" placeholder="상세 주소 입력" required>
+                  </div>
+                  <div>
+                    <input type="email" id="email" name="email" th:field="${user.email}" placeholder="이메일 수정" required>
+                  </div>
+                  <p><strong>생년월일:</strong> <span th:text="${user.birthday}"></span></p>
+                  <p><strong>가입일:</strong> <span th:text="${formattedRegDate}"></span></p>
+                  <div class="profile-actions">
+                    <button type="submit" class="save-profile-button">저장</button>
+                    <button type="button" class="cancel-profile-button" onclick="location.href='/profile'">취소</button>
+                  </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+<!-- Daum 우편번호 API -->
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+  function openDaumPostcode() {
+    new daum.Postcode({
+      oncomplete: function (data) {
+        var roadAddr = data.roadAddress; // 도로명 주소
+        var extraAddr = ''; // 참고 항목
+
+        // 참고 항목 추가
+        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+          extraAddr += data.bname;
+        }
+        if (data.buildingName !== '' && data.apartment === 'Y') {
+          extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+        }
+        if (extraAddr !== '') {
+          extraAddr = ' (' + extraAddr + ')';
+        }
+
+        // 최종 주소 조합
+        var fullAddr = roadAddr + extraAddr;
+
+        // 주소 필드에 값 설정
+        document.getElementById('address').value = fullAddr;
+
+        // 상세 주소 입력 필드로 포커스 이동
+        document.getElementById('detailAddress').focus();
+      }
+    }).open();
+  }
+
+  // 폼 제출 시 상세 주소를 address 필드에 포함
+  document.querySelector('form').addEventListener('submit', function () {
+    var addressField = document.getElementById('address');
+    var detailField = document.getElementById('detailAddress');
+
+    if (detailField.value.trim() !== '') {
+      addressField.value = addressField.value + ', ' + detailField.value.trim();
+    }
+  });
+</script>
+</html>

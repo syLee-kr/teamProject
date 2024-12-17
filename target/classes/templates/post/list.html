@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시물 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+   	<link rel="stylesheet" href="css/post.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h1>게시물 목록</h1>
+    <a th:href="@{/write}" class="btn btn-primary mb-3">게시물 작성</a> <!-- 게시물 작성 페이지로 이동 -->
+    <ul class="list-group">
+        <!-- 게시물 반복 표시 -->
+        <li th:each="postDto : ${postDtoList}" class="list-group-item">
+            <a th:href="@{/detail/{id}(id=${postDto.pSeq})}" class="text-decoration-none"> <!-- 상세보기 페이지로 이동 -->
+                <h4 th:text="${postDto.title}">게시물 제목</h4>
+                <p th:text="${postDto.content}">게시물 내용</p>
+                <span th:text="${postDto.postdate}">작성일</span>
+                <span th:text="${postDto.name}">작성자이름</span>
+                <span th:text="${postDto.userId}">작성자ID</span>
+                
+            </a>
+        </li>
+    </ul>
+    <!-- 페이지 번호 -->
+    <nav aria-label="page navigation">
+        <ul class="pagination">
+            <li th:each="pageNum : ${pageList}" class="page-item"
+            th:classappend="${currentPage == pageNum} ? 'active' : ''">
+                <a class="page-link" th:href="@{/list(page=${pageNum})}" th:text="${pageNum}"></a> 
+            </li>
+        </ul>
+    </nav>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 설명 
+페이지 번호에 대한 active 처리:
+currentPage가 현재 페이지 번호를 받아서, 페이지 번호를 클릭하면 그 번호에 active 클래스 동적추가.
+이를 통해 현재 페이지가 강조됨.
+
+ -->
