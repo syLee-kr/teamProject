@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.food.domain.Post;
@@ -30,7 +29,6 @@ public class PostRepositoryTest {
 	@Autowired
 	private TestEntityManager entityManager;
 	
-	@Disabled
 	@Test
 	@Transactional   //테스트 후 롤백 > 데이터베이스 저장안됨
 	public void testInsertPost() {
