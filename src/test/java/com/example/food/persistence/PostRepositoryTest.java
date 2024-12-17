@@ -30,7 +30,6 @@ public class PostRepositoryTest {
 	@Autowired
 	private TestEntityManager entityManager;
 	
-	@Disabled
 	@Test
 	@Transactional   //테스트 후 롤백 > 데이터베이스 저장안됨
 	public void testInsertPost() {
