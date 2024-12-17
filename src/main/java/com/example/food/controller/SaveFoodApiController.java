@@ -58,7 +58,7 @@ public class SaveFoodApiController {
             for (CreateMenuRequest menuRequest : request.getMenus()) {
                 Menu menu = new Menu();
                 menu.setName(menuRequest.getName());
-                menu.setWeight(menuRequest.getWeight());
+                menu.setGram(menuRequest.getWeight());
                 menu.setProtein(menuRequest.getProtein());
                 menu.setCarbohydrates(menuRequest.getCarbohydrates());
                 menu.setFat(menuRequest.getFat());
