@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.food.CommentDTO;
-import com.example.food.service.postservice.CommentSerivce;
+import com.example.food.service.postservice.CommentService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class CommentController {
 	
 	
-	private final CommentSerivce commentService;
+	private final CommentService commentService;
 	
 	@GetMapping("/{postId}")
 	public List<CommentDTO> getComments(@PathVariable Long postId){
