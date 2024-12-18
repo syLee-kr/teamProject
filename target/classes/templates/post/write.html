@@ -32,7 +32,7 @@
         <!-- 작성/수정 버튼 -->
         <div class="btn-container">
         	<button type="submit" class="btn btn-primary" th:text="${post != null ? '수정' : '작성'}">저장</button>
-        	<a th:href="@{/post}" class="btn btn-secondary">취소</a>
+        	<a th:href="@{/post/list}" class="btn btn-secondary">취소</a>
         </div>
     </form>
 </div>
