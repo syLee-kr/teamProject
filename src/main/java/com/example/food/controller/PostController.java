@@ -32,6 +32,7 @@ import lombok.AllArgsConstructor;
 public class PostController {
 	
 	private PostService postService;
+	private Object isNotice;
 
 	/*
 	 * 게시물 목록
@@ -93,8 +94,8 @@ public class PostController {
 		postDto.setTitle(title);
 		postDto.setContent(content);
 		postDto.setImagePaths(imagePaths); // 이미지 경로
-		  // isNotice 값 설정
-		
+		//postDto.setIsNotice(isNotice != null ? isNotice : false);  // isNotice 값 설정
+		postDto.setIsNotice(postDto.getIsNotice() != null ? postDto.getIsNotice() : false); // 기본값 false
 		// 테스트용 고정된 사용자(고정 사용자만 지울것)
 		Users user = new Users();
 		user.setUserId("test_user"); //로그인한 사용자 ID 설정
