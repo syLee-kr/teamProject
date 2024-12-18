@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.food.CommentDTO;
+import com.example.food.domain.Users;
+import com.example.food.domain.Users.Gender;
 import com.example.food.service.postservice.CommentService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,8 +31,13 @@ public class CommentController {
 	}
 	
 	// 댓글 추가
-	@PostMapping
+	@PostMapping("/add")
 	public void addComment(@RequestBody CommentDTO commentDto) {
+		
+		//테스트용 고정된 사용자 정보
+		commentDto.setUserId("test_user");
+		commentDto.setUserName("테스트유저");
+		
 		commentService.addComment(commentDto);
 	}
 	

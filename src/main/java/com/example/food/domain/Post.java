@@ -35,7 +35,7 @@ public class Post {
     private Long pSeq;           //  게시글 번호
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private Users user;    //  유저 정보
     
     @ElementCollection
@@ -55,7 +55,7 @@ public class Post {
     private OffsetDateTime postdate; // 게시글 작성 시간
     
     @Column(nullable = false)
-    private Boolean isNotice; // 공지 여부
+    private Boolean isNotice = false; // 공지 여부(기본값 설정)
 
     @Column(nullable = false)
     private int priority;    // 게시물 우선순위(isNotice가 true인 경우 공지글 우선순위/ false인 경우 일반 게시글 우선순위) 

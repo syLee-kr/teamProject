@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -19,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.food.PostDTO;
 import com.example.food.domain.Post;
+import com.example.food.domain.Users;
+import com.example.food.domain.Users.Gender;
 import com.example.food.service.postservice.PostService;
 
 import lombok.AllArgsConstructor;
@@ -34,7 +36,7 @@ public class PostController {
 	/*
 	 * 게시물 목록
 	 */
-	@GetMapping
+	@GetMapping("/list")
 	public String PostList(Model model, @RequestParam(value="page", defaultValue="1") Integer pageNum,
 										@RequestParam(value="noticeOnly", defaultValue="false") Boolean noticeOnly){
 		List<PostDTO> postList;
@@ -74,7 +76,8 @@ public class PostController {
 	@PostMapping("/write")
 	public String write(@RequestParam("title") String title,
 					    @RequestParam("content") String content,
-					    @RequestParam("images") MultipartFile[] images) throws IOException {
+					    @RequestParam("images") MultipartFile[] images)/*,  재사용시 images 뒤 ) 제거
+						@AuthenticationPrincipal Users user)*/ throws IOException {
 		List<String> imagePaths = new ArrayList<>();
 		
 		// 이미지 파일 서버에 저장
@@ -86,7 +89,21 @@ public class PostController {
 		}
 		
 		// 게시물 저장
-		PostDTO postDto = new PostDTO(); //이미지 경로포함
+		PostDTO postDto = new PostDTO();
+		postDto.setTitle(title);
+		postDto.setContent(content);
+		postDto.setImagePaths(imagePaths); // 이미지 경로
+		  // isNotice 값 설정
+		
+		// 테스트용 고정된 사용자(고정 사용자만 지울것)
+		Users user = new Users();
+		user.setUserId("test_user"); //로그인한 사용자 ID 설정
+		user.setName("테스트유저");
+		user.setGender(Gender.MALE);
+		
+		postDto.setUserId(user.getUserId()); //로그인한 사용자 ID 설정
+		postDto.setName(user.getName());
+		
 		postService.savePost(postDto);
 
 		return "redirect:post/list";
@@ -125,7 +142,8 @@ public class PostController {
 	public String edit(@PathVariable("pSeq") Long pSeq, 
 					   @RequestParam("title") String title,
 					   @RequestParam("content") String content,
-					   @RequestParam("images")MultipartFile[] images) throws IOException {
+					    @RequestParam("images") MultipartFile[] images)/*,  재사용시 images 뒤 ) 제거
+						@AuthenticationPrincipal Users user)*/ throws IOException {
 		List<String> imagePaths = new ArrayList<>();
 		
 		for(MultipartFile image : images) {
@@ -140,6 +158,16 @@ public class PostController {
 		postDto.setTitle(title);
 		postDto.setContent(content);
 		postDto.setImagePaths(imagePaths);
+		
+		// 테스트용 고정된 사용자(고정 사용자만 지울것)
+		Users user = new Users();
+		user.setUserId("test_user"); //로그인한 사용자 ID 설정
+		user.setName("테스트유저");
+		user.setGender(Gender.MALE);
+		
+		postDto.setUserId(user.getUserId()); //로그인한 사용자 ID 설정
+		postDto.setName(user.getName());
+		
 		postService.updatePost(postDto);
 		
 		return "redirect:/post/list";

@@ -16,11 +16,13 @@
 
 /* 기본 Reset 및 Flex 레이아웃 */
 body {
-    font-family: 'Godo', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    display: flex; /* Sidebar와 Content 나란히 배치 */
-    height: 100vh;
+    font-family: 'Godo', Arial, sans-serif; /* 'Godo' 폰트 적용 */
+    background-color: #ffffff; /* 흰색 배경색 */
+    display: flex;
+    overflow: hidden; /* 스크롤바를 완전히 제거 */
+    height: 100vh; /* 화면 높이에 딱 맞게 설정 */
 }
 
 a {
@@ -30,51 +32,48 @@ a {
 
 /* Sidebar 스타일 */
 .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 200px; /* Sidebar 너비 */
-    background-color: #333; /* Sidebar 배경색 */
-    color: #fff;
-    overflow-y: auto;
+    width: 15%;
+    background-color: #c59d9d;
+    color: #ffffff;
+    height: 100vh;
     padding: 20px;
 }
 
-.sidebar h1 {
-    font-size: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-    color: #ffffff;
-}
-
-.sidebar .menu {
-    list-style: none;
+.sidebar ul.menu {
+    list-style-type: none;
     padding: 0;
-    margin: 0;
 }
 
-.sidebar .menu li {
-    margin-bottom: 15px;
+.sidebar ul.menu li {
+    margin-bottom: 20px;
 }
 
-.sidebar .menu li a {
-    color: white;
+.sidebar ul.menu li a {
+    color: #ffffff;
     text-decoration: none;
-    font-size: 16px;
-    display: block;
-    padding: 10px 12px;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
 }
 
-.sidebar .menu li a:hover {
-    background-color: #575757;
+.sidebar ul.menu li a .icon {
+    margin-right: 10px;
+    font-size: 30px;
+    padding: 10px;
+}
+
+.sidebar ul.menu li a:hover {
+    color: #9c7070; /* 마우스 오버 시 푸른색 */
+}
+
+.menu .icon img {
+    filter: invert(1);
+    width: 24px;  /* 원하는 너비로 설정 */
+    height: 24px; /* 원하는 높이로 설정 */
 }
 
 /* Content 영역 */
 .content {
-    margin-left: 200px; /* Sidebar 너비만큼 여백 */
     width: calc(100% - 200px); /* 나머지 화면 차지 */
     padding: 20px;
     background-color: #f8f9fa; /* 부드러운 배경색 */
@@ -84,9 +83,9 @@ a {
 
 /* 공통 테이블 스타일 */
 .table {
-    width: 100%;
+    width: 80%; 
     border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-bottom: 70px;
 }
 
 .table th,
@@ -101,11 +100,20 @@ a {
     color: #ffffff;
 }
 
+/* 버튼을 감싸는 부모 요소 스타일 */
+.btn-container {
+	width: 80%; /* 테이블 너비와 맞추기 위해 */
+    text-align: right; /* 부모 요소에서 오른쪽 정렬 */
+    margin-top: 40px;   /* 버튼과 테이블 간의 간격을 조정 */
+}
+
 /* 버튼 스타일 */
 .btn {
-    padding: 10px 15px;
-    border-radius: 5px;
+	font-family: 'Godo', Arial, sans-serif; /* 'Godo' 폰트 적용 */
+	border-radius: 5px;
     transition: background-color 0.3s ease;
+    padding: 10px 15px;
+    margin-right: 0;
 }
 
 .btn-primary {
@@ -127,11 +135,18 @@ a {
 }
 
 /* 페이지네이션 스타일 */
+.pagination-container {
+    width: 80%; /* 테이블 너비와 맞추기 위해 */
+    margin-top: 50px;  /* 페이지네이션과 버튼 간격 */
+    margin-bottom: 10px; 
+}
+
 .pagination {
     display: flex;
-    justify-content: center;
+    justify-content: center; /* 중앙 정렬 */
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 .pagination .page-link {
@@ -175,9 +190,32 @@ a {
 
 /* 입력 폼 */
 form .form-control {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     padding: 10px;
     font-size: 16px;
+}
+
+/* 제목 입력 스타일 */
+form .form-group #title {
+    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* 내용 입력 스타일 */
+form .form-group #content {
+    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    min-height: 150px;
+    max-height: 500px;
+    resize: none; /* 세로, 가로 조정 불가능 */
 }
 
 /* 상세 페이지 이미지 */
