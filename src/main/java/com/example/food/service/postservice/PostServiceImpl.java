@@ -1,5 +1,6 @@
 package com.example.food.service.postservice;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -186,7 +187,7 @@ public class PostServiceImpl implements PostService {
     public Integer[] getPageList() {
         log.info("전체 페이지 목록 조회 요청");
 
-        int pageSize = 10; // 페이지당 게시물 수
+        int pageSize =10; // 페이지당 게시물 수
         long totalPosts = postRepo.count(); // 전체 게시물 수
         int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
 
@@ -211,10 +212,39 @@ public class PostServiceImpl implements PostService {
     public List<PostDTO> searchPostsByKeyword(String keyword, Integer pageNum) {
         log.info("게시물 검색 요청, keyword: {}, pageNum: {}", keyword, pageNum);
         
+        //페이징처리
         Pageable pageable = PageRequest.of(pageNum - 1, 10);
+        
+        // 제목, 내용에 키워드가 포함된 게시물 검색
         Page<Post> posts = postRepo.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
         
-        log.info("게시물 검색 완료, keyword: {}, 결과 개수: {}", keyword, posts.getContent().size());
-        return posts.stream().map(PostDTO::new).collect(Collectors.toList());
+        // 검색 결과가 없을떄
+        if (posts == null || posts.isEmpty()) {
+        	log.info("검색된 게시물이 없습니다. keyword: {}", keyword);
+        	return new ArrayList<>(); // 빈 리스트 전달
+        }
+        
+        // 검색된 게시물목록 PostDTO로 
+        List<PostDTO> postDtos = posts.stream()
+        							  .map(PostDTO::new)
+        							  .collect(Collectors.toList());
+        log.info("게시물 검색 완료, keyword: {}, 결과 개수: {}", keyword, posts.getTotalElements());
+        
+        return postDtos;
     }
+
+    
+    // 게시물 조회수
+	@Override
+	public void viewCount(Long pSeq) {
+		// pSeq로 게시물 조회
+		Post post = postRepo.findById(pSeq)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
+		
+		// 조회수 증가
+		post.setCnt(post.getCnt() + 1);
+		
+		postRepo.save(post);
+		
+	}
 }

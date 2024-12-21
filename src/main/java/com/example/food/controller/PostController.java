@@ -53,7 +53,7 @@ public class PostController {
 	        // 검색어가 있을 경우, 제목 또는 내용에 keyword가 포함된 게시물 검색
 	        postList = postService.searchPostsByKeyword(keyword, pageNum);
 	    }else {
-	    	// 검색어가 없으면  공지사항, 게시글 페이징 처리
+	    	// 검색어가 없으면 게시글 페이징 처리
 	    	postList = postService.getPostList(pageNum);
 	    }
 		
@@ -71,6 +71,7 @@ public class PostController {
 		
 		model.addAttribute("postList", postList);
 		model.addAttribute("pageList", pageList);
+		model.addAttribute("keyword", keyword); // 검색어 전달
 		
 		log.info("게시물 목록 조회 완료, 총 게시물 수: {}", postList.size());
 		
@@ -205,8 +206,11 @@ public class PostController {
 	public String detail(@PathVariable Long pSeq, Model model) {
 		log.info("게시물 상세보기 요청, pSeq: {}", pSeq);
 		
+		// 게시물 조회 후 조회수 증가
 		PostDTO postDto = postService.getPostById(pSeq);
 		
+		// 게시물 조회 후  조회수 1증가 처리
+		postService.viewCount(pSeq);
 		if (postDto == null) {
             log.error("게시물 조회 실패, 해당 게시물 없음, pSeq: {}", pSeq);
             return "redirect:/post/list";
@@ -256,10 +260,10 @@ public class PostController {
 		
 		// 이미지 파일 서버에 저장(이미지가 있을때만)
 		for (MultipartFile image : images) {
-			if (image != null && !image.isEmpty()) {
-				String imagePath = saveImage(image);
+			if (image != null && !image.isEmpty()) { //이미지 파일 및 내용이 있는경우만
+				String imagePath = saveImage(image); // 서버저장
 				if(imagePath != null) {
-					imagePaths.add(imagePath);
+					imagePaths.add(imagePath); // img 경로추가
 					log.info("수정된 이미지 저장 완료, 경로: {}", imagePath);
 				}
 			}

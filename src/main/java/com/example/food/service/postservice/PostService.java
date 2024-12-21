@@ -30,6 +30,9 @@ public interface PostService {
 	
 	// keyword 검색
 	List<PostDTO> searchPostsByKeyword(String keyword, Integer pageNum);
+	
+	// 게시물 조회수
+	void viewCount(Long pSeq);
 
 	
 	

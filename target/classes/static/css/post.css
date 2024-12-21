@@ -81,6 +81,10 @@ a {
     height: 100vh;
 }
 
+.postContent {
+	min-height: 100vh;
+}
+
 /* 공통 테이블 스타일 */
 .table {
     width: calc(100% - 200px); /* 나머지 화면 차지 */; 
@@ -220,18 +224,18 @@ a {
 /* 페이지네이션 스타일 */
 .pagination-container {
     width: calc(100% - 200px); /* 나머지 화면 차지 */
+    bottom:0;
     margin-top: 5px;  /* 페이지네이션과 버튼 간격 */
     margin-bottom: 5px; 
     justify-content: center; /* 중앙 정렬 */
-    height:auto;
 }
 
 .pagination {
     display: flex;
     list-style: none;
     justify-content: center; /* 중앙 정렬 */
-    padding: 0;
-    margin: 0;
+    padding-bottom: 5px;
+    margin-bottom: 50px;
 }
 
 .pagination .page-link {
@@ -358,6 +362,7 @@ form .form-group #content {
     margin-top: 20px;
 }
 
+
 /* 댓글 수정/삭제 버튼 스타일 */
 .comment-actions {
     display: flex;
@@ -399,9 +404,4 @@ form .form-group #content {
     margin-right: 10px;
 }
 
-/* 상세 페이지 이미지 */
-.detail-image {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 10px;
-}
+
