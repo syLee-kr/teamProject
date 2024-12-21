@@ -35,7 +35,7 @@ public class Post {
     private Long pSeq;           //  게시글 번호
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private Users user;    //  유저 정보
     
     @ElementCollection

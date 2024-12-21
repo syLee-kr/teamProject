@@ -10,6 +10,7 @@
 <div class="sidebar" th:insert="~{main/sidebar :: sidebar}"></div>
 <div class="content">
     <h1>게시판 목록</h1>
+    <hr class="hr">
     <table class="table">
         <thead>
             <tr>
@@ -21,31 +22,39 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="post : ${postList}">
-                <td th:text="${post.pSeq}"></td>
+            <tr th:each="post, stat : ${postList}">
+                <!-- 공지 여부에 따라 '공지' 또는 번호 -->
+                <td th:text="${post.isNotice ? '공지' : stat.index + 1}"></td>
                 <td>
-                    <a th:href="@{/detail/{id}(id=${post.pSeq})}" th:text="${post.title}"></a>
+                    <a th:href="@{/post/detail/{id}(id=${post.pSeq})}" th:text="${post.title}"></a>
                 </td>
-                <td th:text="${post.user.name}"></td>
-                <td th:text="${post.postdate}"></td>
-                <td th:text="${post.cnt}"></td>
+                <td th:text="${post.userName} + ' (' + ${post.userId} +')'"></td>
+                <td th:text="${post.formattedPostdate}"></td>
+                <td align=center th:text="${post.cnt}"></td>
             </tr>
         </tbody>
     </table>
     
-   	<div class="btn-container">
-        <a th:href="@{/post/write}" class="btn btn-primary">Post</a>
+	<div class="btn-container">
+	    <a th:href="@{/post/write}" class="btn btn-primary">Post</a>
+		
+		<!-- 검색 기능 -->
+		<div class="search">
+		    <form th:action="@{/post/list}" method="get" class="search-form">
+		    	<input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword != null ? keyword : ''}">
+		    	<button type="submit" class="btn btn-primary">Search</button>
+			</form>
+	    </div>
 	</div>
-    
+ 
     <div class="pagination-container">
         <!-- 페이지네이션 -->
         <nav class="pagination">
             <span th:each="page : ${pageList}" th:classappend="${currentPage == page} ? 'active' : ''">
-                <a th:href="@{/list(page=${page})}" th:text="${page}" class="page-link"></a>
+                <a th:href="@{/post/list(page=${page})}" th:text="${page}" class="page-link"></a>
             </span>
         </nav>
 	</div>
-
 </div>
 </body>
 </html>

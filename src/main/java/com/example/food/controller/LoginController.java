@@ -5,6 +5,8 @@ import com.example.food.domain.Users;
 import com.example.food.service.EmailService;
 import com.example.food.service.userservice.UserService;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 
+@Slf4j
 @Controller
 @RequestMapping
 public class LoginController {
@@ -39,6 +42,7 @@ public class LoginController {
             return "redirect:/main";
         }
         // 사용자가 로그인하지 않았으면 로그인 페이지 표시
+        log.info("사용자가 로그인되지 않았습니다.");
         return "login/login";
     }
 
@@ -54,9 +58,11 @@ public class LoginController {
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             // 비밀번호 일치 시 세션에 사용자 저장
             session.setAttribute("user", user);
+            log.info("사용자 로그인 성공: {}", user.getUserId());  // SLF4J 사용
             return "redirect:/main";
         } else {
             // 로그인 실패 메시지 설정
+        	log.warn("로그인 실패: 잘못된 아이디 또는 비밀번호 (아이디: {})", userId);  // SLF4J 사용
             model.addAttribute("error", "아이디 또는 비밀번호가 잘못되었습니다.");
             return "login/login";
         }
@@ -116,6 +122,7 @@ public class LoginController {
     @GetMapping("/logout")
     public String logoutSubmit(HttpSession session) {
         session.invalidate(); // 세션 무효화
+        log.info("사용자가 로그아웃됨.");  // SLF4J 사용
         return "redirect:/login";
     }
 }

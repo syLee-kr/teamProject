@@ -21,9 +21,7 @@ import java.util.List;
 public class Users {
 
     @Id
-    @Column(name = "user_id")
     private String userId;          // 유저 아이디
-    
     private String password;        // 유저 비밀번호
     private String name;            // 유저 이름
     private String email;           // 유저 이메일
