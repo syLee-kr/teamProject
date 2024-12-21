@@ -43,7 +43,7 @@ public class PostController {
 	 */
 	@GetMapping("/list")
 	public String PostList(Model model, @RequestParam(value="page", defaultValue="1") Integer pageNum,
-										@RequestParam(value="Keyword", required = false) String keyword){
+										@RequestParam(value="keyword", required = false) String keyword){
 		log.info("게시물 목록 조회 요청, pageNum: {}, keyword: {}", pageNum, keyword);
 		
 		List<PostDTO> postList;

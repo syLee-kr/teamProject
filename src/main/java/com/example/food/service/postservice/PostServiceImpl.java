@@ -215,7 +215,7 @@ public class PostServiceImpl implements PostService {
         //페이징처리
         Pageable pageable = PageRequest.of(pageNum - 1, 10);
         
-        // 제목, 내용에 키워드가 포함된 게시물 검색
+        // 제목, 내용에 키워드가 포함된 게시물 검색.
         Page<Post> posts = postRepo.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
         
         // 검색 결과가 없을떄
