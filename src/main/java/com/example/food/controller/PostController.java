@@ -46,21 +46,25 @@ public class PostController {
 										@RequestParam(value="keyword", required = false) String keyword){
 		log.info("게시물 목록 조회 요청, pageNum: {}, keyword: {}", pageNum, keyword);
 		
-		List<PostDTO> postList;
+		List<PostDTO> postList; 
 		
+		Integer totalPages = postService.getTotalPages();  // 전체 페이지 수
+		Integer[] pageList = postService.getPageList(); // 전체 페이지 번호 생성
 		
 	    if (keyword != null && !keyword.isEmpty()) {
 	        // 검색어가 있을 경우, 제목 또는 내용에 keyword가 포함된 게시물 검색
 	        postList = postService.searchPostsByKeyword(keyword, pageNum);
+	        totalPages = postService.getTotalPagesForSearch(keyword);  // 검색된 게시물에 대한 총 페이지 수 계산
+	        pageList = postService.getPageListForSearch(keyword, pageNum);  // 검색된 게시물에 맞는 페이지 번호 목록 생성
 	    }else {
 	    	// 검색어가 없으면 게시글 페이징 처리
 	    	postList = postService.getPostList(pageNum);
+	    	totalPages = postService.getTotalPages();  // 전체 게시물에 대한 총 페이지 수 계산
+	        pageList = postService.getPageList();  // 전체 게시물에 대한 페이지 번호 목록 생성
 	    }
+	    
 		
-		// 전체 페이지 번호 생성
-		Integer[] pageList = postService.getPageList();
-		
-		 // 날짜 포맷 처리
+		// 날짜 포맷 처리
 	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
 	    postList.forEach(post -> {
 	        if (post.getPostdate() != null) {
@@ -70,8 +74,18 @@ public class PostController {
 	    });
 		
 		model.addAttribute("postList", postList);
-		model.addAttribute("pageList", pageList);
+		model.addAttribute("pageList", pageList); // 페이지 번호 목록
+		model.addAttribute("totalPages", totalPages); // 전체 페이지 수
+		model.addAttribute("pageNum", pageNum); // 현재 페이지
 		model.addAttribute("keyword", keyword); // 검색어 전달
+		
+	    // 이전/다음 페이지 계산 (현재 페이지가 1보다 크면 이전 페이지로, 총 페이지 수보다 작으면 다음 페이지로 이동)
+	    Integer prevPage = (pageNum > 1) ? pageNum - 1 : null; // 이전 페이지 번호(pageNum 이 1일 경우 null)
+	    Integer nextPage = (pageNum <= totalPages) ? pageNum + 1 : totalPages; // 다음 페이지 번호
+		
+	    model.addAttribute("prevPage", prevPage);
+	    model.addAttribute("nextPage", nextPage);
+		
 		
 		log.info("게시물 목록 조회 완료, 총 게시물 수: {}", postList.size());
 		

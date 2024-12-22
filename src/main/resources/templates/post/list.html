@@ -50,9 +50,22 @@
     <div class="pagination-container">
         <!-- 페이지네이션 -->
         <nav class="pagination">
-            <span th:each="page : ${pageList}" th:classappend="${currentPage == page} ? 'active' : ''">
-                <a th:href="@{/post/list(page=${page})}" th:text="${page}" class="page-link"></a>
-            </span>
+    		<!-- 이전 버튼 -->
+    		<a th:href="@{/post/list(page=${prevPage}, keyword=${keyword})}" th:if="${prevPage >= 1}" class="page-link">&lt;</a>
+		      		
+	        <!-- 페이지 번호 -->
+	        <div th:each="page : ${pageList}">
+		        <a th:href="@{/post/list(page=${page}, keyword=${keyword})}" th:text="${page}" 
+		           class="page-link" th:classappend="${pageNum == page} ? ' active ' : ' '"></a>
+			    <!-- 페이지 번호 확인
+				<p>현재 페이지: <span th:text="${pageNum}"></span></p>
+				<p>각 페이지: <span th:text="${page}"></span></p>
+		    	-->
+		    </div>
+		    
+		    <!-- 다음 버튼 -->
+	        <a th:href="@{/post/list(page=${nextPage}, keyword=${keyword})}" th:if="${nextPage <= totalPages}" class="page-link">&gt;</a>
+			
         </nav>
 	</div>
 </div>

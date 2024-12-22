@@ -19,7 +19,10 @@ public interface PostService {
 	// 게시물 저장
 	void savePost(PostDTO postDto);
 
-	// 전체 게시물 페이지 수 반환
+	// 전체 페이지 수 (페이징용) 
+	Integer getTotalPages();
+	
+	// 전체 페이지 목록 (페이징용)
 	Integer[] getPageList();
 
 	// 게시물 상세
@@ -33,6 +36,14 @@ public interface PostService {
 	
 	// 게시물 조회수
 	void viewCount(Long pSeq);
+	
+	// 검색된 게시물에 대한 전체 페이지 수
+	Integer getTotalPagesForSearch(String keyword);
+	
+	// 검색된 게시물에 대한 전체 페이지 목록
+	Integer[] getPageListForSearch(String keyword, Integer pageNum);
+	
+	
 
 	
 	

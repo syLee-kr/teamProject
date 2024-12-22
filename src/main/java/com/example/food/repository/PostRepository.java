@@ -21,4 +21,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	
 	// 제목이나 내용에 keyword가 포함된 게시물 검색
 	Page<Post> findByTitleContainingOrContentContaining(String keyword, String keyword2, Pageable pageable);
+	
+	// 제목이나 내용에 keyword가 포함된 게시물 수
+	int countByTitleContainingOrContentContaining(String keyword, String keyword2);
+	
+	
+	
 }

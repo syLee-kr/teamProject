@@ -27,7 +27,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepo;
     private final UserRepository userRepo;
-
+    private final int pageSize = 5;
     
     // 게시물 조회 등에 사용(데이터)
     @Override 
@@ -161,11 +161,11 @@ public class PostServiceImpl implements PostService {
         return (pageNum == null || pageNum < 1) ? 1 : pageNum;
     }
     
-    // 페이징 처리
+    // 페이징 처리(전체)
     @Override
     public List<PostDTO> getPostList(Integer pageNum) {
         pageNum = validatePageNum(pageNum); 
-        int pageSize = 10; // 페이지당 게시물 수
+       
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
 
         log.info("전체 게시물(공지사항 포함) 페이징 처리 요청, pageNum: {}", pageNum);
@@ -182,14 +182,31 @@ public class PostServiceImpl implements PostService {
         return postList;
     }
     
-    // 페이징 목록 조회
+    
+    // 전체 페이지 수 
+	@Override
+    public Integer getTotalPages() {
+        log.info("전체 페이지 수 조회 요청");
+
+        int totalPosts = (int)postRepo.count();  // 전체 게시물 수
+        int totalPages = (int) Math.ceil((double) totalPosts / pageSize);  // 전체 페이지 수 계산
+
+        // 최소 1페이지는 유지
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+
+        log.info("전체 페이지 수 조회 완료, 총 페이지 수: {}", totalPages);
+        return totalPages;
+    }
+    
+    // 전체 페이지 번호 목록
     @Override
     public Integer[] getPageList() {
         log.info("전체 페이지 목록 조회 요청");
 
-        int pageSize =10; // 페이지당 게시물 수
-        long totalPosts = postRepo.count(); // 전체 게시물 수
-        int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+        int totalPosts = (int)postRepo.count(); // 전체 게시물 수
+		int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
 
         // 최소 1페이지는 유지
         if (totalPages == 0) {
@@ -204,8 +221,6 @@ public class PostServiceImpl implements PostService {
         log.info("전체 페이지 목록 조회 완료, 총 페이지 수: {}", totalPages);
         return pageList;
     }
-
-
     
     // keyword로 게시글 검색
     @Override
@@ -213,7 +228,7 @@ public class PostServiceImpl implements PostService {
         log.info("게시물 검색 요청, keyword: {}, pageNum: {}", keyword, pageNum);
         
         //페이징처리
-        Pageable pageable = PageRequest.of(pageNum - 1, 10);
+        Pageable pageable = PageRequest.of(pageNum - 1, 5);
         
         // 제목, 내용에 키워드가 포함된 게시물 검색.
         Page<Post> posts = postRepo.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
@@ -233,7 +248,48 @@ public class PostServiceImpl implements PostService {
         return postDtos;
     }
 
-    
+    // 검색된 게시물에 대한 전체 페이지 수
+	@Override
+	public Integer getTotalPagesForSearch(String keyword) {
+		log.info("검색된 게시물의 전체 페이지 수 조회 요청, keyword: {}", keyword);
+		
+		// 검색된 게시물의 총 개수
+        int totalPosts = (int)postRepo.countByTitleContainingOrContentContaining(keyword, keyword);
+        
+        // 전체 페이지 수 계산
+        int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+
+        // 최소 1페이지는 유지
+        return totalPages == 0 ? 1 : totalPages;
+	}
+
+	// 검색된 게시물에 대한 전체 페이지 목록
+	@Override
+	public Integer[] getPageListForSearch(String keyword, Integer pageNum) {
+		log.info("검색된 게시물에 대한 전체 페이지 목록 조회 요청, keyword: {}", keyword);
+	    pageNum = validatePageNum(pageNum);
+
+	    // 검색된 게시물 수 
+	    int totalPosts = (int)postRepo.countByTitleContainingOrContentContaining(keyword, keyword);
+
+	    // 전체 페이지 수 
+	    int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+
+	    // 최소 1페이지는 유지
+	    if (totalPages == 0) {
+	        totalPages = 1;
+	    }
+
+	    // 전체 페이지 번호 목록 생성
+	    Integer[] pageList = new Integer[totalPages];
+	    for (int i = 0; i < totalPages; i++) {
+	        pageList[i] = i + 1; // 페이지 번호 1부터 시작
+	    }
+
+	    log.info("검색된 게시물에 대한 전체 페이지 목록 조회 완료, 총 페이지 수: {}", totalPages);
+	    return pageList;
+	}
+	
     // 게시물 조회수
 	@Override
 	public void viewCount(Long pSeq) {
@@ -247,4 +303,6 @@ public class PostServiceImpl implements PostService {
 		postRepo.save(post);
 		
 	}
+	
+	
 }

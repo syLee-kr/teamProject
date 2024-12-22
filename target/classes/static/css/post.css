@@ -245,12 +245,19 @@ a {
     margin: 0 5px;
     text-align: center;
     display: inline-block;
+    font-weight: normal;
 }
 
 .pagination .page-link:hover {
     background-color: #007bff;
     color: #ffffff;
 }
+
+
+.active {
+	font-weight: bold;
+	text-decoration: underline;
+	font-size:1.2rem;
 
 /* 입력 폼 */
 form .form-control {
