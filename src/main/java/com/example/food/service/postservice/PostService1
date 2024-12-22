@@ -5,12 +5,9 @@ import java.util.List;
 import com.example.food.PostDTO;
 import com.example.food.domain.Post;
 
-public interface PostService {
+public interface PostService1 {
 	
-	// 공지사항 목록
-	List<PostDTO> getIsNoticePosts();
-
-	// 게시물 목록(일반글)
+	// 게시물 목록(공지사항 포함)
 	List<PostDTO> getPostList(Integer pageNum);
 	
 	// 게시물 수정
@@ -45,12 +42,6 @@ public interface PostService {
 	
 	// 검색된 게시물에 대한 전체 페이지 목록
 	Integer[] getPageListForSearch(String keyword, Integer pageNum);
-
-
-
-	
-
-	
 	
 	
 

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 작성/수정</title>
+    <link rel="stylesheet" href="/css/post.css">
+</head>
+<body>
+<div class="sidebar" th:insert="~{main/sidebar :: sidebar}"></div>
+<div class="content">
+    <h1 th:text="${post != null ? '게시글 수정' : '게시글 작성'}">게시글 작성</h1>
+    <hr class="hr">
+    <form th:action="@{${post != null ? '/post/update' : '/post/write'}}" method="post" enctype="multipart/form-data">
+        <!-- 글 유형 -->
+        <div class="form-group" style="display:block; gap:50px;">
+        	<!-- 유형 선택 -->
+        	<label for="isNotice">분류</label>
+        	<select id="isNotice" name="isNotice" class="form-control" style="width:200px;" 
+        		th:if="${user != null and user.role == 'ROLE_ADMIN'}">
+        		<option value="false" th:selected="${post?.isNotice == false}">일반</option>
+        		<option value="true" th:selected="${post?.isNotice == true}">공지</option>
+        	</select>
+        
+        	<!-- 일반 사용자 : 유형 고정 -->
+        	<input type="hidden" id="isNotice" name="isNotice" value="false"
+        		th:unless="${user != null and user.role == 'ROLE_ADMIN'}">
+        </div>
+        <hr class="hr">
+        <!-- 제목 -->
+        <div class="form-group">
+	        <label for="title">제목</label>
+	        <input type="text" id="title" name="title" class="form-control" th:value="${post?.title}" style="flex:1;" placeholder="제목을 입력하세요" required>
+        </div>
+        
+        
+    	<!-- 내용 입력 -->
+        <div class="form-group">
+            <label for="content">내용</label>
+            <textarea id="content" name="content" rows="10" class="form-control" th:text="${post?.content}" placeholder="내용을 입력하세요" required></textarea>
+        </div>
+        <hr class="hr">
+        <!-- 이미지 업로드 추가 -->
+        <div class="form-group">
+            <label for="images">이미지 업로드</label>
+            <input type="file" id="images" name="images" class="form-control uploadimg" multiple>
+        </div>
+        
+        <!-- 수정할 때만 pSeq 전달 -->
+        <input type="hidden" th:if="${post != null}" name="pSeq" th:value="${post.pSeq}"/>
+        
+        <!-- 작성/수정 버튼 -->
+        <div class="btn-container-write">
+        	<button type="submit" class="btn-primary btn write" th:text="${post != null ? '수정' : '작성'}">버튼</button>
+        	<a th:href="@{/post/list}" class="btn btn-secondary">목록</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

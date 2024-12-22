@@ -10,7 +10,7 @@
 <div class="sidebar" th:insert="~{main/sidebar :: sidebar}"></div>
 <div class="content postContent">
     <h1>게시판 목록</h1>
-    <hr class="hr">
+    <hr class="hr">    
     <table class="table">
         <thead>
             <tr>
@@ -22,14 +22,24 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="post, stat : ${postList}">
-                <!-- 공지 여부에 따라 '공지' 또는 번호 -->
-                <td th:text="${post.isNotice ? '공지' : stat.index + 1}"></td>
-                <td>
+        	 <!-- 공지사항 목록 -->
+            <tr th:each="post : ${isNoticePosts}">
+                <td th:text="'공지'"></td>
+                <td class="td-title">
                     <a th:href="@{/post/detail/{id}(id=${post.pSeq})}" th:text="${post.title}"></a>
                 </td>
                 <td th:text="${post.userName} + ' (' + ${post.userId} +')'"></td>
-                <td th:text="${post.formattedPostdate}"></td>
+                <td class="td-date" th:text="${post.formattedPostdate}"></td>
+                <td align="center" th:text="${post.cnt}"></td>
+            </tr>
+            <tr th:each="post, stat : ${postList}">
+                <!-- 공지 여부에 따라 '공지' 또는 번호 -->
+                <td th:text="${stat.index + 1 + (isNoticePosts != null ? isNoticePosts.size():0)}"></td>
+                <td class="td-title">
+                    <a th:href="@{/post/detail/{id}(id=${post.pSeq})}" th:text="${post.title}"></a>
+                </td>
+                <td th:text="${post.userName} + ' (' + ${post.userId} +')'"></td>
+                <td class="td-date" th:text="${post.formattedPostdate}"></td>
                 <td align=center th:text="${post.cnt}"></td>
             </tr>
         </tbody>

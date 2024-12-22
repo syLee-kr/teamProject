@@ -15,42 +15,37 @@
             <h1 class="post-title" th:text="${post.title}"></h1>
             <p class="post-author" th:text="${post.userName} + ' (' + ${post.userId} +')'"></p>
         </div>
-        <hr>
+        <hr class="hr">
         <div class="post-meta">
-            <p class="post-date"><strong>작성일:</strong> <span th:text="${post.postdate}"></span></p>
+            <p class="post-date"><strong>작성일:</strong> <span th:text="${post.formattedPostdate}"></span></p>
             <p class="post-views"><strong>조회수:</strong> <span th:text="${post.cnt}"></span></p>
         </div>
     </div>
-    <hr>
+    <hr class="hr">
 
     <!-- 글 내용 -->
     <div class="post-content">
         <p th:text="${post.content}"></p>
+        
+        <img th:each="image : ${post.imagePaths}" th:src="@{${image}}" class="detail-image" alt="첨부 이미지">
     </div>
 
-    <!-- 첨부된 이미지 -->
-    <div th:if="${post.imagePaths?.size() > 0}">
-        <h4>첨부된 이미지</h4>
-        <div>
-            <img th:each="image : ${post.imagePaths}" th:src="@{${image}}" class="detail-image" alt="첨부 이미지">
-        </div>
-    </div>
-
-    <hr>
+    <hr class="hr">
 
     <!-- 수정 및 삭제 버튼 -->
-    <div class="post-actions">
-        <button class="btn btn-primary">수정</button>
-        <button class="btn btn-secondary">삭제</button>
+    <div class="btn-container-write">
+        <!-- 수정 버튼 -->
+        <a th:href="@{/post/update/{pSeq}(pSeq=${post.pSeq})}" class="btn btn-primary">수정</a>
+        
+        <!-- 삭제 버튼  -->
+        <form th:action="@{/post/delete/{pSeq}(pSeq=${post.pSeq})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-secondary write btn-container-write">삭제</button>
+        </form>
+        
+        <!-- 목록 버튼 -->
+        <a th:href="@{/post/list}" class="btn btn-secondary">목록</a>
     </div>
-
-    <!-- 목록으로 버튼을 댓글 위로 이동 -->
-    <div class="back-to-list">
-        <a th:href="@{/post/list}" class="btn btn-secondary">목록으로</a>
-    </div>
-
-   
-
+    
     <!-- 댓글 섹션 -->
     <section class="comments">
         <h3>댓글</h3>
