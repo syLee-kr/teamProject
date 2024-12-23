@@ -46,7 +46,7 @@ public class PostController {
 										@RequestParam(value="keyword", required = false) String keyword){
 		log.info("게시물 목록 조회 요청, pageNum: {}, keyword: {}", pageNum, keyword);
 		
-		List<PostDTO> postList; 
+		List<PostDTO> postList = postService.getPostList(pageNum);    // 일반글 목록
 		List<PostDTO> isNoticePosts = postService.getIsNoticePosts(); // 공지글 목록
 		Integer totalPages = postService.getTotalPages();  // 전체 페이지 수
 		Integer[] pageList = postService.getPageList(); // 전체 페이지 번호 생성
@@ -73,6 +73,9 @@ public class PostController {
 	        }
 	    });
 		
+	    
+	
+	    
 		model.addAttribute("postList", postList);
 		model.addAttribute("isNoticePosts", isNoticePosts); // 공지 목록
 		model.addAttribute("pageList", pageList); // 페이지 번호 목록
@@ -88,7 +91,8 @@ public class PostController {
 	    model.addAttribute("nextPage", nextPage);
 		
 		
-		log.info("게시물 목록 조회 완료, 총 게시물 수: {}", postList.size());
+	    log.info("공지글 수: {}", isNoticePosts.size());
+	    log.info("일반글 수: {}", postList.size());
 		
 		return "post/list";
 

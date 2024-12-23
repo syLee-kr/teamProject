@@ -6,9 +6,10 @@ import java.util.List;
 
 import com.example.food.domain.Post;
 
+import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @Data
 @NoArgsConstructor
@@ -25,6 +26,8 @@ public class PostDTO {
 	private String userName;		// 작성자 이름			
 	private List<String> imagePaths;// 이미지 경로 리스트
 	private Boolean isNotice; 		// 게시글 공지사항
+	private int startNum; //
+	
 	
 	//post 객체를 PostDTO로 변환
 	public PostDTO(Post post) {
@@ -37,6 +40,7 @@ public class PostDTO {
 		// post 객체의 user 필드를 통해 userId/name 가져옴
 		this.userId = post.getUser().getUserId();
 		this.userName = post.getUser().getName();
+		
 		this.imagePaths = post.getImagePaths();
 		this.isNotice = post.getIsNotice();
 		
@@ -44,6 +48,11 @@ public class PostDTO {
         if (this.postdate != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
             this.formattedPostdate = this.postdate.format(formatter); // 생성자 내에서 포맷
-        }	
+        }
+        
 	}
+	public PostDTO(int startNum) {
+		this.startNum = startNum;
+	}
+
 }

@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 	
-	@Query("SELECT p FROM Post p ORDER BY p.isNotice DESC, p.priority DESC, p.postdate DESC")
+	@Query("SELECT p FROM Post p WHERE p.isNotice = false ORDER BY p.id DESC")
 	// 공지사항 제외한 일반 게시글 페이징 처리
 	Page<Post> findByIsNoticeFalse(Pageable pageable);
 	

@@ -161,21 +161,24 @@ public class PostServiceImpl implements PostService {
         return (pageNum == null || pageNum < 1) ? 1 : pageNum;
     }
     
-    // 페이징 처리(전체)
+    // 페이징 처리(일반)
     @Override
     public List<PostDTO> getPostList(Integer pageNum) {
         pageNum = validatePageNum(pageNum); 
        
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
 
-        log.info("전체 게시물(공지사항 포함) 페이징 처리 요청, pageNum: {}", pageNum);
+        log.info("일반 게시물 페이징 처리 요청, pageNum: {}", pageNum);
         
         // 일반 게시물만 페이징 처리
         Page<Post> postPage = postRepo.findByIsNoticeFalse(pageable);
+        
+        // 게시글 번호 계산 (현재 페이지에서 첫 번째 게시글 번호)
+        int startNum = (pageNum - 1) * pageSize + 1;  // 첫 번째 게시글 번호 계산
 
         // 일반 Page<Post> 객체를 List<PostDTO>로 변환
         List<PostDTO> regularPosts = postPage.getContent().stream()
-        								     .map(post-> new PostDTO(post))
+        								     .map(post-> new PostDTO(post, startNum++))
                                              .collect(Collectors.toList());
        
         
@@ -188,7 +191,6 @@ public class PostServiceImpl implements PostService {
     public List<PostDTO> getIsNoticePosts() {
     	return postRepo.findByIsNoticeTrueOrderByPostdateDesc()
                        .stream()
-                       .filter(post -> post != null)
                        .map(post -> new PostDTO(post))
                        .collect(Collectors.toList());
     }
