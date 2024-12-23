@@ -24,7 +24,7 @@ public class PostDTO {
 	private String userId;			// 작성자 ID
 	private String userName;		// 작성자 이름			
 	private List<String> imagePaths;// 이미지 경로 리스트
-	private Boolean isNotice; 		// 게시글 공지사항/일반글
+	private Boolean isNotice; 		// 게시글 공지사항
 	
 	//post 객체를 PostDTO로 변환
 	public PostDTO(Post post) {

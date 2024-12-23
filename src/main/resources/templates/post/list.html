@@ -33,7 +33,7 @@
                 <td align="center" th:text="${post.cnt}"></td>
             </tr>
             <tr th:each="post, stat : ${postList}">
-                <!-- 공지 여부에 따라 '공지' 또는 번호 -->
+                <!-- 번호 부분: 공지글을 먼저 표시한 후 일반 글 번호를 처리 -->
                 <td th:text="${stat.index + 1 + (isNoticePosts != null ? isNoticePosts.size():0)}"></td>
                 <td class="td-title">
                     <a th:href="@{/post/detail/{id}(id=${post.pSeq})}" th:text="${post.title}"></a>

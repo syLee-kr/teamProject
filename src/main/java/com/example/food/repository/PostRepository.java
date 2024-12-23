@@ -18,7 +18,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	Page<Post> findByIsNoticeFalse(Pageable pageable);
 	
 	//공지사항 목록 조회
-	List<PostDTO> findByIsNoticeTrueOrderByPostdateDesc();
+	List<Post> findByIsNoticeTrueOrderByPostdateDesc();
 	
 	// Users 객체로 게시글 조회
 	List<Post> findByUser(Users user);

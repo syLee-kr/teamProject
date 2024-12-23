@@ -189,7 +189,7 @@ public class PostServiceImpl implements PostService {
     	return postRepo.findByIsNoticeTrueOrderByPostdateDesc()
                        .stream()
                        .filter(post -> post != null)
-                       .map(post -> new PostDTO())
+                       .map(post -> new PostDTO(post))
                        .collect(Collectors.toList());
     }
     
