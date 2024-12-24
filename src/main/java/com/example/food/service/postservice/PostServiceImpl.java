@@ -52,10 +52,10 @@ public class PostServiceImpl implements PostService {
         
         log.info("게시물 상세조회 완료, pSeq: {}", pSeq);
         
-        int startNum = 1; // 페이지 번호에 관계없이 1로 설정(단일 페이지이기 때문)
+        int postNum = 1; // 페이지 번호에 관계없이 1로 설정(단일 페이지이기 때문)
         
         
-        return new PostDTO(post, startNum);
+        return new PostDTO(post, postNum);
     }
     
 
@@ -178,11 +178,11 @@ public class PostServiceImpl implements PostService {
         Page<Post> postPage = postRepo.findByIsNoticeFalse(pageable);
         
         // 게시글 번호 계산 (현재 페이지에서 첫 번째 게시글 번호-배열)
-        int[] startNum = {(pageNum - 1) * pageSize + 1};  // 첫 번째 게시글 번호 계산
+        int[] postNum= {(pageNum - 1) * pageSize + 1};  // 첫 번째 게시글 번호 계산
 
         // 일반 Page<Post> 객체를 List<PostDTO>로 변환
         List<PostDTO> regularPosts = postPage.getContent().stream()
-        								     .map(post-> new PostDTO(post, startNum[0]++))
+        								     .map(post-> new PostDTO(post, postNum[0]++))
                                              .collect(Collectors.toList());
        
         
@@ -194,21 +194,21 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostDTO> getIsNoticePosts() {
     	
-    	int startNum = 1;
+    	int postNum = 1;
     	
     	return postRepo.findByIsNoticeTrueOrderByPostdateDesc()
                        .stream()
-                       .map(post -> new PostDTO(post, startNum))
+                       .map(post -> new PostDTO(post, postNum))
                        .collect(Collectors.toList());
     }
     
     
-    // 전체 페이지 수 
+    // 전체(일반) 페이지 수 
 	@Override
     public Integer getTotalPages() {
-        log.info("전체 페이지 수 조회 요청");
+        log.info("전체(일반) 페이지 수 조회 요청");
 
-        int totalPosts = (int)postRepo.count();  // 전체 게시물 수
+        int totalPosts = (int)postRepo.countByIsNoticeFalse();  // 일반 게시물 수
         int totalPages = (int) Math.ceil((double) totalPosts / pageSize);  // 전체 페이지 수 계산
 
         // 최소 1페이지는 유지
@@ -216,16 +216,16 @@ public class PostServiceImpl implements PostService {
             totalPages = 1;
         }
 
-        log.info("전체 페이지 수 조회 완료, 총 페이지 수: {}", totalPages);
+        log.info("전체(일반) 페이지 수 조회 완료, 총 페이지 수: {}", totalPages);
         return totalPages;
     }
     
-    // 전체 페이지 번호 목록
+    // 전체(일반) 페이지 번호 목록
     @Override
     public Integer[] getPageList() {
-        log.info("전체 페이지 목록 조회 요청");
+        log.info("전체(일반) 페이지 목록 조회 요청");
 
-        int totalPosts = (int)postRepo.count(); // 전체 게시물 수
+        int totalPosts = (int)postRepo.countByIsNoticeFalse(); // 일반 게시물 수
 		int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
 
         // 최소 1페이지는 유지
@@ -238,7 +238,7 @@ public class PostServiceImpl implements PostService {
             pageList[i] = i + 1; // 페이지 번호 1부터 시작
         }
 
-        log.info("전체 페이지 목록 조회 완료, 총 페이지 수: {}", totalPages);
+        log.info("전체(일반) 페이지 목록 조회 완료, 총 페이지 수: {}", totalPages);
         return pageList;
     }
     
@@ -254,11 +254,11 @@ public class PostServiceImpl implements PostService {
         Page<Post> postsPage = postRepo.findByTitleContainingOrContentContainingAndIsNoticeFalse(keyword, keyword, pageable);
         
         // 게시글 번호 계산 (현재 페이지에서 첫 번째 게시글 번호-배열)
-        int[] startNum = {(pageNum - 1) * pageSize + 1};  // 첫 번째 게시글 번호 계산
+        int[] postNum = {(pageNum - 1) * pageSize + 1};  // 첫 번째 게시글 번호 계산
         
         // 검색된 일반 게시물 (isNotice=false) 가져오기
         List<PostDTO> regularPosts = postsPage.getContent().stream()
-                                              .map(post-> new PostDTO(post, startNum[0]++))
+                                              .map(post-> new PostDTO(post, postNum[0]++))
                                               .collect(Collectors.toList());
         // 검색 결과가 없을떄
         if (regularPosts.isEmpty()) {

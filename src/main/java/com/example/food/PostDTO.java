@@ -15,7 +15,7 @@ import lombok.Data;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostDTO {
-	private Long pSeq; 				// 게시글 번호	
+	private Long pSeq; 				// 게시글 분류번호	
 	private String title;			// 게시글 제목
 	private String content;			// 게시글 본문
 	private OffsetDateTime postdate;// 게시글 작성 시간
@@ -26,11 +26,11 @@ public class PostDTO {
 	private String userName;		// 작성자 이름			
 	private List<String> imagePaths;// 이미지 경로 리스트
 	private Boolean isNotice; 		// 게시글 공지사항
-	private int startNum; 			// 게시글 번호
+	private int postNum; 			// 게시글 목록 번호
 	
 	
 	//post 객체를 PostDTO로 변환
-	public PostDTO(Post post, int startNum) {
+	public PostDTO(Post post, int postNum) {
 		this.pSeq = post.getPSeq();
 		this.title = post.getTitle();
 		this.content = post.getContent();
@@ -43,7 +43,7 @@ public class PostDTO {
 		
 		this.imagePaths = post.getImagePaths();
 		this.isNotice = post.getIsNotice();
-		this.startNum = startNum;
+		this.postNum = postNum;
 		
         // 날짜 포맷 처리 (yyyy-MM-dd HH:mm 형식으로 변환)
         if (this.postdate != null) {

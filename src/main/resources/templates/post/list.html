@@ -24,17 +24,17 @@
         <tbody>
         	 <!-- 공지사항 목록 -->
             <tr th:each="post : ${isNoticePosts}">
-                <td th:text="'공지'"></td>
+                <td th:text="'공지'"></td><!-- 고정 -->
                 <td>
                     <a th:href="@{/post/detail/{id}(id=${post.pSeq})}" th:text="${post.title}"></a>
                 </td>
-                <td class="td-hr" th:text="${post.userName} + ' (' + ${post.userId} +')'"></td>
-                <td class="td-hr" th:text="${post.formattedPostdate}"></td>
+                <td th:text="${post.userName} + ' (' + ${post.userId} +')'"></td>
+                <td th:text="${post.formattedPostdate}"></td>
                 <td align="center" th:text="${post.cnt}"></td>
             </tr>
-            <tr th:each="post, stat : ${postList}">
+            <tr th:each="post : ${postList}">
                 <!-- 번호 부분: 공지글을 먼저 표시한 후 일반 글 번호를 처리 -->
-                <td th:text="${stat.index + 1}"></td>
+                <td th:text="${post.postNum}"></td>
                 <td class="td-title">
                     <a th:href="@{/post/detail/{id}(id=${post.pSeq})}" th:text="${post.title}"></a>
                 </td>
