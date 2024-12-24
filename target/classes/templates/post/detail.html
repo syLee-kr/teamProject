@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="sidebar" th:insert="~{main/sidebar :: sidebar}"></div>
-<div class="content postContent">
+<div class="content">
     <!-- 글 제목과 작성일, 작성자, 조회수 -->
    <div class="post-header">
         <div class="post-title-author">
@@ -38,8 +38,8 @@
         <a th:href="@{/post/write/{pSeq}(pSeq=${post.pSeq})}" class="btn btn-primary">수정</a>
         
         <!-- 삭제 버튼  -->
-        <form th:action="@{/post/delete/{pSeq}(pSeq=${post.pSeq})}" method="post" style="display:inline;">
-            <button type="submit" class="btn btn-secondary write btn-container-write">삭제</button>
+        <form th:action="@{/post/delete/{pSeq}(pSeq=${post.pSeq})}" method="post">
+            <button type="submit" class="btn btn-secondary write del">삭제</button>
         </form>
         
         <!-- 목록 버튼 -->
@@ -71,8 +71,8 @@
                 <textarea name="content" class="form-control" rows="3" placeholder="댓글을 작성하세요" required></textarea>
                 <input type="hidden" name="postId" th:value="${post.pSeq}">
                 <div class="button-group">
-                    <button type="submit" class="btn btn-primary">댓글 작성</button>
-                    <button type="button" class="btn btn-danger">삭제</button> <!-- 삭제 버튼 추가 -->
+                    <button type="submit" class="btn btn-primary">Comment</button>
+                    <button type="button" class="btn btn-danger">delete</button> <!-- 삭제 버튼 추가 -->
                 </div>
             </form>
         </div>

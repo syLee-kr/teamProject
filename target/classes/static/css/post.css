@@ -89,11 +89,9 @@ body {
     background-color: #f8f9fa; /* 부드러운 배경색 */
     overflow-y: auto;
     height: 100vh;
+    min-height: 100vh;
 }
 
-.postContent {
-	min-height: 100vh;
-}
 
 /* 공통 테이블 스타일 */
 .table {
@@ -151,7 +149,7 @@ body {
 
 /* 구분선 */
 .hr {
-	width: calc(100% - 200px); /* 나머지 화면 차지 */
+	width: calc(100% - 200px); 
 	margin-left: 0;
 	text-align: left;
 	margin-top: 4px;
@@ -163,7 +161,7 @@ body {
     display: flex;
     justify-content: space-between; /* 왼쪽과 오른쪽으로 공간을 나눔 */
     align-items: center; /* 세로 정렬 */
-    width: calc(100% - 200px); /* 나머지 화면 차지 */ /* 전체 너비를 차지하도록 설정 */
+    width: calc(100% - 200px); 
     margin-bottom: 5px; /* 아래쪽에 간격 추가 (선택 사항) */
 }
 
@@ -207,6 +205,12 @@ body {
     height: auto; /* 버튼 높이를 적당히 조정 */
     padding: 10px 15px; /* 패딩 줄여서 버튼 크기 작게 */
     font-size: 16px; /* 폰트 크기 줄이기 */
+}
+
+.del{
+	display: inline;  /* 인라인으로 나란히 배치 */
+    width: 60px;  /* 버튼 너비 60px 설정 */
+    
 }
 
 /* 작성 버튼을 감싸는 부모 요소 스타일 */
@@ -408,6 +412,7 @@ form .form-group #content {
 .comment-form-actions .button-group {
     display: flex;
     gap: 10px; /* 버튼 간의 간격 설정 */
+    padding: 5px 5px;
 }
 
 /* '목록으로' 버튼 스타일 */

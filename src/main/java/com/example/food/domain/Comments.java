@@ -37,12 +37,12 @@ public class Comments {
     @Column(nullable = false)
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id", nullable = false)
     @JsonBackReference // 자식 필드
     private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 

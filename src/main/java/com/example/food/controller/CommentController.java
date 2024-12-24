@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,13 +37,19 @@ public class CommentController {
 
     // 댓글 추가
     @PostMapping("/add")
-    public void addComment(@RequestBody CommentDTO commentDto) {
-        log.info("댓글 추가 요청, userId: {}, postId: {}, content: {}", 
-                 commentDto.getUserId(), commentDto.getPostId(), commentDto.getContent());
+    public void addComment(@RequestParam String content,
+    					   @RequestParam Long postId ) {
+        log.info("댓글 추가 요청, postId: {}, content: {}", content, postId);
+                 
+        	
         
         // 테스트용 고정된 사용자 정보
+        CommentDTO commentDto = new CommentDTO(); 
+        
         commentDto.setUserId("test_user");
         commentDto.setUserName("테스트유저");
+        commentDto.setContent(content);
+        commentDto.setPostId(postId);
         
         commentService.addComment(commentDto);
         log.info("댓글 추가 완료, userId: {}, postId: {}", commentDto.getUserId(), commentDto.getPostId());
