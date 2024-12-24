@@ -4,7 +4,7 @@
     font-style: normal;
     font-weight: 400;
     src: url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff2') format('woff2'),
-    url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/GodoM.woff') format('woff');
+    url('//fastly.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff') format('woff');
 }
 
 @font-face {
@@ -14,7 +14,11 @@
     font-style: normal;
 }
 
-/* 기본 Reset 및 Flex 레이아웃 */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -25,18 +29,24 @@ body {
     height: 100vh; /* 화면 높이에 딱 맞게 설정 */
 }
 
-a {
-    text-decoration: none;
-    color: inherit;
+.sidebar h1 {
+    position: absolute;
+    font-family: 'TTHakgyoansimSamulhamR', serif; /* 'TTHakgyoansimSamulhamR' 폰트 적용 */
+    bottom: 50px;
+    font-size: 40px;
+    text-align: center;
+    left: 3.5%;
+    color: rgb(255, 255, 255);
 }
 
-/* Sidebar 스타일 */
+/* 사이드바 스타일 */
 .sidebar {
     width: 15%;
     background-color: #c59d9d;
     color: #ffffff;
     height: 100vh;
     padding: 20px;
+    padding-right: 35px;
 }
 
 .sidebar ul.menu {
@@ -92,7 +102,8 @@ a {
     margin-top: 15px;
     margin-bottom: 15px;
     table-layout: auto;
-    font-size: 2.2vh;
+    font-size: 1vh 1vw;
+
 }
 
 .table th,
@@ -102,32 +113,28 @@ a {
     border-bottom: 1px solid #ddd;
     vertical-align: middle; /* 텍스트가 셀에서 수직 중앙에 위치하도록 설정 */
     line-height: 1.5; /* 줄 높이를 설정하여 글자가 위아래로 밀리지 않게 */
-	
 }
 
 .table th {
     background-color: #c59d9d;
     color: #ffffff;
+    font-size: 1vh, 1vw;
+    
 }
 
-.td-title {
-	font-size: 15px;
+.table tb {
+	font-size: 1vh 1vw;
 }
 
-.td-date {
-	font-size: 15px;
-}
 
 /* 테이블 요소별 조절*/
 
 .table th:nth-child(1) { /*번호*/
 	width: 30px;
-	
 }
 
 .table th:nth-child(2) { /*제목*/
 	width: 400px;
-
 }
 .table th:nth-child(3) { /*작성자*/
 	width: 90px;
@@ -352,7 +359,7 @@ form .form-group #content {
     color: #555;
     margin-top: 40px;
     margin-bottom: 5px;
-    align-text: center;
+    text-align: center;
     
 }
 

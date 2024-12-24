@@ -25,11 +25,11 @@
         	 <!-- 공지사항 목록 -->
             <tr th:each="post : ${isNoticePosts}">
                 <td th:text="'공지'"></td>
-                <td class="td-title">
+                <td>
                     <a th:href="@{/post/detail/{id}(id=${post.pSeq})}" th:text="${post.title}"></a>
                 </td>
-                <td th:text="${post.userName} + ' (' + ${post.userId} +')'"></td>
-                <td class="td-date" th:text="${post.formattedPostdate}"></td>
+                <td class="td-hr" th:text="${post.userName} + ' (' + ${post.userId} +')'"></td>
+                <td class="td-hr" th:text="${post.formattedPostdate}"></td>
                 <td align="center" th:text="${post.cnt}"></td>
             </tr>
             <tr th:each="post, stat : ${postList}">

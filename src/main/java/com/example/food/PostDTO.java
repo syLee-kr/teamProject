@@ -26,11 +26,11 @@ public class PostDTO {
 	private String userName;		// 작성자 이름			
 	private List<String> imagePaths;// 이미지 경로 리스트
 	private Boolean isNotice; 		// 게시글 공지사항
-	private int startNum; //
+	private int startNum; 			// 게시글 번호
 	
 	
 	//post 객체를 PostDTO로 변환
-	public PostDTO(Post post) {
+	public PostDTO(Post post, int startNum) {
 		this.pSeq = post.getPSeq();
 		this.title = post.getTitle();
 		this.content = post.getContent();
@@ -43,16 +43,13 @@ public class PostDTO {
 		
 		this.imagePaths = post.getImagePaths();
 		this.isNotice = post.getIsNotice();
+		this.startNum = startNum;
 		
         // 날짜 포맷 처리 (yyyy-MM-dd HH:mm 형식으로 변환)
         if (this.postdate != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
             this.formattedPostdate = this.postdate.format(formatter); // 생성자 내에서 포맷
         }
-        
-	}
-	public PostDTO(int startNum) {
-		this.startNum = startNum;
 	}
 
 }

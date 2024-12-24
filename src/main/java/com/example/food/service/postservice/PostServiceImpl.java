@@ -51,7 +51,11 @@ public class PostServiceImpl implements PostService {
                             .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
         
         log.info("게시물 상세조회 완료, pSeq: {}", pSeq);
-        return new PostDTO(post);
+        
+        int startNum = 1; // 페이지 번호에 관계없이 1로 설정(단일 페이지이기 때문)
+        
+        
+        return new PostDTO(post, startNum);
     }
     
 
@@ -173,12 +177,12 @@ public class PostServiceImpl implements PostService {
         // 일반 게시물만 페이징 처리
         Page<Post> postPage = postRepo.findByIsNoticeFalse(pageable);
         
-        // 게시글 번호 계산 (현재 페이지에서 첫 번째 게시글 번호)
-        int startNum = (pageNum - 1) * pageSize + 1;  // 첫 번째 게시글 번호 계산
+        // 게시글 번호 계산 (현재 페이지에서 첫 번째 게시글 번호-배열)
+        int[] startNum = {(pageNum - 1) * pageSize + 1};  // 첫 번째 게시글 번호 계산
 
         // 일반 Page<Post> 객체를 List<PostDTO>로 변환
         List<PostDTO> regularPosts = postPage.getContent().stream()
-        								     .map(post-> new PostDTO(post, startNum++))
+        								     .map(post-> new PostDTO(post, startNum[0]++))
                                              .collect(Collectors.toList());
        
         
@@ -189,9 +193,12 @@ public class PostServiceImpl implements PostService {
     // 공지사항은 항상 상단에 배치되도록 따로 가져오기
     @Override
     public List<PostDTO> getIsNoticePosts() {
+    	
+    	int startNum = 1;
+    	
     	return postRepo.findByIsNoticeTrueOrderByPostdateDesc()
                        .stream()
-                       .map(post -> new PostDTO(post))
+                       .map(post -> new PostDTO(post, startNum))
                        .collect(Collectors.toList());
     }
     
@@ -246,9 +253,12 @@ public class PostServiceImpl implements PostService {
         // 제목, 내용에 키워드가 포함된 게시물 검색.(공지사항을 제외한)
         Page<Post> postsPage = postRepo.findByTitleContainingOrContentContainingAndIsNoticeFalse(keyword, keyword, pageable);
         
+        // 게시글 번호 계산 (현재 페이지에서 첫 번째 게시글 번호-배열)
+        int[] startNum = {(pageNum - 1) * pageSize + 1};  // 첫 번째 게시글 번호 계산
+        
         // 검색된 일반 게시물 (isNotice=false) 가져오기
         List<PostDTO> regularPosts = postsPage.getContent().stream()
-                                              .map(post-> new PostDTO(post))
+                                              .map(post-> new PostDTO(post, startNum[0]++))
                                               .collect(Collectors.toList());
         // 검색 결과가 없을떄
         if (regularPosts.isEmpty()) {
