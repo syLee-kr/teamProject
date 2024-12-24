@@ -90,7 +90,6 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setPriority(postDto.getPriority());
-        post.setCnt(postDto.getCnt());
         post.setImagePaths(postDto.getImagePaths()); // 수정된 이미지경로 추가
         
 

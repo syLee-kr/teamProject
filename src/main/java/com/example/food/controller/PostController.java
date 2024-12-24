@@ -97,12 +97,12 @@ public class PostController {
 		return "post/list";
 
 	}
-    
+    /*
 	@PostMapping("/list")
     public String PostListRedirect() {
         // 게시물 작성 후 /post/list로 리다이렉트
         return "redirect:/post/list";
-    }
+    }*/
 	
 	/*
 	 * 게시물 작성 페이지
@@ -246,13 +246,24 @@ public class PostController {
 	/*
 	 * 게시물 수정
 	 */
+	@GetMapping("/write/{pSeq}")
+	public String edit(@PathVariable long pSeq, Model model) {
+		
+		PostDTO postDto = postService.getPostById(pSeq);
+		
+		model.addAttribute("post",postDto);
+		
+		return "post/write";
+	}
+	
+	
 	@PostMapping("/update/{pSeq}")
-	public String edit(@RequestParam Long pSeq, 
-					   @RequestParam String title,
-					   @RequestParam String content,
-					   @RequestParam(value="isNotice", defaultValue="false") Boolean isNotice,
-					   @RequestParam MultipartFile[] images)/*, //테스트 사용자 제거 시 images 뒤에)/* 제거
-					   HttpSession session)*/ throws IOException {
+	public String edituUpdate(@RequestParam Long pSeq, 
+						     @RequestParam String title,
+						     @RequestParam String content,
+						     @RequestParam(value="isNotice", defaultValue="false") Boolean isNotice,
+						     @RequestParam MultipartFile[] images)/*, //테스트 사용자 제거 시 images 뒤에)/* 제거
+						      HttpSession session)*/ throws IOException {
 					 			
 		
 		log.info("게시물 수정 요청, pSeq: {}, 제목: {}, 내용: {}", pSeq, title, content);
@@ -298,11 +309,12 @@ public class PostController {
 		postDto.setUserId(user.getUserId()); //로그인한 사용자 ID 설정
 		postDto.setUserName(user.getName());
 		
+		
 		postService.updatePost(postDto);
 		
 		log.info("게시물 수정 완료, pSeq: {}", pSeq);
 		
-		return "redirect:/post/detail" + pSeq;
+		return "redirect:/post/detail/" + pSeq;
 		
 	}
 	

@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="sidebar" th:insert="~{main/sidebar :: sidebar}"></div>
-<div class="content">
+<div class="content postContent">
     <!-- 글 제목과 작성일, 작성자, 조회수 -->
    <div class="post-header">
         <div class="post-title-author">
@@ -35,7 +35,7 @@
     <!-- 수정 및 삭제 버튼 -->
     <div class="btn-container-write">
         <!-- 수정 버튼 -->
-        <a th:href="@{/post/update/{pSeq}(pSeq=${post.pSeq})}" class="btn btn-primary">수정</a>
+        <a th:href="@{/post/write/{pSeq}(pSeq=${post.pSeq})}" class="btn btn-primary">수정</a>
         
         <!-- 삭제 버튼  -->
         <form th:action="@{/post/delete/{pSeq}(pSeq=${post.pSeq})}" method="post" style="display:inline;">

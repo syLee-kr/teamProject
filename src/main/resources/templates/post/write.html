@@ -11,7 +11,7 @@
 <div class="content">
     <h1 th:text="${post != null ? '게시글 수정' : '게시글 작성'}">게시글 작성</h1>
     <hr class="hr">
-    <form th:action="@{${post != null ? '/post/update' : '/post/write'}}" method="post" enctype="multipart/form-data">
+    <form th:action="@{${post != null ? '/post/update/{pSeq}' : '/post/write'}}" method="post" enctype="multipart/form-data">
         <!-- 글 유형 -->
         <div class="form-group" style="display:block; gap:50px;">
         	<!-- 유형 선택 -->
