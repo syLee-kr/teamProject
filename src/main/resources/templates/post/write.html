@@ -48,8 +48,10 @@
         
         <!-- 기존 이미지 목록 -->
 		<div th:if="${post != null and post.imagePaths != null and !post.imagePaths.isEmpty()}">
-		    <h3>이미지</h3>
-		    <p class="delete-info">이미지 삭제 시 체크하세요</p>
+		    <div class="image-header">
+		        <h3>이미지</h3>
+		        <p class="delete-info">(이미지 삭제 시 체크하세요)</p>
+		    </div>
 		    <ul>
 		        <li th:each="imagePath : ${post.imagePaths}" class="image-item">
 		            <img th:src="@{${imagePath}}" alt="이미지" width="100"/>
@@ -59,7 +61,6 @@
 		    </ul>
 		</div>
 
-        
         <!-- 수정할 때만 pSeq 전달 -->
         <input type="hidden" th:if="${post != null}" name="pSeq" th:value="${post.pSeq}"/>
         

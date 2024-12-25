@@ -395,6 +395,7 @@ form .form-group #content {
 .post-content {
     line-height: 1.6;
     margin-top: 20px;
+    margin-bottom: 20px;
     width: calc(100% - 200px); /* 나머지 화면 차지 */  
     padding: 10px;
     font-size: 16px;
@@ -421,6 +422,19 @@ form .form-group #content {
 }
 
 /* 이미지 삭제 체크박스 스타일 */
+
+.image-header {
+  display: flex;          /* 수평으로 배치 */
+  align-items: center;    /* 수직 정렬 */
+  gap: 5px;              /* 요소 간의 간격 */
+}
+
+/* 안내 문구 스타일 */
+.delete-info {
+    font-size: 14px;
+    color: #555;
+    margin-top: 20px;
+}
 .image-item {
     display: flex;
     align-items: center;
@@ -435,12 +449,7 @@ form .form-group #content {
     margin-left: 10px;
 }
 
-/* 안내 문구 스타일 */
-.delete-info {
-    font-size: 14px;
-    color: #555;
-    margin-top: 5px;
-}
+
 
 
 

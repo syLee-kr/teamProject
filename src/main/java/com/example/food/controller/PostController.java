@@ -255,7 +255,7 @@ public class PostController {
 	
 	
 	@PostMapping("/update/{pSeq}")
-	public String edituUpdate(@RequestParam Long pSeq, 
+	public String editUpdate(@RequestParam Long pSeq, 
 						     @RequestParam String title,
 						     @RequestParam String content,
 						     @RequestParam(value="isNotice", defaultValue="false") Boolean isNotice,
