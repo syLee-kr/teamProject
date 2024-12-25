@@ -157,7 +157,7 @@ body {
 	
 }
 
-.btn-container {
+.btn-container-list {
     display: flex;
     justify-content: space-between; /* 왼쪽과 오른쪽으로 공간을 나눔 */
     align-items: center; /* 세로 정렬 */
@@ -346,32 +346,34 @@ form .form-group #content {
     flex-direction: column;
 }
 
-.post-title-author {
+.post-title-view {
 	width: calc(100% - 200px); /* 나머지 화면 차지 */ 
     display: flex;
-    justify-content: space-between; /* 제목과 작성자를 양쪽 끝에 배치 */
+    justify-content: space-between; 
     align-items: center;
 }
 
 .post-title {
-    font-size: 24px;
+    font-size: 25px;
     font-weight: bold;
+    padding: 5px;
+    margin-bottom:40px;
+    
 }
 
 .post-author {
-    font-size: 16px;
+    font-size: 14px;
     color: #555;
     margin-top: 40px;
     margin-bottom: 5px;
-    text-align: center;
     
 }
 
 .post-meta {
 	width: calc(100% - 200px); /* 나머지 화면 차지 */ 
     display: flex;
-    justify-content: flex-end; /* 작성일과 조회수를 왼쪽 정렬 */
-    gap: 20px; /* 작성일과 조회수 간 간격 */
+    justify-content: space-between;  
+    
     font-size: 14px;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -380,25 +382,66 @@ form .form-group #content {
 .post-meta p {
     margin: 0;
 }
-
-.post-date, .post-views {
+.post-views {
+    margin-bottom: 0px;
+    margin-top: 70px;
+    font-size: 14px;
+	}
+.post-date {
     font-size: 14px;
 }
 
 /* 글 내용 스타일 */
 .post-content {
-    font-size: 16px;
     line-height: 1.6;
     margin-top: 20px;
-   
+    width: calc(100% - 200px); /* 나머지 화면 차지 */  
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+	min-height: 350px;
+	max-height: auto;
+    resize: none; 
 }
+
+.post-content p {
+	
+}
+
 
 /* 첨부된 이미지 스타일 */
 .detail-image {
-    max-width: 100%;
-    height: auto;
+	height: 90%;
+	width: 100%;
+	justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center;
     margin-top: 20px;
 }
+
+/* 이미지 삭제 체크박스 스타일 */
+.image-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.image-item img {
+    margin-right: 10px;
+}
+
+.image-item input[type="checkbox"] {
+    margin-left: 10px;
+}
+
+/* 안내 문구 스타일 */
+.delete-info {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+}
+
 
 
 /* 댓글 수정/삭제 버튼 스타일 */
@@ -413,12 +456,9 @@ form .form-group #content {
     display: flex;
     gap: 10px; /* 버튼 간의 간격 설정 */
     padding: 5px 5px;
+    resize: none;
 }
 
-/* '목록으로' 버튼 스타일 */
-.back-to-list {
-    margin-bottom: 20px;
-}
 
 /* 댓글 스타일 */
 

@@ -11,14 +11,14 @@
 <div class="content">
     <!-- 글 제목과 작성일, 작성자, 조회수 -->
    <div class="post-header">
-        <div class="post-title-author">
+        <div class="post-title-view">
             <h1 class="post-title" th:text="${post.title}"></h1>
-            <p class="post-author" th:text="${post.userName} + ' (' + ${post.userId} +')'"></p>
+            <p class="post-views"><strong>조회수:</strong> <span th:text="${post.cnt}"></span></p>
         </div>
         <hr class="hr">
         <div class="post-meta">
+            <p class="post-author"><strong>작성자:</strong> <span th:text="${post.userName} + ' (' + ${post.userId} +')'"></span></p>
             <p class="post-date"><strong>작성일:</strong> <span th:text="${post.formattedPostdate}"></span></p>
-            <p class="post-views"><strong>조회수:</strong> <span th:text="${post.cnt}"></span></p>
         </div>
     </div>
     <hr class="hr">
@@ -46,7 +46,7 @@
         <a th:href="@{/post/list}" class="btn btn-secondary">목록</a>
     </div>
     
-    <!-- 댓글 섹션 -->
+    <!-- 댓글 섹션(리스트) -->
     <section class="comments">
         <h3>댓글</h3>
         <ul class="comment-list">

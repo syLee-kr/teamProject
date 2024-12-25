@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.opentest4j.FileInfo;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -73,9 +72,7 @@ public class PostController {
 	        }
 	    });
 		
-	    
-	
-	    
+
 		model.addAttribute("postList", postList);
 		model.addAttribute("isNoticePosts", isNoticePosts); // 공지 목록
 		model.addAttribute("pageList", pageList); // 페이지 번호 목록
@@ -166,7 +163,7 @@ public class PostController {
 		// 이미지 파일 서버에 저장(이미지가 있을때만)
 		for (MultipartFile image : images) {
 			if (image != null && !image.isEmpty()) {
-				String imagePath = saveImage(image);
+				String imagePath = uploadImage(image);
 				if(imagePath != null) {
 					imagePaths.add(imagePath);
 				}
@@ -192,10 +189,10 @@ public class PostController {
 		return "redirect:/post/list";
 	}
 	
-	// 이미지 저장
-	private String saveImage(MultipartFile image) throws IOException {
+	// 이미지 업로드
+	private String uploadImage(MultipartFile image) throws IOException {
 		if(!image.isEmpty()) {
-			String uploadDir = System.getProperty("user.dir") + "/uploadImg/"; // 애플리케이션의 루트 디렉토리 기준으로 설정
+			String uploadDir = System.getProperty("user.dir") + File.separator + "uploadImg"; // 정적 리소스로  경로 설정
 			log.info("이미지 파일 저장 시작, 경로: {}", uploadDir);
 			
 			//이미지 디렉토리 존재여부 체크/없으면 생성
@@ -206,7 +203,7 @@ public class PostController {
 			
 			// 파일 명 생성(현재시간 + 원본파일명)
 			String fileName =System.currentTimeMillis() + "_" + image.getOriginalFilename();
-			File file = new File(uploadDir + fileName);
+			File file = new File(uploadDir + File.separator + fileName);
 			
 			image.transferTo(file); // 파일 서버에 저장
 			
@@ -262,7 +259,9 @@ public class PostController {
 						     @RequestParam String title,
 						     @RequestParam String content,
 						     @RequestParam(value="isNotice", defaultValue="false") Boolean isNotice,
-						     @RequestParam MultipartFile[] images)/*, //테스트 사용자 제거 시 images 뒤에)/* 제거
+						     @RequestParam MultipartFile[] images,
+						     @RequestParam(value="deleteImage", required=false)
+							 List<String> deleteImages)/*, //테스트 사용자 제거 시 images 뒤에)/* 제거
 						      HttpSession session)*/ throws IOException {
 					 			
 		
@@ -286,14 +285,27 @@ public class PostController {
 		
 		log.info("로그인 사용자: {}, Role: {}", user.getUserId(), user.getRole());
 	
-		List<String> imagePaths = new ArrayList<>();
+		// 기존 게시글 조회
+	    PostDTO existingPost = postService.getPostById(pSeq);
+		// 기존 이미지 경로
+		List<String> imagePaths = new ArrayList<>(existingPost.getImagePaths());
+		
+	    // 기존 이미지 삭제 처리 
+	    if (deleteImages != null && !deleteImages.isEmpty()) {
+	        for (String imagePath : deleteImages) {
+	            // 실제 파일 삭제
+	            deleteImage(imagePath);
+	            // 삭제된 이미지, 경로 리스트에서 삭제
+	            imagePaths.remove(imagePath);
+	        }
+	    }
 		
 		// 이미지 파일 서버에 저장(이미지가 있을때만)
 		for (MultipartFile image : images) {
 			if (image != null && !image.isEmpty()) { //이미지 파일 및 내용이 있는경우만
-				String imagePath = saveImage(image); // 서버저장
+				String imagePath = uploadImage(image); // 서버저장
 				if(imagePath != null) {
-					imagePaths.add(imagePath); // img 경로추가
+					imagePaths.add(imagePath); // 업로드된 이미지 경로추가
 					log.info("수정된 이미지 저장 완료, 경로: {}", imagePath);
 				}
 			}
@@ -309,13 +321,27 @@ public class PostController {
 		postDto.setUserId(user.getUserId()); //로그인한 사용자 ID 설정
 		postDto.setUserName(user.getName());
 		
-		
+		// 게시물 업데이트
 		postService.updatePost(postDto);
 		
 		log.info("게시물 수정 완료, pSeq: {}", pSeq);
 		
 		return "redirect:/post/detail/" + pSeq;
 		
+	}
+	// 이미지 삭제
+	private void deleteImage(String imagePath) {
+	    // 이미지 파일 삭제 로직 (파일 경로에서 파일을 삭제)
+	    File file = new File(imagePath);
+	    if (file.exists()) {
+	        if (file.delete()) {
+	            log.info("이미지 삭제 완료, 경로: {}", imagePath);
+	        } else {
+	            log.warn("이미지 삭제 실패, 경로: {}", imagePath);
+	        }
+	    } else {
+	        log.warn("이미지 파일 없음, 경로: {}", imagePath);
+	    }
 	}
 	
 	/*
