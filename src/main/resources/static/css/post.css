@@ -92,6 +92,13 @@ body {
     min-height: 100vh;
 }
 
+.h1-title-sp::before {
+	content: "◎"; /* 특수문자 추가 */
+    font-size: 0.7em; /* 크기 조정 */
+    text-align: center;
+    margin-right: 5px; /* 텍스트와 특수문자 간격 조정 */
+}
+
 
 /* 공통 테이블 스타일 */
 .table {
@@ -346,6 +353,14 @@ form .form-group #content {
     flex-direction: column;
 }
 
+label::before {
+	content: "●"; /* 특수문자 추가 */
+    font-size: 0.7em; /* 크기 조정 */
+    text-align: center;
+    margin-right: 5px; /* 텍스트와 특수문자 간격 조정 */
+}
+
+
 .post-title-view {
 	width: calc(100% - 200px); /* 나머지 화면 차지 */ 
     display: flex;
@@ -354,7 +369,7 @@ form .form-group #content {
 }
 
 .post-title {
-    font-size: 25px;
+    font-size: 30px;
     font-weight: bold;
     padding: 5px;
     margin-bottom:40px;
@@ -366,7 +381,13 @@ form .form-group #content {
     color: #555;
     margin-top: 40px;
     margin-bottom: 5px;
-    
+}
+
+.post-author::before { 
+	content: " ●"; /* 특수문자 추가 */ 
+    font-size: 0.7em; /* 크기 조정 */
+    text-align: center;
+    margin-right: 5px; /* 텍스트와 특수문자 간격 조정 */
 }
 
 .post-meta {
@@ -407,10 +428,6 @@ form .form-group #content {
     resize: none; 
 }
 
-.post-content p {
-	
-}
-
 
 /* 첨부된 이미지 스타일 */
 .detail-image {
@@ -427,26 +444,53 @@ form .form-group #content {
   display: flex;          /* 수평으로 배치 */
   align-items: center;    /* 수직 정렬 */
   gap: 5px;              /* 요소 간의 간격 */
+  margin: 0px;
+}
+
+.image-header h3 {
+	margin: 0px;
+	font-size: 16.5px;
+}
+
+h3::before {
+	content: "●"; /* 특수문자 추가 */
+    font-size: 0.7em; /* 크기 조정 */
+    text-align: center;
+    margin-right: 5px; /* 텍스트와 특수문자 간격 조정 */
 }
 
 /* 안내 문구 스타일 */
 .delete-info {
     font-size: 14px;
     color: #555;
-    margin-top: 20px;
-}
-.image-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 0px;
 }
 
+.image-container{
+	margin: 0px;
+	padding: 10px;
+}
+
+.image-item {
+	position: relative;
+    display: inline-block;
+    align-items: center;
+}
+
+
 .image-item img {
+	width: 8vw;
+	height: 8vh;
     margin-right: 10px;
+	border-radius: 5px;
 }
 
 .image-item input[type="checkbox"] {
-    margin-left: 10px;
+   	position: absolute;    /* 체크박스를 절대 위치로 설정 */
+    top: 5px;              /* 이미지 상단에서 5px 떨어지게 */
+    left: 5px;             /* 이미지 왼쪽에서 5px 떨어지게 */
+    z-index: 10;           /* 체크박스를 이미지 위에 겹치게 */
 }
 
 

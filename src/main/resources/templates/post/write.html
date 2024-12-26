@@ -9,7 +9,7 @@
 <body>
 <div class="sidebar" th:insert="~{main/sidebar :: sidebar}"></div>
 <div class="content">
-    <h1 th:text="${post != null ? '게시글 수정' : '게시글 작성'}">게시글 작성</h1>
+    <h1 class="h1-title-sp" th:text="${post != null ? '게시글 수정' : '게시글 작성'}">게시글 작성</h1>
     <hr class="hr">
     <form th:action="@{${post != null ? '/post/update/{pSeq}' : '/post/write'}}" method="post" enctype="multipart/form-data">
         <!-- 글 유형 -->
@@ -52,9 +52,9 @@
 		        <h3>이미지</h3>
 		        <p class="delete-info">(이미지 삭제 시 체크하세요)</p>
 		    </div>
-		    <ul>
+		    <ul class="image-container">
 		        <li th:each="imagePath : ${post.imagePaths}" class="image-item">
-		            <img th:src="@{${imagePath}}" alt="이미지" width="100"/>
+		            <img th:src="@{${imagePath}}" alt="이미지"/>
 		            <!-- 이미지를 선택할 수 있는 체크박스 -->
 		            <input type="checkbox" name="deleteImage" th:value="${imagePath}"/>
 		        </li>
