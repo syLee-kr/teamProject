@@ -33,13 +33,13 @@
     <hr class="hr">
 
     <!-- 수정 및 삭제 버튼 -->
-    <div class="btn-container-write">
+    <div class="btn-container-detail">
         <!-- 수정 버튼 -->
         <a th:href="@{/post/write/{pSeq}(pSeq=${post.pSeq})}" class="btn btn-primary">수정</a>
         
         <!-- 삭제 버튼  -->
         <form th:action="@{/post/delete/{pSeq}(pSeq=${post.pSeq})}" method="post">
-            <button type="submit" class="btn btn-secondary write del">삭제</button>
+            <button type="submit" class="btn write">삭제</button>
         </form>
         
         <!-- 목록 버튼 -->

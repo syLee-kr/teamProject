@@ -163,7 +163,31 @@ body {
 	margin-bottom: 4px;
 	
 }
+/* detail 템플릿 버튼 부모 요소 스타일 */
+.btn-container-detail {
+	width: calc(100% - 200px); /* 나머지 화면 차지 */
+    text-align: right; /* 부모 요소에서 오른쪽 정렬 */
+    margin-top: 10px;   /* 버튼과  이미지업로드간의 간격을 조정 */
+    margin-bottom: 5px;
+    border: none;
+}
 
+.btn-container-detail form {
+   display: inline; /* 버튼들을 수평으로 정렬 */
+}
+
+.btn-container-detail form button {
+   width: auto;
+   background-color: #d9534f;
+   color: white;
+}
+
+.btn-container-detail form button:hover {
+   background-color: #c9302c;
+}
+
+
+/* list 템플릿 Post 버튼을 감싸는 부모 요소 스타일 */
 .btn-container-list {
     display: flex;
     justify-content: space-between; /* 왼쪽과 오른쪽으로 공간을 나눔 */
@@ -214,13 +238,8 @@ body {
     font-size: 16px; /* 폰트 크기 줄이기 */
 }
 
-.del{
-	display: inline;  /* 인라인으로 나란히 배치 */
-    width: 60px;  /* 버튼 너비 60px 설정 */
-    
-}
 
-/* 작성 버튼을 감싸는 부모 요소 스타일 */
+/* write 템플릿 수정/작성 버튼을 감싸는 부모 요소 스타일 */
 .btn-container-write {
 	width: calc(100% - 200px); /* 나머지 화면 차지 */
     text-align: right; /* 부모 요소에서 오른쪽 정렬 */
