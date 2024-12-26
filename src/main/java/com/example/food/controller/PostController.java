@@ -23,6 +23,7 @@ import com.example.food.domain.Post;
 import com.example.food.domain.Users;
 import com.example.food.domain.Users.Gender;
 import com.example.food.domain.Users.Role;
+import com.example.food.service.postservice.CommentService;
 import com.example.food.service.postservice.PostService;
 
 import lombok.AllArgsConstructor;
@@ -36,7 +37,9 @@ import lombok.extern.slf4j.Slf4j;
 public class PostController {
 	
 	private PostService postService;
-
+	private CommentService commentService;
+	
+	
 	/*
 	 * 게시물 목록
 	 */
@@ -86,8 +89,7 @@ public class PostController {
 		
 	    model.addAttribute("prevPage", prevPage);
 	    model.addAttribute("nextPage", nextPage);
-		
-		
+
 	    log.info("공지글 수: {}", isNoticePosts.size());
 	    log.info("일반글 수: {}", postList.size());
 		
@@ -233,6 +235,7 @@ public class PostController {
         }
 		
 		model.addAttribute("post", postDto);
+		model.addAttribute("comments", commentService.getCommentByPostId(pSeq));
 		
 		log.info("게시물 상세보기 완료, 제목: {}", postDto.getTitle());
 		

@@ -29,6 +29,7 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepo;
     private final int pageSize = 5;
     
+    
     // 게시물 조회 등에 사용(데이터)
     @Override 
     public Post getPost(Long pSeq) {

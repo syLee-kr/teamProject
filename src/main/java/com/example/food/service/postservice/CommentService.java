@@ -3,6 +3,7 @@ package com.example.food.service.postservice;
 import java.util.List;
 
 import com.example.food.CommentDTO;
+import com.example.food.domain.Comments;
 
 public interface CommentService {
 
@@ -10,6 +11,6 @@ public interface CommentService {
 	
 	void addComment(CommentDTO commentDto);
 	
-	void delComment(Long cSeq);
+	Comments delComment(Long cSeq); //
 	
 }

@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.food.CommentDTO;
+import com.example.food.domain.Comments;
 import com.example.food.service.postservice.CommentService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,12 +39,11 @@ public class CommentController {
 
     // 댓글 추가
     @PostMapping("/add")
-    public void addComment(@RequestParam String content,
-    					   @RequestParam Long postId ) {
+    public String addComment(@RequestParam String content,
+    					   @RequestParam Long postId, 
+    					   RedirectAttributes redirectAttr) {//추가
         log.info("댓글 추가 요청, postId: {}, content: {}", content, postId);
                  
-        	
-        
         // 테스트용 고정된 사용자 정보
         CommentDTO commentDto = new CommentDTO(); 
         
@@ -53,14 +54,28 @@ public class CommentController {
         
         commentService.addComment(commentDto);
         log.info("댓글 추가 완료, userId: {}, postId: {}", commentDto.getUserId(), commentDto.getPostId());
+        
+        // 댓글 추가 후, 게시글 상세 페이지로 
+        redirectAttr.addAttribute("postId", postId); //
+        return "redirect:/post/detail/{postId}";//
     }
 
     // 댓글 삭제
     @DeleteMapping("/{cSeq}")
-    public void delComment(@PathVariable Long cSeq) {
+    public String delComment(@PathVariable Long cSeq,
+    						RedirectAttributes redirectAttr) {//
         log.info("댓글 삭제 요청, cSeq: {}", cSeq);
         
-        commentService.delComment(cSeq);
+        // 댓글 정보 
+        Comments comment = commentService.delComment(cSeq);
+        Long postId = comment.getPost().getPSeq(); //
+        
         log.info("댓글 삭제 완료, cSeq: {}", cSeq);
+        
+        commentService.delComment(cSeq);
+        
+        // 댓글 삭제 후 detail 페이지로 
+        redirectAttr.addAttribute("postId", postId);//
+        return "redirect:/post/detail/{postId}";//
     }
 }

@@ -85,13 +85,19 @@ public class CommentServiceImpl implements CommentService {
 
     // 댓글 삭제
     @Override
-    public void delComment(Long cSeq) {
+    public Comments delComment(Long cSeq) {
         log.info("댓글 삭제 요청, cSeq: {}", cSeq);
         
         Comments comment = commentRepo.findById(cSeq)
                                       .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
         
+        // 삭제된 댓글이 속한 게시글의 ID
+        Long postId = comment.getPost().getPSeq(); // 
+        
         commentRepo.delete(comment);
+        
         log.info("댓글이 삭제되었습니다: cSeq = {}", cSeq);
+		
+        return comment;
     }
 }
