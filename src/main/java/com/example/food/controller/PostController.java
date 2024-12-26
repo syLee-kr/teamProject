@@ -331,16 +331,19 @@ public class PostController {
 	}
 	// 이미지 삭제
 	private void deleteImage(String imagePath) {
+		String uploadDir = System.getProperty("user.dir") + File.separator + "uploadImg";
+		String filePath = uploadDir + File.separator + imagePath.substring(imagePath.lastIndexOf("/") + 1); // 이미지 파일명만 추출하여 경로 합침
+		
 	    // 이미지 파일 삭제 로직 (파일 경로에서 파일을 삭제)
-	    File file = new File(imagePath);
+	    File file = new File(filePath);
 	    if (file.exists()) {
 	        if (file.delete()) {
-	            log.info("이미지 삭제 완료, 경로: {}", imagePath);
+	            log.info("이미지 삭제 완료, 경로: {}", filePath);
 	        } else {
-	            log.warn("이미지 삭제 실패, 경로: {}", imagePath);
+	            log.warn("이미지 삭제 실패, 경로: {}", filePath);
 	        }
 	    } else {
-	        log.warn("이미지 파일 없음, 경로: {}", imagePath);
+	        log.warn("이미지 파일 없음, 경로: {}", filePath);
 	    }
 	}
 	
