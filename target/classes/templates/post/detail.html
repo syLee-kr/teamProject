@@ -52,11 +52,16 @@
         <ul class="comment-list">
             <li th:each="comment : ${comments}" class="comment-item">
                 <p>
-                    <strong th:text="${comment.userName}" class="comment-author"></strong>
-                    (<span th:text="${comment.userId}"></span>)
+                    <small> 
+                    	작성자: <span th:text="${comment.userName}" class="comment-author"></span>
+                    	(<span th:text="${comment.userId}"></span>) 
+                    </small>
+                    <small class="comment-date">
+                    	작성일: <span th:text="${comment.formattedCreatedAt}"></span>
+                    </small>
                 </p>
                 <p th:text="${comment.content}" class="comment-content"></p>
-                <small th:text="${comment.createdAt}" class="comment-date"></small>
+                
                 <!-- 댓글 수정 및 삭제 버튼 -->
                 <div class="comment-actions">
                     <button class="btn btn-primary">수정</button>

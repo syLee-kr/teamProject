@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.example.food.PostDTO;
@@ -44,6 +45,7 @@ public class PostServiceImpl implements PostService {
     
     
     // 게시물 상세조회(화면표시)
+    
     @Override 
     public PostDTO getPostById(Long pSeq) {
         log.info("게시물 상세조회 요청, pSeq: {}", pSeq);
@@ -73,7 +75,7 @@ public class PostServiceImpl implements PostService {
             throw new IllegalArgumentException("사용자가 로그인하지 않았습니다.");
         }
         */
-        
+        /*
         // 고정 사용자 설정
         Users user = userRepo.findById("test_user")
                              .orElseGet(() -> {
@@ -85,15 +87,18 @@ public class PostServiceImpl implements PostService {
                                  newUser.setRole(Users.Role.ROLE_ADMIN); // 관리자 권한 설정
                                  return userRepo.save(newUser);
                              });
-
+		*/
+        
+        //fixedUser 사용
+        Users user = userRepo.findById("test_user")//
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보 없음"));
+        
         Post post = postRepo.findById(postDto.getPSeq())
                             .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setPriority(postDto.getPriority());
         post.setImagePaths(postDto.getImagePaths()); // 수정된 이미지경로 추가
-        
-
         post.setUser(user); // Post 엔티티에 고정 사용자 설정
         
         postRepo.save(post);
@@ -126,7 +131,7 @@ public class PostServiceImpl implements PostService {
         Users user = userRepo.findById(postDto.getUserId())
                              .orElseThrow(() -> new IllegalArgumentException("사용자 정보 없음"));
         */
-        
+        /*
         // 고정 사용자 설정
         Users user = userRepo.findById("test_user")
                              .orElseGet(() -> {
@@ -140,12 +145,18 @@ public class PostServiceImpl implements PostService {
                              });
         
         log.info("사용자 정보 확인, ID: {}, Role: {}", user.getUserId(), user.getRole());
-
-        //공지글 권한 확인
-        if (postDto.getIsNotice() && user.getRole() !=Users.Role.ROLE_ADMIN) {
+         */
+        // fiexedUser 사용
+        Users user = userRepo.findById("test_user")//
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보 없음"));
+        
+        
+        //공지글 권한 확인//
+        if (postDto.getIsNotice() != null && postDto.getIsNotice() && user.getRole() !=Users.Role.ROLE_ADMIN) {
             log.warn("공지글 저장 권한 없음: {}", user.getUserId());
             throw new IllegalArgumentException("공지글은 관리자만 작성할 수 있습니다.");
         }
+        
         
         Post post = new Post();
         post.setTitle(postDto.getTitle());
@@ -177,12 +188,15 @@ public class PostServiceImpl implements PostService {
         // 일반 게시물만 페이징 처리
         Page<Post> postPage = postRepo.findByIsNoticeFalse(pageable);
         
-        // 게시글 번호 계산 (현재 페이지에서 첫 번째 게시글 번호-배열)
-        int[] postNum= {(pageNum - 1) * pageSize + 1};  // 첫 번째 게시글 번호 계산
+        // 총 게시물 수 
+        long totalPosts = postPage.getTotalElements();
+        
+        // 게시글 번호 계산 (총 게시물 수에서 시작해서 1씩 감소)
+        int[] postNum= {(int) totalPosts - (pageNum - 1) * pageSize};  // 마지막 게시글 번호 계산
 
         // 일반 Page<Post> 객체를 List<PostDTO>로 변환
         List<PostDTO> regularPosts = postPage.getContent().stream()
-        								     .map(post-> new PostDTO(post, postNum[0]++))
+        								     .map(post-> new PostDTO(post, postNum[0]--))
                                              .collect(Collectors.toList());
        
         
@@ -251,22 +265,25 @@ public class PostServiceImpl implements PostService {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
         
         // 제목, 내용에 키워드가 포함된 게시물 검색.(공지사항을 제외한)
-        Page<Post> postsPage = postRepo.findByTitleContainingOrContentContainingAndIsNoticeFalse(keyword, keyword, pageable);
+        Page<Post> keywordPosts = postRepo.findByTitleContainingOrContentContainingAndIsNoticeFalse(keyword, keyword, pageable);//
         
-        // 게시글 번호 계산 (현재 페이지에서 첫 번째 게시글 번호-배열)
-        int[] postNum = {(pageNum - 1) * pageSize + 1};  // 첫 번째 게시글 번호 계산
+        // 검색 결과의 총 게시물 수 구하기
+        long keywordTotal = keywordPosts.getTotalElements();  // 키워드에 맞는 게시물 수//
         
-        // 검색된 일반 게시물 (isNotice=false) 가져오기
-        List<PostDTO> regularPosts = postsPage.getContent().stream()
-                                              .map(post-> new PostDTO(post, postNum[0]++))
-                                              .collect(Collectors.toList());
+        // 게시글 번호 계산 (총 게시물 수에서 시작해서 1씩 감소)
+        int[] postNum= {(int) keywordTotal - (pageNum - 1) * pageSize};  // 마지막 게시글 번호 계산//
+
+        // 일반 Page<Post> 객체를 List<PostDTO>로 변환
+        List<PostDTO> regularPosts = keywordPosts.getContent().stream()
+        								     .map(post-> new PostDTO(post, postNum[0]--))//
+                                             .collect(Collectors.toList());
         // 검색 결과가 없을떄
         if (regularPosts.isEmpty()) {
             log.info("검색된 게시물이 없습니다. keyword: {}", keyword);
             return new ArrayList<>(); // 빈 리스트 반환
         }
         
-        log.info("게시물 검색 완료, keyword: {}, 결과 개수: {}", keyword, postsPage.getTotalElements());
+        log.info("게시물 검색 완료, keyword: {}, 결과 개수: {}", keyword, keywordPosts.getTotalElements());
         
         return regularPosts;
     }
