@@ -29,6 +29,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	int countByTitleContainingOrContentContaining(String keyword, String keyword2);
 	
 	// 제목이나 내용에 keyword가 포함된 게시물 검색(공지사항 제외)
+	@Query("SELECT p FROM Post p WHERE p.isNotice = false ORDER BY p.id DESC")//
 	Page<Post> findByTitleContainingOrContentContainingAndIsNoticeFalse(String keyword, String keyword2,
 			Pageable pageable);
 	

@@ -31,13 +31,14 @@ public class CommentServiceImpl implements CommentService {
         log.info("댓글 조회 요청, postId: {}", postId);
         
         Post post = postRepo.findById(postId)
-                            .orElseThrow(() -> new IllegalArgumentException("ID가 " + postId + "인 게시물이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("ID가 " + postId + "인 게시물이 존재하지 않습니다."));
         
         List<Comments> comments = commentRepo.findByPost(post);
         
+        // 댓글이 업는 경우 로그만 출력
         if (comments.isEmpty()) {
             log.warn("ID가 {}인 게시물에 댓글이 존재하지 않습니다.", postId);
-            throw new IllegalArgumentException("ID가 " + postId + "인 게시물에 댓글이 존재하지 않습니다.");
+            
         }
         
         log.info("댓글 조회 완료, postId: {}, 댓글 개수: {}", postId, comments.size());
