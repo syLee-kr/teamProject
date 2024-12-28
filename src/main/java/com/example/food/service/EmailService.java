@@ -15,9 +15,9 @@ public class EmailService {
     public void sendVerificationCode(String toEmail, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
-        message.setSubject("Your Verification Code");
-        message.setText("Here is your verification code: " + code);
-        message.setFrom("your-email@gmail.com"); // Optional: Define sender email
+        message.setSubject("Healthy Table 인증 번호 입니다.");
+        message.setText("인증 번호: " + code);
+        message.setFrom("tjdduq410@naver.com"); // Optional: Define sender email
         mailSender.send(message);
     }
 }

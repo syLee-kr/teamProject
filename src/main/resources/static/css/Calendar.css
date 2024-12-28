@@ -28,23 +28,24 @@ body {
     height: 100vh; /* 화면 높이에 딱 맞게 설정 */
 }
 
-.sidebar h1 {
-    position: absolute;
-    font-family: 'TTHakgyoansimSamulhamR', serif; /* 'TTHakgyoansimSamulhamR' 폰트 적용 */
-    bottom: 50px;
-    font-size: 40px;
-    text-align: center;
-    left: 3.5%;
-    color: rgb(255, 255, 255);
-}
-
-/* 사이드바 스타일 */
 .sidebar {
     width: 15%;
     background-color: #c59d9d;
     color: #ffffff;
     height: 100vh;
     padding: 20px;
+    position: relative; /* 하단의 제목을 절대 위치로 배치하기 위해 */
+}
+
+.sidebar h1 {
+    position: absolute;
+    font-family: 'TTHakgyoansimSamulhamR', serif; /* 'TTHakgyoansimSamulhamR' 폰트 적용 */
+    bottom: 50px;
+    font-size: 40px !important;
+    text-align: center;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgb(255, 255, 255);
 }
 
 .sidebar ul.menu {
@@ -56,6 +57,7 @@ body {
     margin-bottom: 20px;
 }
 
+
 .sidebar ul.menu li a {
     color: #ffffff;
     text-decoration: none;
@@ -66,10 +68,14 @@ body {
 
 .sidebar ul.menu li a .icon {
     margin-right: 10px;
-    font-size: 30px;
-    padding: 10px;
+    font-size: 24px;
+    padding: 8px;
+    background-color: #9c7070;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-
 .sidebar ul.menu li a:hover {
     color: #9c7070; /* 마우스 오버 시 푸른색 */
 }
@@ -285,18 +291,22 @@ body {
 /* 공통 모달 스타일 */
 .modal {
     position: fixed;
-    top: 50%; /* 세로 중앙 */
-    left: 50%; /* 가로 중앙 */
-    transform: translate(-50%, -50%); /* 중앙 정렬 */
-    background-color: #ffffff; /* 배경색 */
-    border-radius: 10px; /* 둥근 모서리 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); /* 그림자 */
-    padding: 20px; /* 내부 여백 */
-    z-index: 1001; /* 오버레이보다 높게 설정 */
-    width: 90%; /* 모바일 대응 */
-    max-width: 400px; /* 최대 너비 */
-    display: none; /* 기본적으로 숨김 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    z-index: 1001;
+    width: 60%;         /* 화면의 90% 너비까지 확장 */
+    max-width: 500px;   /* 모달 최대 너비 지정 */
+    max-height: 90vh;   /* 모달 최대 높이 지정 */
+    overflow-y: hidden;   /* 세로 스크롤 가능 (내용이 넘칠 경우) */
+    overflow-x: hidden; /* 가로 스크롤은 숨김 (가로 영역은 flex-wrap 등으로 처리) */
+    display: none;      /* 기본적으로 숨김 */
 }
+
 
 /* 모달 활성화 클래스 */
 .modal.active {
@@ -331,7 +341,7 @@ body {
 
 /* 모달 텍스트 스타일 */
 .modal p {
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 20px; /* 텍스트 아래 여백 */
     text-align: center;
     color: #555555;
@@ -453,4 +463,70 @@ select:focus {
     color: #333;
     box-sizing: border-box;
     font-family: 'Godo', sans-serif; /* 드롭다운 폰트 */
+}
+/* 파이차트를 감싸는 전체 컨테이너 */
+#chartContainer {
+    /* JS에서 기본적으로 display: none으로 숨김 처리했다가,
+       showPieChart() 호출 시 display: block으로 바꿉니다. */
+    display: none;
+    margin-top: 20px;        /* 위쪽 여백 */
+    background-color: #ffffff;
+    border: 1px solid #c59d9d;  /* 기존 테마 컬러와 맞추어 테두리 적용 */
+    border-radius: 10px;     /* 둥근 모서리 */
+    padding: 20px;           /* 내부 여백 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 약간의 그림자 */
+    box-sizing: border-box;  /* 패딩 포함 크기 계산 */
+}
+
+/* 내부를 가로(flex) 배치할 때 사용할 래퍼 (임의 클래스명 예: .chart-flex ) */
+#chartContainer .chart-flex {
+    display: flex;
+    gap: 30px;               /* 칸 사이 여백 */
+    justify-content: center; /* 차트+설명 모두 수평 중앙 정렬 */
+    align-items: flex-start; /* 세로 정렬 (위쪽 시작점) */
+}
+
+/* 왼쪽 파이차트 영역 (canvas) */
+#chartContainer .chart-canvas {
+    flex: 1;                /* 가로 공간을 나눠 가짐 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 280px;       /* 캔버스가 너무 작아지지 않게 최소 너비 */
+}
+
+/* 오른쪽 설명 영역 */
+#chartContainer .chart-explanation {
+    flex: 1;                /* 가로 공간을 나눠 가짐 */
+    color: #333;            /* 텍스트 색상 */
+    font-size: 14px;        /* 텍스트 크기 */
+    line-height: 1.5;       /* 줄 간격 */
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    justify-content: center;
+}
+
+#chartContainer .chart-explanation h4 {
+    margin-top: 0;          /* 제목 위쪽 여백 제거 */
+    margin-bottom: 10px;    /* 제목 아래 여백 */
+    color: #975f5f;         /* 조금 더 도드라지는 색상 */
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#chartContainer .chart-explanation ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;     /* 아래쪽 여백 */
+}
+
+#chartContainer .chart-explanation li {
+    margin-bottom: 5px;
+}
+
+#chartContainer .chart-explanation p {
+    margin: 0;             /* 기본 마진 제거 */
+    font-weight: bold;     /* 강조 */
+    color: #633f3f;        /* 테마 컬러에 어울리는 색상 */
+    margin-top: 10px;      /* 위쪽 여백 */
 }

@@ -1,3 +1,4 @@
+/* 공통 폰트 */
 @font-face {
     font-family: 'Godo';
     font-style: normal;
@@ -18,22 +19,24 @@ a {
     color: inherit;
 }
 
+/* 기본 Reset 및 Flex 레이아웃 */
 body {
     margin: 0;
     padding: 0;
     font-family: 'Godo', Arial, sans-serif; /* 'Godo' 폰트 적용 */
-    background-color: #ffffff; /* 흰색 배경색 */
+    background-color: #f0f2f5; /* 부드러운 회색 배경색 */
     display: flex;
-    overflow: hidden; /* 스크롤바를 완전히 제거 */
     height: 100vh; /* 화면 높이에 딱 맞게 설정 */
+    overflow: hidden; /* 스크롤바를 완전히 제거 */
 }
 
 .sidebar {
     width: 15%;
-    background-color: #c59d9d;
-    color: #ffffff;
+    background-color: #e6ca8d; /* 어두운 네이비 색상으로 변경 */
+    color: #ecf0f1;
     height: 100vh;
     padding: 20px;
+    position: relative;
 }
 
 .sidebar h1 {
@@ -42,7 +45,8 @@ body {
     bottom: 50px;
     font-size: 40px !important;
     text-align: center;
-    left: 3.5%;
+    left: 50%;
+    transform: translateX(-50%);
     color: rgb(255, 255, 255);
 }
 
@@ -65,12 +69,17 @@ body {
 
 .sidebar ul.menu li a .icon {
     margin-right: 10px;
-    font-size: 30px;
-    padding: 10px;
+    font-size: 24px;
+    padding: 8px;
+    background-color: #bfb172;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar ul.menu li a:hover {
-    color: #9c7070; /* 마우스 오버 시 변경 */
+    color: #bdab55; /* 마우스 오버 시 변경 */
 }
 
 .menu .icon img {
@@ -78,8 +87,6 @@ body {
     width: 24px;  /* 원하는 너비로 설정 */
     height: 24px; /* 원하는 높이로 설정 */
 }
-
-
 
 .menu_sidebar {
     flex: 0 0 250px; /* 고정된 너비 */
@@ -91,70 +98,92 @@ body {
     overflow: hidden; /* 스크롤바 필요 시 추가 */
 }
 
+/* 프로필 컨테이너 스타일 */
 .profile-container {
-    background-color: #c59d9d;
-    border: 1px solid #c59d9d;
+    background-color: #ffffff;
+    border: 1px solid #e6ca8d;
     border-radius: 10px;
-    padding: 20px;
+    padding: 30px;
     box-sizing: border-box;
-    color: #fff;
+    color: #333;
     width: 500px;
-    height: 700px;
+    max-width: 100%;
     margin: 40px auto;
-    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* 프로필 이미지 */
 .profile-image {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
 .profile-image .profile-img {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    border: 2px solid #fff;
+    border: 4px solid #e6ca8d;
     object-fit: cover;
-    background-color: white;
+    background-color: #f0f2f5;
 }
 
+/* 프로필 세부정보 폼 */
 .profile-details {
-    text-align: left;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.profile-details .form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.profile-details .form-group.half-width {
+    width: calc(50% - 10px);
+}
+
+.profile-details .form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.profile-details .form-group span {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
     font-size: 16px;
-    line-height: 1.8;
-    margin-bottom: 20px;
 }
 
-.profile-details p {
-    margin: 10px 0;
-}
-
-.profile-details strong {
-    color: #ddd;
+/* 프로필 수정 버튼 */
+.profile-actions {
+    text-align: center;
+    margin-top: 30px;
 }
 
 .edit-profile-button {
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #e6ca8d;
+    color: #fff;
     border: none;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
+    padding: 12px 25px;
     font-size: 18px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
 }
 
 .edit-profile-button:hover {
-    background-color: #ffffff;
+    background-color: #bdab55;
 }
 
-/* 레이아웃 조정 (반응형 디자인) */
+/* 반응형 디자인 */
 @media screen and (max-width: 768px) {
     .profile-container {
-        width: 90%;
-        padding: 15px;
+        padding: 20px;
+        margin: 20px auto;
     }
 
     .profile-image .profile-img {
@@ -163,74 +192,106 @@ body {
     }
 
     .edit-profile-button {
-        font-size: 14px;
-        padding: 8px 16px;
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+
+    .profile-details .form-group.half-width {
+        width: 100%;
     }
 }
-
-
-/* 각 입력 필드 그룹 */
-.profile-edit-form div {
-    margin-bottom: 20px;
+/* 기본 이미지 업로드 버튼 숨기기 */
+.upload-image-input {
+    display: none;
 }
 
-/* 라벨 스타일 */
-.profile-edit-form label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #333;
+.upload-image-label {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: #e6ca8d;
+    color: white;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
 }
 
-/* 입력 필드 스타일 */
-.profile-edit-form input[type="text"],
-.profile-edit-form input[type="password"],
-.profile-edit-form input[type="date"],
-.profile-edit-form input[type="email"]{
-    width: 90%;
+.upload-image-label:hover {
+    background-color: #bdab55;
+}
+
+/* input, select 공통 스타일 */
+.profile-details input[type="text"],
+.profile-details input[type="date"],
+.profile-details input[type="file"],
+.profile-details select {
+    width: 100%;
     padding: 10px;
+    margin-top: 5px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
 }
 
-/* 입력 필드 포커스 스타일 */
-.profile-edit-form input:focus {
-    border-color: #9c7070;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+.profile-details input[type="text"]:focus,
+.profile-details input[type="date"]:focus,
+.profile-details select:focus {
+    border-color: #e6ca8d;
     outline: none;
 }
 
-/* 버튼 스타일 */
-.profile-actions {
-    text-align: center;
-    margin-top: 20px;
+.profile-details .form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: #555;
 }
 
-.save-profile-button,
-.cancel-profile-button {
-    background-color: #9c7070;
-    color: #fff;
+/* 생일 입력 필드 스타일 수정 */
+.birthday {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.birthday select {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
     border: none;
-    padding: 10px 20px;
-    font-size: 16px;
+    border-bottom: 1px solid #c59d9d;
     cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
-    transition: background-color 0.3s;
-    margin: 0 10px;
+    transition: border-bottom 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
-.save-profile-button:hover {
-    background-color: #705151;
+.birthday select:focus {
+    border-bottom: 1px solid #975f5f;
+    background-color: #f9f6f6;
+    color: #975f5f;
 }
 
-.cancel-profile-button {
-    background-color: white;
-    color: #9c7070;
+.birthday select::placeholder {
+    color: #999;
 }
 
-.cancel-profile-button:hover {
-    background-color: #b1abab;
-    color: white;
+.birthday select option {
+    font-family: 'Godo', sans-serif;
+    padding: 8px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+}
+
+.birthday select:disabled {
+    background-color: #f0f0f0;
+    color: #999;
+    cursor: not-allowed;
+    border-bottom: 1px solid #ccc;
 }

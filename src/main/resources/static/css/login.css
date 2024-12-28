@@ -28,7 +28,7 @@ body {
     height: 100vh;
     padding: 50px;
     margin: 0;
-    font-family: sans-serif;
+    font-family: 'Godo', sans-serif;
     background-color: #ccb1b1;
     background-repeat: no-repeat;
     background-size: cover;
@@ -94,6 +94,7 @@ input[type='email'] {
     padding: 0 1rem;
     outline: none;
     font-size: 15px;
+    font-family: 'Godo', sans-serif;
 }
 .form-cbox {
     margin-left: 5px;
@@ -137,6 +138,7 @@ button {
     font-size: 15px;
     height: 50px;
     cursor: pointer;
+    font-family: 'Godo', sans-serif;
 }
 
 .horizon {
@@ -185,4 +187,68 @@ button {
     main {
         grid-template-columns: auto;
     }
+}
+
+/* 기본 alert 스타일 */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-family: 'Godo', sans-serif;
+}
+
+/* 성공 메시지 스타일 */
+.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+/* 에러 메시지 스타일 */
+.alert-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+/* 모달 스타일 수정 */
+.modal {
+    display: none; /* 기본적으로 숨김 */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* 배경 어둡게 */
+    font-family: 'Godo', sans-serif;
+}
+
+/* 모달 콘텐츠 스타일 수정 */
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 30px;
+    border: none;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+
+.close:hover,
+.close:focus {
+    color: #c59d9d;
+    text-decoration: none;
+}
+
+/* 모달 메시지 스타일 */
+.modal p {
+    font-size: 16px;
+    color: #333;
+    margin-top: 20px;
 }

@@ -1,6 +1,6 @@
 package com.example.food.service.savefood;
 
-import com.example.food.domain.SaveFood;
+import com.example.food.entity.SaveFood;
 
 import java.util.List;
 

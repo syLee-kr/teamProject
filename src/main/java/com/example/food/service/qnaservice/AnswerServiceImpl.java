@@ -1,8 +1,8 @@
 package com.example.food.service.qnaservice;
 
-import com.example.food.domain.Answer;
-import com.example.food.domain.Question;
-import com.example.food.domain.Users;
+import com.example.food.entity.Answer;
+import com.example.food.entity.Question;
+import com.example.food.entity.Users;
 import com.example.food.repository.AnswerRepository;
 import com.example.food.repository.QuestionRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,7 +17,6 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepo;
     private final QuestionRepository questionRepo;
 
-    // 생성자 추가
     @Autowired
     public AnswerServiceImpl(AnswerRepository answerRepo, QuestionRepository questionRepo) {
         this.answerRepo = answerRepo;
@@ -55,11 +54,11 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public Page<Answer> getAnswersByQuestion(Long questionId, Pageable pageable) {
-        return answerRepo.findByQuestion_QSeq(questionId, pageable);
+        return answerRepo.findByQuestion_QSeqOrderByRegDateAsc(questionId, pageable); // 답변을 오름차순 정렬
     }
 
     @Override
     public Page<Answer> getAnswersByQuestionAndKeyword(Long questionId, String keyword, Pageable pageable) {
-        return answerRepo.findByQuestion_QSeqAndContentContainingIgnoreCase(questionId, keyword, pageable);
+        return answerRepo.findByQuestion_QSeqAndContentContainingIgnoreCaseOrderByRegDateAsc(questionId, keyword, pageable); // 답변을 오름차순 정렬
     }
 }

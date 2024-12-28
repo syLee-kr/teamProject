@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 목록</title>
+    <link rel="stylesheet" href="/css/post.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 성공 메시지 모달 표시
+            const successModal = document.getElementById('successModal');
+            if (successModal) {
+                successModal.style.display = 'block';
+            }
+
+            // 에러 메시지 모달 표시
+            const errorModal = document.getElementById('errorModal');
+            if (errorModal) {
+                errorModal.style.display = 'block';
+            }
+
+            // 체크박스 로직 (아이디 저장)
+            var checkbox = document.getElementById('check');
+            var userIdInput = document.getElementById('userId');
+
+            var savedId = localStorage.getItem('savedUserId');
+            if (savedId) {
+                userIdInput.value = savedId;
+                checkbox.checked = true;
+            }
+
+            checkbox.addEventListener('change', function () {
+                if (checkbox.checked) {
+                    localStorage.setItem('savedUserId', userIdInput.value);
+                } else {
+                    localStorage.removeItem('savedUserId');
+                }
+            });
+
+            userIdInput.addEventListener('input', function () {
+                if (checkbox.checked) {
+                    localStorage.setItem('savedUserId', userIdInput.value);
+                }
+            });
+
+            // 모달 외부 클릭으로 닫기
+            window.addEventListener('click', function (event) {
+                if (event.target === successModal) {
+                    successModal.style.display = 'none';
+                }
+
+                if (event.target === errorModal) {
+                    errorModal.style.display = 'none';
+                }
+            });
+        });
+
+        // 모달 닫기 함수
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="sidebar" th:insert="~{user/main/sidebar :: sidebar}"></div>
+<div id="successModal" class="modal" th:if="${message}">
+    <div class="modal-content">
+        <p th:text="${message}"></p>
+    </div>
+</div>
+<div id="errorModal" class="modal" th:if="${loginFail}">
+    <div class="modal-content">
+        <p th:text="${errorMessage}"></p>
+    </div>
+</div>
+<div class="content postContent">
+    <h1>게시판 목록</h1>
+    <hr class="hr">
+
+    <!-- 공지글 + 일반글 테이블 -->
+    <table class="table">
+        <thead>
+        <tr>
+            <th>번호</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일</th>
+            <th>조회수</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 공지사항 목록 -->
+        <tr th:each="post : ${isNoticePosts}">
+            <!-- 공지글은 '공지' 표시 -->
+            <td class="notice">공지</td>
+            <td class="td-title">
+                <!-- 상세 보기: /board/{pSeq} -->
+                <a th:href="@{/board/{pSeq}(pSeq=${post.pSeq})}"
+                   th:text="${post.title}"></a>
+            </td>
+            <td th:text="${post.user.name} + ' (' + ${post.user.userId} +')'"></td>
+            <td class="td-date" th:text="${post.formattedPostdate}"></td>
+            <td align="center" th:text="${post.cnt}"></td>
+        </tr>
+
+        <!-- 일반 게시글 목록 -->
+        <tr th:each="post, stat : ${postList}">
+            <!-- 번호 부분: 공지글을 먼저 표시한 후 일반 글 번호를 처리 -->
+            <td th:text="${stat.index + 1 + (isNoticePosts != null ? isNoticePosts.size() : 0)}"></td>
+            <td class="td-title">
+                <a th:href="@{/board/{pSeq}(pSeq=${post.pSeq})}"
+                   th:text="${post.title}"></a>
+            </td>
+            <td th:text="${post.user.name} + ' (' + ${post.user.userId} + ')'"></td>
+            <td class="td-date" th:text="${post.formattedPostdate}"></td>
+            <td align="center" th:text="${post.cnt}"></td>
+        </tr>
+
+        <!-- 게시물이 없을 때 "등록된 게시물이 없습니다." 메시지 -->
+        <tr th:if="${postList.size() + isNoticePosts.size() == 0}">
+            <td colspan="5">등록된 게시물이 없습니다.</td>
+        </tr>
+
+        <!-- 총 10개의 행을 유지하기 위한 빈 행 추가 -->
+        <tr th:each="i : ${#numbers.sequence(postList.size() + isNoticePosts.size() + 1, 10)}" class="empty-row">
+            <td colspan="5">&nbsp;</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="btn-container">
+        <!-- 글 작성 버튼 (새 글) -> GET /board/new -->
+        <a th:href="@{/board/new}" class="btn btn-primary">글 작성</a>
+
+        <!-- 검색 폼: GET /board?page=1&keyword=... -->
+        <div class="search">
+            <form th:action="@{/board}" method="get" class="search-form">
+                <input type="text" name="keyword" placeholder="검색어 입력"
+                       th:value="${keyword != null ? keyword : ''}">
+                <button type="submit" class="btn">검색</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div class="pagination-container">
+        <nav class="pagination">
+            <!-- 이전 버튼 -->
+            <a th:if="${prevPage != null}"
+               th:href="@{/board(page=${prevPage}, keyword=${keyword})}"
+               class="page-link">&lt;</a>
+
+            <!-- 페이지 번호 목록 -->
+            <a th:each="page : ${pageList}"
+               th:href="@{/board(page=${page}, keyword=${keyword})}"
+               th:text="${page}"
+               th:classappend="${pageNum == page} ? ' active ' : ''"
+               class="page-link">
+            </a>
+
+            <!-- 다음 버튼 -->
+            <a th:if="${nextPage != null}"
+               th:href="@{/board(page=${nextPage}, keyword=${keyword})}"
+               class="page-link">&gt;</a>
+        </nav>
+    </div>
+</div>
+</body>
+</html>

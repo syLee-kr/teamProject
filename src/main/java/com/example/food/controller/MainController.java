@@ -1,62 +1,32 @@
 package com.example.food.controller;
 
-import com.example.food.domain.SaveFood;
-import com.example.food.domain.Users;
-import com.example.food.service.savefood.SaveFoodService;
-import com.example.food.service.userservice.UserService;
-import jakarta.servlet.http.HttpSession;
+import com.example.food.service.MainService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
 
 @Controller
-@RequestMapping
+@RequestMapping("/main")
 public class MainController {
 
-    private final SaveFoodService saveFoodService;
-    private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
+    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
+
+    private final MainService mainService;
 
     @Autowired
-    public MainController(SaveFoodService saveFoodService, UserService userService, PasswordEncoder passwordEncoder) {
-        this.saveFoodService = saveFoodService;
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
+    public MainController(MainService mainService) {
+        this.mainService = mainService;
+        logger.info("MainController가 초기화되었습니다.");
     }
 
-    private String renderMainPage(Users user, Model model) {
-        if (user == null) {
-            model.addAttribute("isLoggedIn", false);
-            return "main/main";
-        }
-        List<SaveFood> saveFoods = saveFoodService.getUserFood(user.getUserId());
-        model.addAttribute("isLoggedIn", true);
-        model.addAttribute("user", user);
-        model.addAttribute("saveFoods", saveFoods);
-
-        return "main/main";
+    @GetMapping
+    public String mainPage(Model model) {
+        logger.info("GET /main 요청이 들어왔습니다.");
+        mainService.handleGetMain(model);
+        return "user/main/main";
     }
-
-    @GetMapping("/main")
-    public String mainPage(HttpSession session, Model model) {
-        Users user = (Users) session.getAttribute("user");
-        return renderMainPage(user, model);
-    }
-
-    @PostMapping("/main")
-    public String mainPages(@RequestParam String userId, @RequestParam String password, HttpSession session, Model model) {
-        Users user = userService.getUser(userId);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            session.setAttribute("user", user);
-        }
-        return renderMainPage(user, model);
-    }
-
 }

@@ -1,26 +1,28 @@
 package com.example.food.controller;
 
-import com.example.food.domain.Menu;
-import com.example.food.domain.SaveFood;
-import com.example.food.domain.Users;
+import com.example.food.entity.Menu;
+import com.example.food.entity.SaveFood;
+import com.example.food.entity.Users;
 import com.example.food.repository.UserRepository;
+import com.example.food.service.AuthenticationService;
 import com.example.food.service.savefood.SaveFoodService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -28,50 +30,57 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api/users")
 public class UserApiController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserApiController.class);
+
     private final UserRepository userRepository;
     private final SaveFoodService saveFoodService;
+    private final AuthenticationService authService;
 
     @Autowired
-    public UserApiController(UserRepository userRepository, SaveFoodService saveFoodService) {
+    public UserApiController(UserRepository userRepository, SaveFoodService saveFoodService, AuthenticationService authService) {
         this.userRepository = userRepository;
         this.saveFoodService = saveFoodService;
+        this.authService = authService;
     }
+
     @GetMapping("/foodInfo")
-    public ResponseEntity<List<SaveFood>> getUserSaveFoods(@SessionAttribute Users user) {
+    public ResponseEntity<List<SaveFood>> getUserSaveFoods() {
+        logger.info("GET /api/users/foodInfo 요청이 들어왔습니다.");
+
+        Users user = authService.getLoggedInUser();
+        if (user == null) {
+            logger.warn("인증되지 않은 사용자의 요청입니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        logger.info("사용자 ID: {}의 저장된 음식 정보를 조회합니다.", user.getUserId());
         List<SaveFood> saveFoods = saveFoodService.getUserFood(user.getUserId());
+        logger.info("사용자 ID: {}의 저장된 음식 정보 개수: {}", user.getUserId(), saveFoods.size());
         return ResponseEntity.ok(saveFoods);
     }
 
-    // ... 기존 import 문 및 클래스 정의 ...
-
     @PostMapping("/foodInfo")
-    public ResponseEntity<Map<String, Object>> submitBodyAndFoodInfo(@RequestBody @Valid FoodRequest request,
-                                                                     @SessionAttribute Users user,
-                                                                     BindingResult bindingResult) {
+    public ResponseEntity<Map<String, Object>> submitBodyAndFoodInfo(
+            @RequestBody @Valid FoodRequest request,
+            BindingResult bindingResult) {
+        logger.info("POST /api/users/foodInfo 요청이 들어왔습니다.");
+
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid input data"));
+            logger.warn("유효성 검사 실패: {}", bindingResult.getAllErrors());
+            return ResponseEntity.badRequest().body(Map.of("error", "유효하지 않은 입력 데이터"));
         }
 
         try {
-            System.out.println("Request received: " + request);
-
-            // Step 1: 사용자 정보 조회
-            Optional<Users> optionalUser = userRepository.findById(user.getUserId());
-            if (!optionalUser.isPresent()) {
-                System.out.println("User not found with ID: " + user.getUserId());
-                return ResponseEntity.status(404).body(Map.of("error", "User not found"));
+            Users user = authService.getLoggedInUser();
+            if (user == null) {
+                logger.warn("인증되지 않은 사용자의 요청입니다.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "사용자가 인증되지 않았습니다."));
             }
-            System.out.println("User found: " + optionalUser.get());
 
-            Users users = optionalUser.get();
-            users.setHeight(request.getHeight());
-            users.setWeight(request.getWeight());
-            userRepository.save(users);
-            System.out.println("Updated user info: " + users);
-
-            String gender = users.getGender().toString();
-            int age = users.getAge();
-            System.out.println("Gender: " + gender + ", Age: " + age);
+            user.setHeight(request.getHeight());
+            user.setWeight(request.getWeight());
+            userRepository.save(user);
+            logger.info("사용자 정보 업데이트 완료: {}", user);
 
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> categoriesData = Map.of(
@@ -85,204 +94,180 @@ public class UserApiController {
                     "bmr", request.getBmr()
             );
             String categoriesJson = mapper.writeValueAsString(categoriesData);
-            System.out.println("Categories JSON: " + categoriesJson);
+            logger.debug("Categories JSON: {}", categoriesJson);
 
-            // Python 스크립트의 절대 경로 설정
-            String scriptPath = Paths.get("src/main/resources/scripts/random_food.py").toAbsolutePath().toString();
-
-            // Python 인터프리터 경로 확인 (환경에 따라 'python3' 또는 'python' 사용)
-            String pythonInterpreter = "python";
-
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                    pythonInterpreter, scriptPath
-            );
-
-            // 작업 디렉토리 설정 (Python 스크립트가 위치한 디렉토리)
-            processBuilder.directory(new File(Paths.get("src/main/resources/scripts").toAbsolutePath().toString()));
-
-            // 환경 변수 설정: PYTHONIOENCODING을 UTF-8로 설정
-            processBuilder.environment().put("PYTHONIOENCODING", "utf-8");
-
-            // stderr와 stdout을 분리하여 읽기 위해 redirectErrorStream을 false로 설정
-            processBuilder.redirectErrorStream(false);
-
-            System.out.println("Starting Python script...");
-            Process process = processBuilder.start();
-            System.out.println("Python script started.");
-
-            // Step 2: JSON을 Python 스크립트의 stdin으로 전달
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8))) {
-                writer.write(categoriesJson);
-                writer.flush();
-                System.out.println("Sent categories JSON to Python script.");
-            } catch (IOException e) {
-                System.err.println("Failed to send data to Python script.");
-                e.printStackTrace();
-                process.destroy();
-                return ResponseEntity.status(500).body(Map.of("error", "Failed to send data to Python script"));
+            String scriptResult = executePythonScript(categoriesJson);
+            if (scriptResult == null || scriptResult.isEmpty()) {
+                throw new RuntimeException("Python 스크립트 실행 결과가 비어 있습니다.");
             }
 
-            // Step 3: Python 스크립트의 stdout과 stderr를 별도로 읽기
-            StringBuilder stdoutOutput = new StringBuilder();
-            StringBuilder stderrOutput = new StringBuilder();
+            JsonNode rootNode = mapper.readTree(scriptResult);
+            if (!rootNode.path("status").asText().equals("success")) {
+                throw new RuntimeException("Python 스크립트 실행 실패: " + rootNode.path("status").asText());
+            }
+
+            JsonNode dataNode = rootNode.path("data");
+            List<SaveFood> saveFoods = processAndSaveFoodData(user, dataNode, request.getSelectedDate());
+            logger.info("추천 식단 저장 완료. 저장된 식단 수: {}", saveFoods.size());
+
+            return ResponseEntity.ok(Map.of(
+                    "savedFoods", saveFoods,
+                    "message", "추천 식단 저장이 완료되었습니다."
+            ));
+
+        } catch (Exception e) {
+            logger.error("POST /api/users/foodInfo 처리 중 예외 발생: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Python 스크립트를 실행하고 결과를 반환합니다.
+     *
+     * @param inputJson 스크립트에 전달할 JSON 입력
+     * @return 스크립트의 stdout 결과 문자열 또는 null
+     */
+    private String executePythonScript(String inputJson) {
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            File scriptFile = new File(classLoader.getResource("scripts/random_food.py").getFile());
+            String scriptPath = scriptFile.getAbsolutePath();
+
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                    "python", // 시스템 환경에 따라 "python3"으로 변경 필요
+                    scriptPath
+            );
+            processBuilder.environment().put("PYTHONIOENCODING", "utf-8");
+            processBuilder.redirectErrorStream(false); // stderr와 stdout을 분리하여 읽기
+
+            logger.info("Starting Python script: {}", scriptPath);
+            Process process = processBuilder.start();
+
+            // JSON을 Python 스크립트의 stdin으로 전달
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8))) {
+                writer.write(inputJson);
+                writer.flush();
+                logger.info("Sent categories JSON to Python script.");
+            } catch (IOException e) {
+                logger.error("Failed to send data to Python script.", e);
+                process.destroy();
+                throw new RuntimeException("Failed to send data to Python script");
+            }
+
+            StringBuilder stdout = new StringBuilder();
+            StringBuilder stderr = new StringBuilder();
 
             // stdout 읽기 스레드
             Thread stdoutThread = new Thread(() -> {
-                try (BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
                     String line;
-                    while ((line = stdoutReader.readLine()) != null) {
-                        stdoutOutput.append(line).append("\n");
+                    while ((line = reader.readLine()) != null) {
+                        stdout.append(line).append("\n");
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Error reading stdout from Python script.", e);
                 }
             });
 
             // stderr 읽기 스레드
             Thread stderrThread = new Thread(() -> {
-                try (BufferedReader stderrReader = new BufferedReader(new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
                     String line;
-                    while ((line = stderrReader.readLine()) != null) {
-                        stderrOutput.append(line).append("\n");
+                    while ((line = reader.readLine()) != null) {
+                        stderr.append(line).append("\n");
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Error reading stderr from Python script.", e);
                 }
             });
 
             stdoutThread.start();
             stderrThread.start();
 
-            // Step 4: 기다리는 시간 제한 (예: 10초)
-            boolean finished = process.waitFor(5, TimeUnit.SECONDS);
+            // 스크립트 실행 완료 대기 (타임아웃 10초)
+            boolean finished = process.waitFor(10, TimeUnit.SECONDS);
             if (!finished) {
-                System.err.println("Python script timed out.");
+                logger.error("Python script timed out.");
                 process.destroy();
-                return ResponseEntity.status(500).body(Map.of("error", "Python script timed out"));
+                throw new RuntimeException("Python script timed out.");
             }
 
-            // Ensure both threads have finished
+            // 스레드가 완료될 때까지 대기
             stdoutThread.join();
             stderrThread.join();
 
-            int exitCode = process.exitValue();
-            System.out.println("Python script exit code: " + exitCode);
-            System.out.println("Python script output (stdout): " + stdoutOutput.toString());
-            System.out.println("Python script output (stderr): " + stderrOutput.toString());
-
-            if (exitCode != 0) {
-                String errorMessage = stderrOutput.toString();
-                System.err.println("Python script error: " + errorMessage);
-                return ResponseEntity.status(500).body(Map.of("error", "Python script execution failed: " + errorMessage));
+            if (process.exitValue() != 0) {
+                throw new RuntimeException("Python script error: " + stderr.toString());
             }
 
-            // Step 5: Python 결과 처리
-            String result = stdoutOutput.toString();
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(result);
-            System.out.println("Parsed Python result: " + rootNode);
-
-            List<Map<String, Object>> savedFoodsResponse = new ArrayList<>();
-            String[] mealTypes = {"breakfast", "lunch", "dinner"};
-
-            // 'data' 노드 아래에서 mealType을 가져옴
-            JsonNode dataNode = rootNode.get("data");
-            if (dataNode == null || !dataNode.isObject()) {
-                System.err.println("Invalid JSON structure: 'data' node is missing or not an object");
-                return ResponseEntity.status(500).body(Map.of("error", "Invalid JSON structure from Python script"));
-            }
-
-            // Step 6: SaveFood 생성 및 저장
-            for (String mealType : mealTypes) {
-                JsonNode mealNode = dataNode.get(mealType);
-                if (mealNode != null && mealNode.isArray()) {
-                    System.out.println("Processing mealType: " + mealType);
-
-                    SaveFood saveFood = new SaveFood();
-                    saveFood.setUser(users);
-                    saveFood.setSaveDate(OffsetDateTime.now());
-                    saveFood.setMealType(mealType);
-
-                    // menus 리스트 초기화
-                    if (saveFood.getMenus() == null) {
-                        saveFood.setMenus(new ArrayList<>());
-                    }
-
-                    for (JsonNode foodNode : mealNode) {
-                        Menu menu = new Menu();
-                        menu.setName(foodNode.get("식품명").asText());
-
-                        // 'gram' 처리
-                        JsonNode gramNode = foodNode.get("식품중량");
-                        if (gramNode != null && gramNode.isNumber()) {
-                            menu.setGram(gramNode.asDouble());
-                        } else {
-                            menu.setGram(0.0); // 기본값 설정
-                        }
-
-                        // '총 에너지(kcal)' 처리
-                        JsonNode energyNode = foodNode.get("총 에너지(kcal)");
-                        if (energyNode != null && energyNode.isNumber()) {
-                            menu.setCalories(energyNode.asDouble());
-                        } else {
-                            menu.setCalories(0.0); // 기본값 설정
-                        }
-
-                        // '총 탄수화물(g)' 처리
-                        JsonNode carbNode = foodNode.get("총 탄수화물(g)");
-                        if (carbNode != null && carbNode.isNumber()) {
-                            menu.setCarbohydrates(carbNode.asDouble());
-                        } else {
-                            menu.setCarbohydrates(0.0); // 기본값 설정
-                        }
-
-                        // '총 단백질(g)' 처리
-                        JsonNode proteinNode = foodNode.get("총 단백질(g)");
-                        if (proteinNode != null && proteinNode.isNumber()) {
-                            menu.setProtein(proteinNode.asDouble());
-                        } else {
-                            menu.setProtein(0.0); // 기본값 설정
-                        }
-
-                        // '총 지방(g)' 처리
-                        JsonNode fatNode = foodNode.get("총 지방(g)");
-                        if (fatNode != null && fatNode.isNumber()) {
-                            menu.setFat(fatNode.asDouble());
-                        } else {
-                            menu.setFat(0.0); // 기본값 설정
-                        }
-
-                        menu.setSaveFood(saveFood);
-                        saveFood.getMenus().add(menu);
-                    }
-
-                    // SaveFood 저장
-                    SaveFood savedFood = saveFoodService.saveSaveFood(saveFood);
-                    System.out.println("Saved food: " + savedFood);
-
-                    // 저장된 음식 정보를 응답에 추가
-                    Map<String, Object> saveFoodMap = new HashMap<>();
-                    saveFoodMap.put("sfSeq", savedFood.getSfSeq());
-                    saveFoodMap.put("saveDate", savedFood.getSaveDate());
-                    saveFoodMap.put("mealType", savedFood.getMealType());
-                    saveFoodMap.put("menus", savedFood.getMenus());
-                    savedFoodsResponse.add(saveFoodMap);
-                }
-            }
-
-            // Step 7: 최종 응답 생성
-            Map<String, Object> response = new HashMap<>();
-            response.put("savedFoods", savedFoodsResponse);
-            response.put("gender", gender);
-            response.put("age", age);
-            response.put("bmr", request.getBmr());
-            System.out.println("Final response: " + response);
-
-            return ResponseEntity.ok(response);
+            return stdout.toString().trim();
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+            logger.error("Python 스크립트 실행 중 오류 발생: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
+     * Python 스크립트의 결과를 처리하고 저장합니다.
+     *
+     * @param user        현재 로그인한 사용자
+     * @param dataNode    Python 스크립트에서 반환한 데이터 노드
+     * @param selectedDate 선택한 날짜
+     * @return 저장된 SaveFood 목록
+     */
+    private List<SaveFood> processAndSaveFoodData(Users user, JsonNode dataNode, String selectedDate) {
+        List<SaveFood> saveFoods = new ArrayList<>();
+
+        LocalDate parsedDate = LocalDate.parse(selectedDate);
+
+        for (String mealType : List.of("breakfast", "lunch", "dinner")) {
+            JsonNode mealNode = dataNode.path(mealType);
+            if (mealNode.isArray()) {
+                SaveFood saveFood = new SaveFood();
+                saveFood.setUser(user);
+                saveFood.setMealType(mealType);
+                saveFood.setSaveDate(parsedDate.atStartOfDay(ZoneOffset.UTC).toOffsetDateTime());
+
+                List<Menu> menus = new ArrayList<>();
+                for (JsonNode item : mealNode) {
+                    Menu menu = new Menu();
+                    menu.setName(item.path("식품명").asText());
+                    menu.setGram(item.path("식품중량").asDouble(0.0));
+                    menu.setCalories(item.path("총 에너지(kcal)").asDouble(0.0));
+                    menu.setProtein(item.path("총 단백질(g)").asDouble(0.0));
+                    menu.setCarbohydrates(item.path("총 탄수화물(g)").asDouble(0.0));
+                    menu.setFat(item.path("총 지방(g)").asDouble(0.0));
+                    menu.setSaveFood(saveFood);
+                    menus.add(menu);
+                }
+
+                saveFood.setMenus(menus);
+                saveFoodService.saveSaveFood(saveFood);
+                saveFoods.add(saveFood);
+                logger.info("Saved food for mealType {}: {} items", mealType, menus.size());
+            }
+        }
+
+        return saveFoods;
+    }
+
+    @DeleteMapping("/foodInfo/{sfSeq}")
+    @Transactional
+    public ResponseEntity<String> deleteFoodInfo(@PathVariable Long sfSeq) {
+        logger.info("DELETE /api/users/foodInfo/{} 요청이 들어왔습니다.", sfSeq);
+        try {
+            saveFoodService.deleteSaveFood(sfSeq);
+            logger.info("식단 정보 삭제 성공: sfSeq = {}", sfSeq);
+            return ResponseEntity.ok("식단이 삭제되었습니다.");
+        } catch (EmptyResultDataAccessException e) {
+            logger.warn("식단 정보 삭제 실패: 존재하지 않는 sfSeq = {}", sfSeq);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("식단 정보가 존재하지 않습니다.");
+        } catch (Exception e) {
+            logger.error("식단 정보 삭제 중 오류 발생: sfSeq = {}, 오류 메시지 = {}", sfSeq, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("식단 삭제 실패: " + e.getMessage());
         }
     }
 
@@ -297,18 +282,4 @@ public class UserApiController {
         private String category4;
         private String selectedDate;
     }
-
-    @DeleteMapping("/foodInfo/{sfSeq}")
-    @Transactional
-    public ResponseEntity<String> deleteFoodInfo(@PathVariable Long sfSeq) {
-        try {
-            saveFoodService.deleteSaveFood(sfSeq);
-            return ResponseEntity.ok("식단이 삭제되었습니다.");
-        } catch (EmptyResultDataAccessException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("식단 삭제 실패: " + e.getMessage());
-        }
-    }
 }
-

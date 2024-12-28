@@ -1,7 +1,7 @@
 package com.example.food.service.qnaservice;
 
-import com.example.food.domain.Answer;
-import com.example.food.domain.Users;
+import com.example.food.entity.Answer;
+import com.example.food.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

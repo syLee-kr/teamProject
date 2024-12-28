@@ -1,6 +1,6 @@
 package com.example.food.service.savefood;
 
-import com.example.food.domain.SaveFood;
+import com.example.food.entity.SaveFood;
 import com.example.food.repository.SaveFoodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class SaveFoodServiceImpl implements SaveFoodService{
 
     @Override
     public List<SaveFood> getUserFood(String userId) {
-        return saveFoodRepository.findAllByUser_UserId(userId);
+        return saveFoodRepository.findAllWithMenusByUserId(userId);
     }
     @Override
     public void deleteSaveFood(Long sfSeq) {

@@ -1,121 +1,130 @@
 package com.example.food.controller;
 
 import com.example.food.CodeGenerator;
-import com.example.food.domain.Users;
+import com.example.food.entity.Users;
+import com.example.food.service.AuthenticationService;
 import com.example.food.service.EmailService;
 import com.example.food.service.userservice.UserService;
-import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping
 public class LoginController {
 
-    private final UserService us;
-    private final EmailService es;
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+    private final UserService userService;
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationService authService;
 
     @Autowired
-    public LoginController(UserService us, EmailService es, PasswordEncoder passwordEncoder) {
-        this.us = us;
-        this.es = es;
+    public LoginController(UserService userService, EmailService emailService, PasswordEncoder passwordEncoder, AuthenticationService authService) {
+        this.userService = userService;
+        this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
+        this.authService = authService;
+        logger.info("LoginController가 초기화되었습니다.");
     }
 
-    @GetMapping("/login")
-    public String login(HttpSession session) {
-        Object loginUser = session.getAttribute("user");
-
-        if (loginUser != null) {
-            // 사용자가 이미 로그인되어 있으면 메인 페이지로 리다이렉트
-            return "redirect:/main";
+    private String getErrorMessage(String error) {
+        switch (error) {
+            case "invalid_credentials":
+                return "잘못된 사용자 이름 또는 비밀번호입니다.";
+            case "account_disabled":
+                return "계정이 비활성화되어 있습니다. 관리자에게 문의하세요.";
+            case "oauth_error":
+                return "소셜 로그인 중 오류가 발생했습니다.";
+            default:
+                return "알 수 없는 오류가 발생했습니다. 다시 시도해주세요.";
         }
-        // 사용자가 로그인하지 않았으면 로그인 페이지 표시
-        return "login/login";
     }
 
-    @PostMapping("/login")
-    public String loginAction(
-            @RequestParam String userId,
-            @RequestParam String password,
-            HttpSession session,
+    // 로그인 페이지
+    @GetMapping("/login")
+    public String loginPage(
+            @RequestParam(value = "error", required = false) String error,
+            @RequestParam(value = "logout", required = false) String logout,
             Model model) {
 
-        // 사용자 정보 조회
-        Users user = us.getUser(userId);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            // 비밀번호 일치 시 세션에 사용자 저장
-            session.setAttribute("user", user);
+        if (authService.isAuthenticated()) {
+            logger.info("인증된 사용자가 감지되어 /main으로 리다이렉트합니다.");
             return "redirect:/main";
-        } else {
-            // 로그인 실패 메시지 설정
-            model.addAttribute("error", "아이디 또는 비밀번호가 잘못되었습니다.");
-            return "login/login";
         }
+
+        if (logout != null) {
+            model.addAttribute("message", "성공적으로 로그아웃되었습니다.");
+        }
+
+        if (error != null) {
+            logger.warn("로그인 오류가 발생했습니다.");
+            String errorMessage = getErrorMessage(error);
+            model.addAttribute("loginFail", true);
+            model.addAttribute("errorMessage", errorMessage);
+        }
+
+        return "user/login/login";
     }
 
-    // 회원가입 화면 표시
-    @PostMapping("/join")
-    public String joinView() {
-        return "login/join";
-    }
-
-    // 아이디,비밀번호 찾기 화면 표시
+    // 아이디 및 비밀번호 찾기 페이지
     @GetMapping("/find")
     public String findIdView() {
-        return "login/find";
+        logger.info("아이디/비밀번호 찾기 페이지에 접근했습니다.");
+        return "user/login/find";
     }
 
-    // 아이디 찾기 처리
+    // 아이디 찾기
     @PostMapping("/findId")
-    public String findIdAction(Users vo, Model model) {
-        Users users = us.getUser(vo.getName());
+    @ResponseBody
+    public Map<String, Object> findIdAction(@RequestParam("name") String name, @RequestParam("phone") String phone) {
+        logger.info("아이디 찾기 요청: 이름={}, 전화번호={}", name, phone);
+        Users user = userService.getUserByNameAndPhone(name, phone);
 
-        if (users != null) { // 아이디 조회 성공
-            model.addAttribute("message", 1);
-            model.addAttribute("userId", users.getUserId());
+        Map<String, Object> response = new HashMap<>();
+        if (user != null) {
+            logger.info("사용자가 발견되었습니다: 이름={}, 사용자 ID={}", name, user.getUserId());
+            response.put("message", 1);
+            response.put("userId", user.getUserId());
         } else {
-            model.addAttribute("message", -1);
+            logger.warn("사용자를 찾을 수 없습니다: 이름={}, 전화번호={}", name, phone);
+            response.put("message", -1);
         }
-        return "login/findResult";
+        return response;
     }
 
+    // 비밀번호 찾기
     @PostMapping("/findPwd")
-    public String findPwdAction(Users vo, Model model, HttpSession session) {
-        Users user = us.getUser(vo.getUserId());
+    public String findPwdAction(@RequestParam("userId") String userId, @RequestParam("phone") String phone, Model model) {
+        logger.info("비밀번호 찾기 요청: 사용자 ID={}, 전화번호={}", userId, phone);
+        Users user = userService.getUserByIdAndPhone(userId, phone);
 
-        if (user != null && user.getEmail().equals(vo.getEmail())) {
-            // 인증 코드 생성
-            String verificationCode = CodeGenerator.generateCode(6);
-
-            // 인증 코드를 세션에 저장 (추후 검증을 위해)
-            session.setAttribute("verificationCode", verificationCode);
-            session.setAttribute("userId", user.getUserId());
-
-            // 인증 코드를 이메일로 전송
-            es.sendVerificationCode(user.getEmail(), verificationCode);
-
-            // 성공 메시지와 사용자 ID를 모델에 추가
-            model.addAttribute("message", 1);
-            model.addAttribute("userId", user.getUserId());
-        } else {
-            // 사용자 조회 실패 시 메시지 추가
-            model.addAttribute("message", -1);
+        if (user == null) {
+            logger.warn("사용자를 찾을 수 없습니다: 사용자 ID={}, 전화번호={}", userId, phone);
+            model.addAttribute("message", "잘못된 사용자 ID 또는 전화번호입니다.");
+            return "user/login/login";
         }
-        return "login/findPwdResult";
-    }
 
-    @GetMapping("/logout")
-    public String logoutSubmit(HttpSession session) {
-        session.invalidate(); // 세션 무효화
-        return "redirect:/login";
+        try {
+            String temporaryPassword = CodeGenerator.generateCode(6);
+            user.setPassword(passwordEncoder.encode(temporaryPassword));
+            userService.changeUser(user);
+            emailService.sendVerificationCode(user.getUserId(), temporaryPassword);
+            logger.info("임시 비밀번호가 사용자에게 전송되었습니다: 사용자 ID={}", userId);
+            model.addAttribute("message", "임시 비밀번호가 휴대폰으로 전송되었습니다.");
+        } catch (Exception e) {
+            logger.error("비밀번호 재설정 처리 중 오류 발생: 사용자 ID={}, 오류={}", userId, e.getMessage());
+            model.addAttribute("message", "비밀번호 재설정 중 오류가 발생했습니다. 다시 시도해주세요.");
+        }
+
+        return "user/login/login";
     }
 }
