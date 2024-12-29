@@ -1,11 +1,13 @@
 package com.example.food.service.postservice;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.example.food.CommentDTO;
+import com.example.food.config.FixedUser;
 import com.example.food.domain.Comments;
 import com.example.food.domain.Post;
 import com.example.food.domain.Users;
@@ -14,7 +16,7 @@ import com.example.food.repository.PostRepository;
 import com.example.food.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;  // @Slf4j 추가
+import lombok.extern.slf4j.Slf4j;  
 
 @Slf4j  
 @Service
@@ -24,6 +26,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepo;
     private final PostRepository postRepo;
     private final UserRepository userRepo;
+    private final FixedUser fixedUser;
 
     // 특정 게시물 댓글 조회
     @Override
@@ -62,7 +65,7 @@ public class CommentServiceImpl implements CommentService {
 		Users user = userRepo.findById(commentDto.getUserId())
 							.orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 		*/
-        
+        /*
         // 고정 사용자 설정 (테스트용 고정 사용자)
         Users user = userRepo.findById("test_user")
                              .orElseGet(() -> {
@@ -72,7 +75,9 @@ public class CommentServiceImpl implements CommentService {
                                  newUser.setName("테스트유저");
                                  return userRepo.save(newUser); // 새로 저장된 사용자를 반환
                              });
-        
+        */
+        // fixedUser 사용
+     	Users user = fixedUser.getFixedUser();
         // 댓글 생성 및 저장
         Comments comment = Comments.builder()
                                    .content(commentDto.getContent())
@@ -83,6 +88,35 @@ public class CommentServiceImpl implements CommentService {
         commentRepo.save(comment);
         log.info("댓글이 추가되었습니다: postId = {}, userId = {}", commentDto.getPostId(), commentDto.getUserId());
     }
+    
+    
+    // 댓글 수정
+	@Override
+	public Comments getCommentById(Long cSeq) {
+		log.info("댓글 조회 요청, cSeq: {}", cSeq);
+		
+		// cSeq로 댓글 조회
+		return commentRepo.findById(cSeq)
+						  .orElseThrow(()-> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+	}
+	
+	// 댓글 수정 처리
+	@Override
+	public void updateComment(Long cSeq, String content) {
+		log.info("댓글 수정 요청, cSeq: {}, newContent: {}", cSeq, content);
+		
+		// 댓글 조회
+        Comments comment = commentRepo.findById(cSeq)
+                                      .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+        // 댓글 내용 수정
+        comment.setContent(content);
+        comment.setUpdatedAt(OffsetDateTime.now()); // 수정시간 갱신
+        
+        // 수정된 댓글 저장
+        commentRepo.save(comment);
+        
+        log.info("댓글 수정 완료: cSeq = {}", cSeq);
+	}
 
     // 댓글 삭제
     @Override
@@ -91,10 +125,7 @@ public class CommentServiceImpl implements CommentService {
         
         Comments comment = commentRepo.findById(cSeq)
                                       .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
-        
-        // 삭제된 댓글이 속한 게시글의 ID
-        Long postId = comment.getPost().getPSeq(); // 
-        
+       
         commentRepo.delete(comment);
         
         log.info("댓글이 삭제되었습니다: cSeq = {}", cSeq);

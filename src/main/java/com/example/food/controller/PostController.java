@@ -119,7 +119,8 @@ public class PostController {
         } else {
             // 로그인되지 않은 경우 처리 (필요에 따라 로그인 페이지로 리다이렉트)
             return "redirect:/login/login";
-        }*/
+        }
+        */
 		
 		return "post/write";
 	}
@@ -151,8 +152,8 @@ public class PostController {
 		user.setGender(Gender.MALE);
 		user.setRole(Role.ROLE_ADMIN); 
 		*/
-		// fixedUser 사용
-		Users user = FixedUser.getFixeduser();
+		// fixedUser 사용 //
+		Users user = fixedUser.getFixedUser();
 		
 		
 		// 로그인된 사용자 정보 확인
@@ -283,14 +284,17 @@ public class PostController {
 	        log.warn("로그인 사용자 정보 없음");
 	        throw new IllegalArgumentException("로그인이 필요합니다.");
 	    }*/
-		
+		/*
 		// 테스트용 고정된 사용자(고정 사용자만 지울것)
 		Users user = new Users();
 		user.setUserId("test_user"); //로그인한 사용자 ID 설정
 		user.setName("테스트유저");
 		user.setGender(Gender.MALE);
 		user.setRole(Role.ROLE_ADMIN);
+		*/
 		
+		// fixedUser 사용 //
+		Users user = fixedUser.getFixedUser();
 		log.info("로그인 사용자: {}, Role: {}", user.getUserId(), user.getRole());
 	
 		// 기존 게시글 조회

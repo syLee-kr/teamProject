@@ -16,6 +16,7 @@ public class FixedUser {
 	
 	@Autowired
 	private UserRepository userRepo;
+	private Users fixedUser;
 	
 	@PostConstruct // 어플리케이션 초기화 시점에 실행
 	public void init() {
@@ -32,5 +33,8 @@ public class FixedUser {
         
         log.info("사용자 정보 확인, ID: {}, Role: {}", user.getUserId(), user.getRole());
 	}
-
+	
+	public Users getFixedUser() {
+		return fixedUser;
+	}
 }

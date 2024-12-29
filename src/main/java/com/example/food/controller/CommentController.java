@@ -13,6 +13,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.food.CommentDTO;
 import com.example.food.domain.Comments;
+import com.example.food.domain.Users;
+import com.example.food.repository.UserRepository;
 import com.example.food.service.postservice.CommentService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CommentController {
 
     private final CommentService commentService;
+    private final UserRepository userRepo;
 
     // 댓글 조회
     @GetMapping("/{postId}")
@@ -43,12 +46,15 @@ public class CommentController {
     					   @RequestParam Long postId, 
     					   RedirectAttributes redirectAttr) {//추가
         log.info("댓글 추가 요청, postId: {}, content: {}", content, postId);
-                 
-        // 테스트용 고정된 사용자 정보
-        CommentDTO commentDto = new CommentDTO(); 
         
-        commentDto.setUserId("test_user");
-        commentDto.setUserName("테스트유저");
+        Users user = userRepo.findById("test_user")
+        					 .orElseThrow(()-> new IllegalArgumentException("test_user가 존재하지않습니다."));
+        
+        
+        // 댓글 추가 객체
+        CommentDTO commentDto = new CommentDTO(); 
+        commentDto.setUserId(user.getUserId());
+        commentDto.setUserName(user.getName());
         commentDto.setContent(content);
         commentDto.setPostId(postId);
         
@@ -59,20 +65,47 @@ public class CommentController {
         redirectAttr.addAttribute("postId", postId); //
         return "redirect:/post/detail/{postId}";//
     }
-
+    
+    //댓글 수정 폼
+    @GetMapping("/{cSeq}/edit")
+    public String editCommentForm(@PathVariable Long cSeq,
+    						  RedirectAttributes redirectAttr) {
+    	log.info("댓글 수정 폼 요청,  cSeq: {}", cSeq);
+    	
+    	Comments comment = commentService.getCommentById(cSeq);
+    	
+    	if (comment == null){
+    		log.error("댓글을 찾을수 없습니다. , cSeq: {}", cSeq);
+    		return "redirect:/post/detail"; // 댓글이 없으면 상세페이지로 
+    	}
+    	
+    	redirectAttr.addFlashAttribute("comment", comment);
+    	return "post/detail";
+    }
+    
+    // 댓글 수정 처리
+    @PostMapping("{cSeq}/edit")
+    public String updateComment(@PathVariable Long cSeq,
+    							@RequestParam String content,
+    							RedirectAttributes redirectAttr) {
+    	log.info("댓글 수정 요청, cSeq: {}, content: {}", cSeq, content);
+    	commentService.updateComment(cSeq, content);
+    	return "redirect:/post/detail/{postId}";
+    }
+    
+    
     // 댓글 삭제
-    @DeleteMapping("/{cSeq}")
+    @PostMapping("/{cSeq}/detele")
     public String delComment(@PathVariable Long cSeq,
     						RedirectAttributes redirectAttr) {//
         log.info("댓글 삭제 요청, cSeq: {}", cSeq);
         
-        // 댓글 정보 
+        // 댓글 삭제
         Comments comment = commentService.delComment(cSeq);
+        // 댓글이 속한 게시글 ID
         Long postId = comment.getPost().getPSeq(); //
         
         log.info("댓글 삭제 완료, cSeq: {}", cSeq);
-        
-        commentService.delComment(cSeq);
         
         // 댓글 삭제 후 detail 페이지로 
         redirectAttr.addAttribute("postId", postId);//
