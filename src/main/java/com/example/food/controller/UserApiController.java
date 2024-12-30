@@ -134,7 +134,7 @@ public class UserApiController {
             String scriptPath = scriptFile.getAbsolutePath();
 
             ProcessBuilder processBuilder = new ProcessBuilder(
-                    "python", // 시스템 환경에 따라 "python3"으로 변경 필요
+                    "python",
                     scriptPath
             );
             processBuilder.environment().put("PYTHONIOENCODING", "utf-8");

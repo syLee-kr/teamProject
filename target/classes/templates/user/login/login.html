@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>사용자 로그인</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/login.css}">
+</head>
+<body>
+<div class="main">
+    <div class="subMain">
+        <div id="successModal" class="modal" th:if="${message}">
+            <div class="modal-content">
+                <p th:text="${message}"></p>
+            </div>
+        </div>
+
+        <div id="errorModal" class="modal" th:if="${loginFail}">
+            <div class="modal-content">
+                <p th:text="${errorMessage}"></p>
+            </div>
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <!-- CSRF 토큰 추가 -->
+<!--            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
+            <h1><a th:href="@{/main}">Healthy Table</a></h1>
+            <div>
+                <div class="form-id">
+                    <div class="form-id-in">
+                        <input type="text" id="userId" name="userId" placeholder="아이디" required><br>
+                    </div>
+                </div>
+                <div class="form-pwd">
+                    <input type="password" id="password" name="password" placeholder="비밀번호" required>
+                </div>
+                <div class="form-cbox">
+                    <input type="checkbox" id="check" checked>
+                    <label for="check" class="cbox">아이디 저장</label>
+                    <div class="find">
+                        <a th:href="@{/find}">아이디/비밀번호 찾기</a>
+                    </div>
+                </div>
+                <div class="login">
+                    <button type="submit">Login</button>
+                </div>
+            </div>
+            <div class="horizon">또는</div>
+            <div class="login-another">
+                <a th:href="@{/oauth2/authorization/google}">
+                    <img width="50px" th:src="@{/images/googlelog.png}">
+                </a>
+                <a th:href="@{/oauth2/authorization/naver}">
+                    <img width="50px" th:src="@{/images/naverlog.png}">
+                </a>
+                <!--<a th:href="@{/oauth2/authorization/kakao}">
+                    <img width="50px" th:src="@{/images/kakaolog.png}">
+                </a>-->
+            </div>
+        </form>
+    </div>
+    <div class="join">
+        <p>Healthy Table가 처음이세요? <a th:href="@{/join}">회원 가입</a></p>
+    </div>
+</div>
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 성공 메시지 모달 표시
+        const successModal = document.getElementById('successModal');
+        if (successModal) {
+            successModal.style.display = 'block';
+        }
+
+        // 에러 메시지 모달 표시
+        const errorModal = document.getElementById('errorModal');
+        if (errorModal) {
+            errorModal.style.display = 'block';
+        }
+
+        // 체크박스 로직 (아이디 저장)
+        var checkbox = document.getElementById('check');
+        var userIdInput = document.getElementById('userId');
+
+        var savedId = localStorage.getItem('savedUserId');
+        if (savedId) {
+            userIdInput.value = savedId;
+            checkbox.checked = true;
+        }
+
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                localStorage.setItem('savedUserId', userIdInput.value);
+            } else {
+                localStorage.removeItem('savedUserId');
+            }
+        });
+
+        userIdInput.addEventListener('input', function () {
+            if (checkbox.checked) {
+                localStorage.setItem('savedUserId', userIdInput.value);
+            }
+        });
+
+        // 모달 외부 클릭으로 닫기
+        window.addEventListener('click', function (event) {
+            if (event.target === successModal) {
+                successModal.style.display = 'none';
+            }
+
+            if (event.target === errorModal) {
+                errorModal.style.display = 'none';
+            }
+        });
+    });
+
+    // 모달 닫기 함수
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+</html>

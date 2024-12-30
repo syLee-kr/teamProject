@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/find.css}">
+    <title>아이디 비밀번호 찾기</title>
+</head>
+<body>
+<div class="main">
+    <div class="subMain">
+        <h1><a th:href="@{/templates/user/main}">Healthy Table</a></h1>
+
+        <!-- 아이디 찾기 섹션 -->
+        <section>
+            <form th:action="@{/findId}" method="post" onsubmit="openModal(event);">
+                <input type="text" id="name" name="name" placeholder="이름을 입력하세요." required>
+                <input type="text" id="phone" name="phone" placeholder="전화번호를 입력하세요." required>
+                <button type="submit">아이디 찾기</button>
+            </form>
+        </section>
+
+        <br>
+        <!-- 비밀번호 찾기 섹션 -->
+        <section>
+            <form th:action="@{/findPwd}" method="post">
+                <input type="text" id="userId" name="userId" placeholder="아이디를 입력하세요." required>
+                <input type="text" id="phone2" name="phone" placeholder="전화번호를 입력하세요." required>
+                <button type="submit">비밀번호 찾기</button>
+            </form>
+        </section>
+    </div>
+</div>
+
+<!-- 모달 구조 추가 -->
+<div id="idFindModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <p id="modalMessage">아이디 찾기 결과가 여기에 표시됩니다.</p>
+        <p id="foundUserId"></p>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    function openModal(event) {
+        event.preventDefault(); // 폼 제출 방지
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const name = formData.get('name');
+        const phone = formData.get('phone');
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                name: name,
+                phone: phone
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('네트워크 응답에 문제가 있습니다.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.message === 1) {
+                    document.getElementById("modalMessage").innerText = "찾은 아이디:";
+                    document.getElementById("foundUserId").innerText = data.userId;
+                } else {
+                    document.getElementById("modalMessage").innerText = "아이디를 찾을 수 없습니다.";
+                    document.getElementById("foundUserId").innerText = "";
+                }
+                document.getElementById("idFindModal").style.display = "block";
+            })
+            .catch(error => {
+                console.error('아이디 찾기 중 오류 발생:', error);
+                document.getElementById("modalMessage").innerText = "아이디 찾기 중 오류가 발생했습니다.";
+                document.getElementById("foundUserId").innerText = "";
+                document.getElementById("idFindModal").style.display = "block";
+            });
+    }
+
+    function closeModal() {
+        document.getElementById("idFindModal").style.display = "none";
+    }
+
+    // 모달 외부 클릭 시 닫기
+    window.onclick = function(event) {
+        const modal = document.getElementById("idFindModal");
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+</body>
+</html>
