@@ -143,8 +143,8 @@ public class PostController {
 		log.info("로그인 사용자: {}, Role: {}", user.getUserId(), user.getRole());
 		
 		
-		// 관지라 권한 확인
-		if (isNotice && user.getRole().equals(Users.Role.ROLE_ADMIN)) {
+		// 관리자 권한 확인
+		if (!user.getRole().equals(Users.Role.ROLE_ADMIN)) {
 			log.warn("공지글 작성 권한 없음: {}", user.getUserId());
 			throw new IllegalArgumentException("공지글은 관리자만 작성할 수 있습니다.");
 		}
@@ -226,7 +226,7 @@ public class PostController {
 		// 게시물에 달린 댓글 목록
 		List<CommentDTO> comments = commentService.getCommentByPostId(pSeq);
 		
-		// 로그인한 사용자 권한 저장할 변수(고정)
+		// 로그인한 사용자 권한 저장할 변수(고정 사용자)
 		Users loggedInUserRole = fixedUser.getFixedUser();
 		
 		/*
@@ -278,7 +278,7 @@ public class PostController {
 						      HttpSession session)*/ throws IOException {
 					 			
 		
-		log.info("게시물 수정 요청, pSeq: {}, 제목: {}, 내용: {}", pSeq, title, content);
+		log.info("게시물 수정 요청, pSeq: {}, 제목: {}, 내용: {}", pSeq, title, content, isNotice);
 		
 	    /*
 		// 세션에서 사용자 정보 가져오기
@@ -293,16 +293,20 @@ public class PostController {
 		Users user = fixedUser.getFixedUser();
 		log.info("로그인 사용자: {}, Role: {}", user.getUserId(), user.getRole());
 	
+		// 관리자 권한 체크
+		if (!user.getRole().equals(Users.Role.ROLE_ADMIN)) {
+			log.warn("관리자 권한이 없습니다: {}", user.getUserId());
+			throw new IllegalArgumentException("관리자만 접근 가능");
+		}
+		
 		// 기존 게시글 조회
 	    PostDTO existingPost = postService.getPostById(pSeq);
 		
 	    // 게시물 작성자만 수정할수 있게 권한 체크 //
-	    if (!existingPost.getUserId()
-	    			.equals(user.getUserId())) {
+	    if (!existingPost.getUserId().equals(user.getUserId())) {
 	    	log.warn("수정 권한 없음, 사용자: {}, 게시물 작성자: {}", user.getUserId(), existingPost.getUserId());
 	    	throw new IllegalArgumentException("수정 권한이 없습니다.");
 	    }
-	    
 	    
 	    
 	    // 기존 이미지 경로
@@ -335,7 +339,7 @@ public class PostController {
 		postDto.setContent(content);
 		postDto.setImagePaths(imagePaths);
 		postDto.setIsNotice(isNotice);
-
+		log.info("업데이트된 isNotice 값: {}", postDto.getIsNotice()); // 업데이트된 값 확인
 		postDto.setUserId(user.getUserId()); //로그인한 사용자 ID 설정
 		postDto.setUserName(user.getName());
 		

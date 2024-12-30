@@ -75,19 +75,6 @@ public class PostServiceImpl implements PostService {
             throw new IllegalArgumentException("사용자가 로그인하지 않았습니다.");
         }
         */
-        /*
-        // 고정 사용자 설정
-        Users user = userRepo.findById("test_user")
-                             .orElseGet(() -> {
-                                 // 고정 사용자가 없으면 새로 생성하여 저장
-                                 Users newUser = new Users();
-                                 newUser.setUserId("test_user");
-                                 newUser.setName("테스트유저");
-                                 newUser.setGender(Gender.MALE);
-                                 newUser.setRole(Users.Role.ROLE_ADMIN); // 관리자 권한 설정
-                                 return userRepo.save(newUser);
-                             });
-		*/
         
         //fixedUser 사용
         Users user = userRepo.findById("test_user")//
@@ -98,6 +85,7 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setPriority(postDto.getPriority());
+        post.setIsNotice(postDto.getIsNotice()); // 글 수정 시 일반/공지 저장 //
         post.setImagePaths(postDto.getImagePaths()); // 수정된 이미지경로 추가
         post.setUser(user); // Post 엔티티에 고정 사용자 설정
         
@@ -131,24 +119,11 @@ public class PostServiceImpl implements PostService {
         Users user = userRepo.findById(postDto.getUserId())
                              .orElseThrow(() -> new IllegalArgumentException("사용자 정보 없음"));
         */
-        /*
-        // 고정 사용자 설정
-        Users user = userRepo.findById("test_user")
-                             .orElseGet(() -> {
-                                 // 고정 사용자가 없으면 새로 생성하여 저장
-                                 Users newUser = new Users();
-                                 newUser.setUserId("test_user");
-                                 newUser.setName("테스트유저");
-                                 newUser.setGender(Gender.MALE);
-                                 newUser.setRole(Users.Role.ROLE_ADMIN); // 관리자 권한 설정
-                                 return userRepo.save(newUser);
-                             });
-        
-        log.info("사용자 정보 확인, ID: {}, Role: {}", user.getUserId(), user.getRole());
-         */
+
         // fiexedUser 사용
         Users user = userRepo.findById("test_user")//
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보 없음"));
+        log.info("사용자 정보 확인, ID: {}, Role: {}", user.getUserId(), user.getRole());
         
         
         //공지글 권한 확인//
