@@ -1,0 +1,91 @@
+[33m8694862[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfinal[m[33m)[m Remove large log files from repository
+[33mcb16a3a[m Removed sensitive JSON file from tracking and updated .gitignore
+[33mb104fff[m Remove sensitive information and use environment variables
+[33mbaef54f[m Remove large log files and update .gitignore
+[33m383b22e[m 프로젝트 끝
+[33mad1d6e4[m 프로젝트 끝
+[33m5236760[m[33m ([m[1;31morigin/develop[m[33m)[m Merge pull request #16 from syLee-kr/private_workspace
+[33me89afc7[m Post/comment code add & not yet test insert data
+[33m1915066[m Merge branch 'develop' into private_workspace
+[33mb5cd5e7[m CommentService/post.css 수정
+[33m05e9a3b[m Merge branch 'develop' of https://github.com/syLee-kr/teamProject.git into develop
+[33mf55adb9[m comment /post imagePaths add
+[33m204cfb6[m Merge pull request #15 from syLee-kr/feature1
+[33m515b46f[m QnA 병합. 식단 추천 로직 저장 성공.
+[33m03f597d[m Merge branch 'develop' of https://github.com/syLee-kr/teamProject.git into develop
+[33m5851dc5[m checkout
+[33m1a87634[m Merge branch 'develop' into private_workspace
+[33m759b377[m checkout
+[33mc797f23[m Junit processing update > before merge teamproject
+[33m92f82a4[m checkout
+[33m03b18c3[m Merge branch 'develop' of https://github.com/syLee-kr/teamProject.git into develop
+[33m331119d[m Merge pull request #14 from syLee-kr/feature1
+[33m808eb5e[m 회원가입, 로그인 등 회원관리 일부 로직 구현.
+[33me7e0c47[m test 코드로 데이터베이스 확인 > 기본코드 실행시 오류 발생
+[33m49fe93d[m pageNum Validate add
+[33m9aefb11[m TestEntityManager add 수정 필요
+[33me856d80[m PostRepositoryTest JUnit success
+[33m7d3a5dd[m checkout
+[33mb8ded1f[m 일반/공지, ServiceImpl 수정
+[33m50f5d87[m 공지사항과 일반글에 대한 분류
+[33m03b4868[m test + html update
+[33mff2dc69[m list,detail,write html add
+[33me920f4a[m post, repository,service update
+[33m9967618[m checkout
+[33mfc80bef[m serviceImpl update
+[33m84c177d[m PostDAO del
+[33m095b54f[m checkout
+[33m39996ee[m 공지/일반 우선순위
+[33m14a3ea2[m Merge 1211_24
+[33md2853f3[m Merge branch 'develop' of https://github.com/syLee-kr/teamProject.git into develop
+[33m74184e1[m postServieImpl update
+[33m147ea8a[m Controller, DTO, Service,ServiceImpl add
+[33m2134574[m postcontroller update
+[33me6d93d0[m Merge pull request #13 from syLee-kr/feature1
+[33m4c81769[m 메인페이지 구성 및 파이썬 코드 추가. 현재 회원가입 및 로그인 로직 구현되지 않은 관계로 추후 수정 필요.
+[33m8132f6a[m testPostList > priority sort add
+[33m321ed66[m 임시게시판 호출
+[33md822215[m testPostList 생성
+[33mf3d4dff[m jsp > thymeleaf 변경
+[33mfa40bf8[m postController add
+[33m4937f0b[m web.xml basic add
+[33m4aba934[m Merge branch 'develop' of https://github.com/syLee-kr/teamProject into feature1
+[33md209548[m 패스워드 암호화 로직 수정
+[33mb5211a2[m Merge pull request #11 from syLee-kr/private_workspace
+[33m636c217[m Merge branch 'private_workspace' into develop
+[33mc17cfd9[m .
+[33m9289a29[m annotation bean add
+[33maf19cd5[m .
+[33m9d4b411[m annotaion bean add
+[33m586f105[m Merge pull request #9 from syLee-kr/private_workspace
+[33m95c1fb6[m new commit
+[33mad1447f[m pom.xml, properties update
+[33m69e7955[m .
+[33mebd29d2[m .
+[33m3646c2b[m .
+[33meac77e8[m Merge pull request #7 from syLee-kr/feature2
+[33m5fdb4aa[m 패스워드 암호화 로직 수정
+[33m655486e[m Merge pull request #6 from syLee-kr/feature2
+[33m09895be[m 유저 수정 및 데이터베이스 연결
+[33m4dbdc2d[m Merge pull request #5 from syLee-kr/feature2
+[33m79efbfe[m 객체 수정
+[33m0591329[m Merge pull request #4 from syLee-kr/feature2
+[33m83cfbe9[m 객체 5개 추가
+[33m4a01084[m 객체 5개 추가
+[33m3d3ead1[m Admin controller 추가
+[33m77b4b24[m Merge branch 'develop' of https://github.com/syLee-kr/teamProject into develop
+[33mf286457[m 프로덕트 리포지토리 비활성화
+[33mf7b0b73[m ProductRepository 수정
+[33m3e8893a[m Merge branch 'develop' of https://github.com/syLee-kr/teamProject into develop
+[33mc72aca1[m Merge remote-tracking branch 'origin/develop' into develop
+[33m23c5f73[m 유저 정보 로직 완료
+[33mf7345ee[m Merge branch 'develop' of https://github.com/syLee-kr/teamProject.git into develop
+[33m318b6de[m Admin 도메인 추가
+[33m788430e[m Update ProductRepository.java
+[33mcfc4745[m Admin domain, Service 추가
+[33mc7b8da7[m ProductRepository 기능 추가
+[33m54e9815[m ParoductController class추가
+[33md154fe8[m Delete .idea directory
+[33m7ef264e[m 유저 정보 로직 추가
+[33m1d7807a[m first1 commit
+[33m05e6f42[m first commit
