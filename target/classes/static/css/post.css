@@ -336,9 +336,27 @@ form .form-group {
     margin-bottom: 5px; /* 각 항목 간 간격을 주기 위해 */
 }
 
+
+/*Select dropdown key 위치 조정*/
+form .form-group-select {
+    display: inline-block; /* label과 input/textarea가 블록 요소로 나열되게 함 */
+    width: 100%; /* 텍스트 박스의 너비 */
+    margin-bottom: 5px; /* 각 항목 간 간격을 주기 위해 */
+    margin-top: 5px;
+    height: 40px;
+    font-weight: bold; /* 글씨를 두껍게 */
+}
+/*label과 select 공간 조절*/
+form .form-group-select select{
+    margin-left: 5px;
+}
+
+
+
 /* 내용 <label> 스타일 */
 form .form-group label {
     display: block; /* label을 블록 요소로 처리하여 위에 배치 */
+    margin-top: 10px;
     margin-bottom: 10px; /* 텍스트 박스와 '내용' 사이 간격을 설정 */
     font-size: 16px; /* 폰트 크기 */
     font-weight: bold; /* 글씨를 두껍게 */
@@ -371,6 +389,9 @@ form .form-group #content {
     display: flex;
     flex-direction: column;
 }
+
+
+
 
 label::before {
 	content: "●"; /* 특수문자 추가 */

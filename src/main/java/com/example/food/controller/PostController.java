@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.opentest4j.FileInfo;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -20,10 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.food.CommentDTO;
 import com.example.food.PostDTO;
 import com.example.food.config.FixedUser;
-import com.example.food.domain.Post;
 import com.example.food.domain.Users;
-import com.example.food.domain.Users.Gender;
-import com.example.food.domain.Users.Role;
 import com.example.food.service.postservice.CommentService;
 import com.example.food.service.postservice.PostService;
 
@@ -97,12 +94,6 @@ public class PostController {
 		return "post/list";
 
 	}
-    /*
-	@PostMapping("/list")
-    public String PostListRedirect() {
-        // 게시물 작성 후 /post/list로 리다이렉트
-        return "redirect:/post/list";
-    }*/
 	
 	/*
 	 * 게시물 작성 페이지
@@ -144,28 +135,27 @@ public class PostController {
 	        log.warn("로그인 사용자 정보 없음");
 	        throw new IllegalArgumentException("로그인이 필요합니다.");
 	    } */
-		/* 
-		// 테스트용 고정된 사용자(고정 사용자만 지울것)
-		Users user = new Users();
-		user.setUserId("test_user"); //로그인한 사용자 ID 설정
-		user.setName("테스트유저");
-		user.setGender(Gender.MALE);
-		user.setRole(Role.ROLE_ADMIN); 
-		*/
+
 		// fixedUser 사용 //
 		Users user = fixedUser.getFixedUser();
-		
 		
 		// 로그인된 사용자 정보 확인
 		log.info("로그인 사용자: {}, Role: {}", user.getUserId(), user.getRole());
 		
 		
 		// 관지라 권한 확인
-		if (isNotice && user.getRole() !=Users.Role.ROLE_ADMIN) {
+		if (isNotice && user.getRole().equals(Users.Role.ROLE_ADMIN)) {
 			log.warn("공지글 작성 권한 없음: {}", user.getUserId());
 			throw new IllegalArgumentException("공지글은 관리자만 작성할 수 있습니다.");
 		}
-		 
+		
+		/*
+		// 고정 사용자의 관리자 권한 확인
+		if (postDto.getIsNotice() && !fixedUser.getRole()
+											   .equals(Users.Role.ROLE_ADMIN)) {
+			log.warn("공지글 작성 권한 없음: {}", fixedUser.getUserId());
+		}
+		 */
 		 List<String> imagePaths = new ArrayList<>();
 		
 		// 이미지 파일 서버에 저장(이미지가 있을때만)
@@ -227,11 +217,25 @@ public class PostController {
 	 * 게시물 상세보기
 	 */
 	@GetMapping("/detail/{pSeq}")
-	public String detail(@PathVariable Long pSeq, Model model) {
+	public String detail(@PathVariable Long pSeq, Model model /*, Authentication authen*/ ) {
 		log.info("게시물 상세보기 요청, pSeq: {}", pSeq);
 		
 		// 게시물 조회 후 조회수 증가
 		PostDTO postDto = postService.getPostById(pSeq);
+		
+		// 게시물에 달린 댓글 목록
+		List<CommentDTO> comments = commentService.getCommentByPostId(pSeq);
+		
+		// 로그인한 사용자 권한 저장할 변수(고정)
+		Users loggedInUserRole = fixedUser.getFixedUser();
+		
+		/*
+		// 로그인한 사용자 권한
+		if(authen != null "&& authen.getAuthorities())
+								   .stream()
+								   .map(GrantedAuthority::getAuthority)
+								   .collect(Collectors.joining(","));
+		*/
 		
 		// 게시물 조회 후  조회수 1증가 처리
 		postService.viewCount(pSeq);
@@ -241,8 +245,8 @@ public class PostController {
         }
 		
 		model.addAttribute("post", postDto);
-		model.addAttribute("comments", commentService.getCommentByPostId(pSeq));
-		
+		model.addAttribute("comments", comments);
+		model.addAttribute("loggedInUserRole", loggedInUserRole); //
 		log.info("게시물 상세보기 완료, 제목: {}", postDto.getTitle());
 		
 		return "post/detail";
@@ -284,14 +288,6 @@ public class PostController {
 	        log.warn("로그인 사용자 정보 없음");
 	        throw new IllegalArgumentException("로그인이 필요합니다.");
 	    }*/
-		/*
-		// 테스트용 고정된 사용자(고정 사용자만 지울것)
-		Users user = new Users();
-		user.setUserId("test_user"); //로그인한 사용자 ID 설정
-		user.setName("테스트유저");
-		user.setGender(Gender.MALE);
-		user.setRole(Role.ROLE_ADMIN);
-		*/
 		
 		// fixedUser 사용 //
 		Users user = fixedUser.getFixedUser();
@@ -299,7 +295,17 @@ public class PostController {
 	
 		// 기존 게시글 조회
 	    PostDTO existingPost = postService.getPostById(pSeq);
-		// 기존 이미지 경로
+		
+	    // 게시물 작성자만 수정할수 있게 권한 체크 //
+	    if (!existingPost.getUserId()
+	    			.equals(user.getUserId())) {
+	    	log.warn("수정 권한 없음, 사용자: {}, 게시물 작성자: {}", user.getUserId(), existingPost.getUserId());
+	    	throw new IllegalArgumentException("수정 권한이 없습니다.");
+	    }
+	    
+	    
+	    
+	    // 기존 이미지 경로
 		List<String> imagePaths = new ArrayList<>(existingPost.getImagePaths());
 		
 	    // 기존 이미지 삭제 처리 
@@ -364,7 +370,21 @@ public class PostController {
 	 */
 	@PostMapping("/delete/{pSeq}")
 	public String delete(@PathVariable Long pSeq) {
+		// 고정 사용자 
+		Users user = fixedUser.getFixedUser();//
+		log.info("로그인 사용자: {}, Role: {}", user.getUserId(), user.getRole()); //
 		
+		// 게시물 조회
+		PostDTO postDto = postService.getPostById(pSeq);
+		
+		// 게시물 장석자와 관리자만 삭제할수 있게 권한 체크 //
+		if(user.getRole() != Users.Role.ROLE_ADMIN && !postDto.getUserId()
+				   .equals(user.getUserId())) {
+			log.warn("삭제 권한 없음: {}", user.getUserId(), postDto.getUserId());
+			throw new IllegalArgumentException("삭제 권한이 없습니다.");
+		}
+		
+		// 게시물 삭제
 		postService.deletePost(pSeq);
 		
 		log.info("게시물 삭제 완료, pSeq: {}", pSeq);

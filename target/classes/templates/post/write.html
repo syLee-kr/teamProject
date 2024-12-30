@@ -13,20 +13,13 @@
     <hr class="hr">
     <form th:action="@{${post != null ? '/post/update/{pSeq}' : '/post/write'}}" method="post" enctype="multipart/form-data">
         <!-- 글 유형 -->
-        <div class="form-group" style="display:block; gap:50px;">
+        <div class="form-group-select">
         	<!-- 유형 선택 -->
-        	<label for="isNoticeSelect">분류</label>
-        	<select id="isNoticeSelect" name="isNotice" class="form-control" style="width:200px;"> 
-        		<!--  th:if="${user != null and user.role == 'ROLE_ADMIN'}"-->
+        	<label for="isNoticeSelect">분류 : </label>
+        	<select id="isNoticeSelect" name="isNotice" class="form-control"> 
         		<option value="false" th:selected="${post?.isNotice == false}">일반</option>
         		<option value="true" th:selected="${post?.isNotice == true}">공지</option>
         	</select>
-        
-        	<!-- 일반 사용자 : 유형 고정 -->
-        	<!-- 
-        	<input type="hidden" id="isNoticeHidden" name="isNotice" value="false"
-        		th:unless="${user != null and user.role == 'ROLE_ADMIN'}">
-        	 -->
         </div>
         <hr class="hr">
         <!-- 제목 -->
