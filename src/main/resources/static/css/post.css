@@ -556,6 +556,17 @@ h3::before {
     border-bottom: 1px solid #ddd;
 }
 
+.comment-content {
+    display: inline-block; /* 댓글 내용을 블록 요소처럼 취급 */
+    background-color: #f1f1f1; /* 배경 색상 */
+    border-radius: 50px; /* 타원형 모양 */
+    padding: 10px 20px; /* 패딩으로 크기 조정 */
+    margin-top: 10px; /* 위쪽 여백 */
+    margin-bottom: 10px; /* 아래쪽 여백 */
+    font-size: 14px; /* 글씨 크기 조정 */
+    word-wrap: break-word; /* 긴 글이 잘리지 않도록 */
+}
+
 /* 댓글 작성 폼 및 버튼 스타일 */
 .comment-form-actions {
     display: flex;
@@ -574,15 +585,22 @@ h3::before {
 .comment-actions {
     margin-top: 10px;
     display: flex;
-    justify-content: flex-start;
+    /*justify-content: flex-start;*/
+    align-items: center; /* 세로 정렬을 맞추기 위해 추가 */
+    
 }
 
 .comment-actions .btn {
     margin-right: 5px;
 }
 
-.coment-action button btn-secondary {
-	width: auto;
-	margin-left:5px;
+.comment-actions form {
+    display: inline-block; /* form을 inline-block으로 설정하여 버튼들이 가로로 정렬되도록 함 */
 }
+
+/* 삭제 버튼에 대한 추가 스타일 */
+.comment-actions form button.btn-secondary {
+    display: inline-block; /* 버튼의 디스플레이 방식 설정 */
+}
+
 

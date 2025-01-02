@@ -65,17 +65,7 @@ public class CommentServiceImpl implements CommentService {
 		Users user = userRepo.findById(commentDto.getUserId())
 							.orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 		*/
-        /*
-        // 고정 사용자 설정 (테스트용 고정 사용자)
-        Users user = userRepo.findById("test_user")
-                             .orElseGet(() -> {
-                                 // 고정 사용자가 없으면 새로 생성하여 저장
-                                 Users newUser = new Users();
-                                 newUser.setUserId("test_user");
-                                 newUser.setName("테스트유저");
-                                 return userRepo.save(newUser); // 새로 저장된 사용자를 반환
-                             });
-        */
+
         // fixedUser 사용
      	Users user = fixedUser.getFixedUser();
         // 댓글 생성 및 저장

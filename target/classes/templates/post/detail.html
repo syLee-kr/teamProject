@@ -64,8 +64,14 @@
                 
                 <!-- 댓글 수정 및 삭제 버튼 -->
                 <div class="comment-actions">
-                    <button class="btn btn-primary">수정</button>
-                    <button class="btn btn-secondary">삭제</button>
+        			<!-- 댓글 수정 폼 링크 -->
+        			<form th:action="@{/comments/edit/{cSeq}(cSeq=${comment.cSeq})}" method="get">
+                    	<button type="submit" class="btn btn-primary">수정</button>
+                    </form>
+                    <!-- 댓글 삭제 -->
+                    <form th:action="@{/comments/delete/{cSeq}(cSeq=${comment.cSeq})}" method="post">
+                    	<button type="submit" class="btn btn-secondary">삭제</button>
+                    </form>
                 </div>
             </li>
         </ul>
