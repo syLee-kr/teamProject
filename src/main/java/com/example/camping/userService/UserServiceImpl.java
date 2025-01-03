@@ -49,16 +49,6 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 		return userRepo.save(user);
 	}
 	
-	// 비밀번호 암호화
-	@Override
-	public void registerUser(Users user) {
-		
-		String encodedPassword = passwordEncoder.encode(user.getPassword());
-		user.setPassword(encodedPassword);
-		
-		userRepo.save(user);
-	}
-	
 	/*
 	 * Spring Security에서 사용하는 UserDetailsService 메서드 구현 = CustomUserDetailsService
 	 * 객체를 따로 구현하지 않고 UserServiceImpl에서 메서드를 통해서 구현가능
@@ -79,6 +69,16 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 				   .password(user.getPassword())  // 암호화된 비밀번호
 				   .roles(user.getRole().name())  // 사용자의 권한
 				   .build();
+	}
+	
+	// 비밀번호 암호화
+	@Override
+	public void registerUser(Users user) {
+		
+		String encodedPassword = passwordEncoder.encode(user.getPassword());
+		user.setPassword(encodedPassword);
+		
+		userRepo.save(user);
 	}
 
 }
