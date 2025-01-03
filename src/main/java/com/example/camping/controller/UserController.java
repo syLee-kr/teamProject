@@ -26,45 +26,51 @@ public class UserController {
 	@GetMapping("/profile")
 	public String profile(@AuthenticationPrincipal User pricipal, Model model) {
 		
-		// 로그인 한 사용자의 username
-		String username = pricipal.getUsername();
+		/*
+		 * spirng security에서는 username = userId 자동으로 인식하기 때문에 
+		 * 혼동방지를 위해 username 매개변수를 userId로 치환해서 사용
+		 */  
+		 
+		// 로그인 한 사용자의 userId
+		String userId = pricipal.getUsername();
 		
+	
 		// 사용자 확인
-		Users user = userService.findByUsername(username);
+		Users user = userService.findByUserId(userId);
 		
 		if (user == null) {
-			return "redirect:/login";
+			return "redirect:/users/login/login";
 		}
 		
 		model.addAttribute("user", user);
 		
-		return "user/profile";
+		return "users/profile/profile";
 	}
 	// 프로필 수정 폼
 	@GetMapping("/edit")
 	public String editProfile(@AuthenticationPrincipal User principal, Model model) {
 		
-		String username = principal.getUsername();
+		String userId = principal.getUsername();
 		
-		Users user = userService.findByUsername(username);
+		Users user = userService.findByUserId(userId);
 		
 		if (user == null) {
-			return "redirect:/login";
+			return "redirect:/users/login/login";
 		}
 		
 		model.addAttribute("user", user);
 		
-		return "user/edit";
+		return "users/profile/profile-edit";
 	}
 	
 	// 프로필 수정 처리
 	@PostMapping("/update")
 	public String updateProfile(@ModelAttribute Users updatedUser,
 								@AuthenticationPrincipal User principal) {
-		String username = principal.getUsername();
+		String userId = principal.getUsername();
 		
 		// 사용자 업데이트
-		Users user = userService.findByUsername(username);
+		Users user = userService.findByUserId(userId);
 		
 		if (user != null) {
 			user.setName(updatedUser.getName());
@@ -78,36 +84,8 @@ public class UserController {
 			// 업데이트 된 정보 DB에 저장
 			userService.save(user);
 		}
-		return "redirect:/user/profile";
+		return "redirect:/users/profile/profile";
 
 	}
-	// 비밀번호 변경 폼
-	@GetMapping("/change-password")
-	public String changePasswordForm() {
-		return "user/change-password";
-	}
-	
-	// 비밀번호 변경 처리
-	@PostMapping("/change-password")
-	public String changePassword(@RequestParam String oldPassword,
-								 @RequestParam String newPassword,
-								 @AuthenticationPrincipal User principal) {
-		
-		String username = principal.getUsername();
-		
-		Users user = userService.findByUsername(username);
-		
-		// 기존 비밀번호가 일치하면 비밀번호 변경
-		if(user != null && user.getPassword().equals(oldPassword)) {
-			user.setPassword(newPassword);
-			userService.save(user);
-		}else {
-			return "user/change-password";
-		}
-		
-		return "redirect:/user/profile";
-		
-	}
-	
 	
 }
