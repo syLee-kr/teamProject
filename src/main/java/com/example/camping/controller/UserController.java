@@ -73,6 +73,14 @@ public class UserController {
 		Users user = userService.findByUserId(userId);
 		
 		if (user != null) {
+			
+			// 비밀번호 변경이 있을경우 암호화
+			if (!updatedUser.getPassword().equals(user.getPassword())) {
+				user.setPassword(updatedUser.getPassword());
+				userService.registerUser(user);
+			}
+			
+			// 비밀번호를 제외한 다른 정보 업데이트
 			user.setName(updatedUser.getName());
 			user.setPhone(updatedUser.getPhone());
 			user.setEmail(updatedUser.getEmail());

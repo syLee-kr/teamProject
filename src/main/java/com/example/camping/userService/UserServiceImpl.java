@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 		Users user = userRepo.findByUserId(userId);
 		
 		// 로그인 성공 시 
-		if (user !=null && user.getPassword().equals(password)) {
+		if (user !=null && passwordEncoder.matches(password, user.getPassword())) {
 			return user;
 		}
 		// 로그인 실패시 null
