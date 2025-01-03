@@ -13,8 +13,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,11 +28,11 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Users {
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-    private String userId;          // 유저 아이디
+
+    @Id
+    @Column(nullable = false)
+    private String userId;          // 유저 아이디(primary key)
+    
     private String password;        // 유저 비밀번호
     private String name;            // 유저 이름
     private String email;           // 유저 이메일
@@ -53,10 +51,29 @@ public class Users {
         return Period.between(this.birthday, LocalDate.now()).getYears();
     }
     
-    // Gender Enum 추가
     public enum Gender {
-        MALE, FEMALE
+        MALE("M"), FEMALE("F");
+
+        private final String code;
+
+        Gender(String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public static Gender fromCode(String code) {
+            for (Gender gender : Gender.values()) {
+                if (gender.code.equalsIgnoreCase(code)) {
+                    return gender;
+                }
+            }
+            throw new IllegalArgumentException("Invalid gender code: " + code);
+        }
     }
+    
     
     // 성별
     @Enumerated(EnumType.STRING)
