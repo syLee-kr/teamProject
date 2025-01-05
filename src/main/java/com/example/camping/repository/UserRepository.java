@@ -4,8 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.camping.domain.Users;
 
-public interface UserRepository extends JpaRepository<Users, Long>{
-	
+public interface UserRepository extends JpaRepository<Users, String>{
+
 	// 사용자 정보 조회
 	Users findByUserId(String userId);
 	

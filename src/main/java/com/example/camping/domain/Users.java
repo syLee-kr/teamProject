@@ -41,7 +41,7 @@ public class Users {
 	
 	// 생일
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate birthday;          
+    private LocalDate birthday;
 
     // 나이 계산
     public int getAge() {
@@ -50,7 +50,7 @@ public class Users {
         }
         return Period.between(this.birthday, LocalDate.now()).getYears();
     }
-    
+
     public enum Gender {
         MALE("M"), FEMALE("F");
 
@@ -86,7 +86,7 @@ public class Users {
     private OffsetDateTime regdate;
     
     // 프로필 이미지
-    @Column(columnDefinition = "varchar2(255) default 'images/profileimg.png'")
+    @Column(columnDefinition = "varchar2(255) default 'images/profile.png'")
     private String profileImage; 
     
     // Role Enum 추가

@@ -1,4 +1,4 @@
-package com.example.camping.userService;
+package com.example.camping.service.userService;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

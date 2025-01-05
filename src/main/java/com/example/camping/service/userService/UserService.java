@@ -1,4 +1,4 @@
-package com.example.camping.userService;
+package com.example.camping.service.userService;
 
 import com.example.camping.domain.Users;
 
