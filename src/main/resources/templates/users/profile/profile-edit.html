@@ -1,0 +1,13 @@
+<form action="/users/profile/profile-edit" method="POST">
+    <input type="text" name="name" value="{{user.name}}" required>
+    <input type="email" name="email" value="{{user.email}}" required>
+    <input type="text" name="phone" value="{{user.phone}}" required>
+    <input type="text" name="address" value="{{user.address}}" required>
+    <input type="date" name="birthday" value="{{user.birthday}}" required>
+    <select name="gender">
+        <option value="MALE" {{user.gender == 'MALE' ? 'selected' : ''}}>Male</option>
+        <option value="FEMALE" {{user.gender == 'FEMALE' ? 'selected' : ''}}>Female</option>
+    </select>
+    <input type="file" name="profileImage">
+    <button type="submit">Update Profile</button>
+</form>
