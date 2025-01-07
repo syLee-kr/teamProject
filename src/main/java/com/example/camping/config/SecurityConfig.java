@@ -60,11 +60,12 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/")                        // 로그인 성공 후 이동할 경로
                         .permitAll()
                 )
-
                 // 로그아웃 설정
                 .logout(logout -> logout
-                        .logoutUrl("/logout")                          // 로그아웃 URL
-                        .logoutSuccessUrl("/")                         // 로그아웃 성공 후 이동 경로
+                        .logoutUrl("/logout")                 // 로그아웃 URL (기본값: /logout)
+                        .logoutSuccessUrl("/login?logout")    // 로그아웃 성공 후 리다이렉트 URL
+                        .invalidateHttpSession(true)          // 세션 무효화
+                        .deleteCookies("JSESSIONID")          // 쿠키 삭제
                         .permitAll()
                 );
 

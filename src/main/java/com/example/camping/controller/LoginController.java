@@ -26,12 +26,4 @@ public class LoginController {
 		return "users/login/login";
 	}
 
-	
-	// 비밀번호 변경 폼
-	@GetMapping("/change-password")
-	public String changePasswordForm() {
-		return "users/login/change-password";
-	}
-	
-
 }
