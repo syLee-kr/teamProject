@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.camping.domain.Users;
+import com.example.camping.entity.Users;
 import com.example.camping.userService.UserService;
 
 import lombok.AllArgsConstructor;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.camping.domain.Users;
+import com.example.camping.entity.Users;
 import com.example.camping.userService.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;

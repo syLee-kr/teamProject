@@ -1,6 +1,6 @@
 package com.example.camping.config;
 
-import com.example.camping.domain.Users;
+import com.example.camping.entity.Users;
 import com.example.camping.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;

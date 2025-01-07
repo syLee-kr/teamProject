@@ -2,7 +2,7 @@ package com.example.camping.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.camping.domain.Users;
+import com.example.camping.entity.Users;
 
 public interface UserRepository extends JpaRepository<Users, String>{
 	

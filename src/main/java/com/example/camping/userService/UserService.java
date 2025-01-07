@@ -1,6 +1,6 @@
 package com.example.camping.userService;
 
-import com.example.camping.domain.Users;
+import com.example.camping.entity.Users;
 
 public interface UserService {
 	
@@ -15,6 +15,9 @@ public interface UserService {
 	
 	// 비밀번호 암호화 적용
 	void registerUser(Users user);
+	
+	// 회원가입 시 사용자ID 중복체크
+	Boolean usernameExists(String userId);
 	
 
 }

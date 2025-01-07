@@ -1,4 +1,4 @@
-package com.example.camping.domain;
+package com.example.camping.entity;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;

@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.camping.domain.Users;
+import com.example.camping.entity.Users;
 import com.example.camping.repository.UserRepository;
 
 
@@ -79,6 +79,16 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 		user.setPassword(encodedPassword);
 		
 		userRepo.save(user);
+	}
+	
+	// 회원가입 시 사용자ID 중복체크
+	@Override
+	public Boolean usernameExists(String userId) {
+		// userId로 사용자 검색
+		Users existingUser = userRepo.findByUserId(userId);
+		
+		// 해당 userId가 존재하면 true, 없으면 false로 반환
+		return existingUser != null;
 	}
 
 }
