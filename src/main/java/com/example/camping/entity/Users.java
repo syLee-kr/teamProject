@@ -78,7 +78,7 @@ public class Users {
     // 성별
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Gender gender; 
+    private Gender gender = Gender.MALE; // 기본값 설정
     
     // 자동으로 시간을 적용
     @CreationTimestamp              

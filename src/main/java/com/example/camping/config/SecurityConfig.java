@@ -1,12 +1,10 @@
 package com.example.camping.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import com.example.camping.entity.Users;
@@ -15,10 +13,11 @@ import com.example.camping.userService.UserServiceImpl;
 
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-
+@Slf4j
 @AllArgsConstructor
 @Configuration
 @EnableWebSecurity
@@ -31,12 +30,6 @@ public class SecurityConfig {
 	
 	private PasswordEncoder passwordEncoder;
 	
-    // PasswordEncoder 빈 등록
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 
     // 로그인 인증 처리
     @Bean
@@ -66,7 +59,7 @@ public class SecurityConfig {
 			adminUser = new Users();
 			adminUser.setUserId("admin_user");
 			adminUser.setName("관리자");
-			adminUser.setPassword(passwordEncoder.encode("admin_password")); // 관리자 비밀번호 암호화
+			adminUser.setPassword(passwordEncoder.encode("admin")); // 관리자 비밀번호 암호화
 			adminUser.setRole(Users.Role.ROLE_ADMIN); // 관리자 권한 설정
 			userRepo.save(adminUser); // DB에 관리자 계정 저장
 		}
