@@ -17,13 +17,13 @@ public class RegisterController {
     private final UserService userService;
 
     // 약관 페이지
-    @GetMapping("/register/terms")
+    @GetMapping("/register/term")
     public String TermPage() {
     	return "users/login/term";
     }
     
     // 약관 동의 후 회원가입 페이지 이동
-    @PostMapping("/register/terms")
+    @PostMapping("/register/term")
     public String TermsAgreement(@ModelAttribute("agree") Boolean agree) {
     	if (agree) {
     		// 약관에 동의한 경우, 

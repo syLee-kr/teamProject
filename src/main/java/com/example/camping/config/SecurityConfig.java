@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Slf4j
 @AllArgsConstructor
@@ -34,6 +36,7 @@ public class SecurityConfig {
     // 로그인 인증 처리
     @Bean
     AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+    	log.info("AuthenticationManager 초기화 중");
     	AuthenticationManagerBuilder authenticationManagerBuilder =
     	
     	http
@@ -43,51 +46,62 @@ public class SecurityConfig {
     		.userDetailsService(userServiceImpl) // UserServiceImpl을 UserDetailsService로 사용
 			.passwordEncoder(passwordEncoder); // 비밀번호 인코딩
 		
-    	return authenticationManagerBuilder
-    			.build();
+    	AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
+    	log.info("AuthenticationManager 초기화 완료.");
+    	
+    	return authenticationManager;
+    			
     }
     
     
-	// 관리자 계정 생성
-	@PostConstruct
-	public void initAdminUser() {
-		// 관리자 계정 확인
-		Users adminUser = userRepo.findByUserId("admin_user");
-		
-		if (adminUser == null) {
-			// 관리자 계정 없을 시 새로 생성
-			adminUser = new Users();
-			adminUser.setUserId("admin_user");
-			adminUser.setName("관리자");
-			adminUser.setPassword(passwordEncoder.encode("admin")); // 관리자 비밀번호 암호화
-			adminUser.setRole(Users.Role.ROLE_ADMIN); // 관리자 권한 설정
-			userRepo.save(adminUser); // DB에 관리자 계정 저장
-		}
-	}
-
-
-    // SecurityFilterChain을 사용하여 보안 설정
+    // 로그인 & 로그아웃 처리, 권한 설정
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(authorizeRequests -> 
                 	authorizeRequests
-                        	.requestMatchers("/login", "/register").permitAll() // 로그인과 회원가입은 모두 접근 가능
+                        	.requestMatchers("/login", "/register","/register/term").permitAll() // 로그인과 회원가입은 모두 접근 가능
                         	.requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 경로
+                        	.requestMatchers("/users/profile", "/users/edit").authenticated()  // 프로필 조회, 수정 경로
                         	.anyRequest().authenticated() // 그외 모든 요청 인증
                 )
                 .formLogin(formLogin -> 
                 	formLogin
                 			.loginPage("/login")  // 로그인 페이지 경로
                         	.loginProcessingUrl("/login") // 로그인 처리 URL
-                        	.defaultSuccessUrl("/main", true) // 로그인 성공 시 redirect URL
+                        	.defaultSuccessUrl("/users/profile", true) // 로그인 성공 시 redirect URL
                         	.permitAll()
                 )
                 .logout(logout -> 
                 		logout
+                			.logoutUrl("/logout") // 로그아웃 URL
+                			.logoutSuccessUrl("/login") // 로그아웃 성공 후 URL
                         	.permitAll()
                 )
         		.build();
     }
-
+    
+    
+	// 관리자 계정 생성
+	@PostConstruct
+	public void initAdminUser() {
+		log.info("관리자 계정 여부 확인");
+		// 관리자 계정 확인
+		Users adminUser = userRepo.findByUserId("admin");
+				
+		if (adminUser == null) {
+			log.warn("관리자 계정이 존재하지 않습니다. 새로운 관리자 계정 생성");
+			// 관리자 계정 없을 시 새로 생성
+			adminUser = new Users();
+			adminUser.setUserId("admin");
+			adminUser.setName("관리자");
+			adminUser.setPassword(passwordEncoder.encode("admin")); // 관리자 비밀번호 암호화
+			adminUser.setRole(Users.Role.ROLE_ADMIN); // 관리자 권한 설정
+			userRepo.save(adminUser); // DB에 관리자 계정 저장
+			log.info("새로운 관리자 계정이 생성되었습니다. (사용자명: {}, 권한: {})", adminUser.getUserId(), adminUser.getRole());
+		}else {
+			log.info("관리자 계정이 존재합니다. (사용자명: {}, 권한: {})", adminUser.getUserId(), adminUser.getRole());
+		}
+					
+	}
 }
