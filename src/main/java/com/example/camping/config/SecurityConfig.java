@@ -69,7 +69,8 @@ public class SecurityConfig {
                 	formLogin
                 			.loginPage("/login")  // 로그인 페이지 경로
                         	.loginProcessingUrl("/login") // 로그인 처리 URL
-                        	.defaultSuccessUrl("/users/profile", true) // 로그인 성공 시 redirect URL
+                        	.defaultSuccessUrl("/loginSuccess", true) // 로그인 성공 시 redirect URL
+                        	.failureUrl("/loginFail")
                         	.permitAll()
                 )
                 .logout(logout -> 
@@ -78,6 +79,8 @@ public class SecurityConfig {
                 			.logoutSuccessUrl("/login") // 로그아웃 성공 후 URL
                         	.permitAll()
                 )
+                
+                
         		.build();
     }
     

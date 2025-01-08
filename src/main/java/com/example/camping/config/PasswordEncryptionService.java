@@ -3,6 +3,7 @@ package com.example.camping.config;
 import com.example.camping.entity.Users;
 import com.example.camping.repository.UserRepository;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class PasswordEncryptionService {
 
     private PasswordEncoder passwordEncoder;

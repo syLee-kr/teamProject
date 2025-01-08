@@ -1,6 +1,8 @@
 package com.example.camping.controller;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +19,8 @@ import com.example.camping.userService.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Controller
 @AllArgsConstructor
 public class LoginController {
@@ -29,34 +32,7 @@ public class LoginController {
 	public String loginForm() {
 		return "users/login/login";
 	}
-	/* SecurityConfig 에서 로그인 요청처리, 로그아웃 처리 메서드 구현으로 생략되기 때문에
-	 * 해당 부분을 비활성화 처리함
-	// 로그인 요청 처리
-	@PostMapping("/login")
-	public String login(@RequestParam("userId") String userId,
-						@RequestParam("password") String password,
-						Model model) {
-		Users user = userService.login(userId, password);
-		
-        if (user != null) {
-            
-            return "redirect:/"; // 로그인 후 메인페이지로
-        } else {
-            // 로그인 실패, 에러 메시지 표시
-            model.addAttribute("error", "Invalid credentials");
-            return "users/login/login";
-        }
-    }
-    // 로그아웃 처리
-    @GetMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
-        
-    	new SecurityContextLogoutHandler().logout(request, response, null); // 로그아웃 처리
-        
-    	return "redirect:/users/login/login"; // 로그인 페이지로 리다이렉트
-	}*/
 
-	
 	// 비밀번호 변경 폼
 	@GetMapping("/change-password")
 	public String changePasswordForm() {
@@ -110,4 +86,39 @@ public class LoginController {
         return "users/login/forgot-password"; // 다시 폼을 반환
     }
    	*/
+	
+	// 현재 로그인된 사용자 정보 로그
+	@GetMapping("/loginSuccess")
+	public String loginSuccess(@RequestParam String userId, Model model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    if (authentication != null) {
+	    	String currentUser = authentication.getName();
+	    	
+	    	String authorities = authentication.getAuthorities().stream()
+	    									   .map(authority -> authority.getAuthority())
+	    									   .reduce((a, b) -> a + ", " + b)
+	    									   .orElse("권한없음");
+	    	
+	    	log.info("현재 로그인된 사용자: {}, 권한: {}", currentUser, authorities);
+	    	
+	    	model.addAttribute("currentUser", currentUser);
+	    	model.addAttribute("authorities", authorities);
+	    
+	    } else {
+	    	log.warn("로그인된 사용자가 없습니다.");
+	    }
+	     
+	     return "users/profile/profile";
+	        
+	}
+	
+	@GetMapping("/loginFail")
+	public String loginFail(Model model) {
+		model.addAttribute("error", "로그인 실패");
+		return "users/login/login";
+	}
+	
+	
+	
+	
 }

@@ -1,4 +1,3 @@
-<!-- src/main/resources/templates/login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,5 +16,7 @@
         
         <button type="submit">Login</button>
     </form>
+     <!-- 로그인 실패 시 -->
+    <p th:if="${param.error}">로그인 실패! 사용자 ID와 비밀번호를 다시 확인해 주세요.</p>
 </body>
 </html>
