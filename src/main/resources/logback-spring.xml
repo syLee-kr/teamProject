@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <!-- 콘솔 로그 설정 -->
+    <!-- 콘솔 로그 출력 설정 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+            <!-- 콘솔에 출력되는 로그 패턴 설정 -->
+            <Pattern>
+            	%d{yyyy-MM-dd |HH:mm:ss|} %highlight([%-5level]) --- [%thread] %cyan(%-36logger{36}) : %msg%n
+			</Pattern>
         </encoder>
     </appender>
 
@@ -16,16 +19,19 @@
             <maxFileSize>10MB</maxFileSize> <!-- 파일 크기 제한 -->
             <maxHistory>30</maxHistory> <!-- 최대 30일의 로그 파일을 보관 -->
         </rollingPolicy>
-        
+
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+            <!-- 파일에 출력되는 로그 패턴 설정 -->
+            <pattern>%d{yyyy-MM-dd |HH:mm:ss|} - %msg%n</pattern>
         </encoder>
     </appender>
 
     <!-- 로그 레벨 및 출력 지정 -->
     <root level="INFO">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="ROLLING_FILE" />
-    </root>
+        <!-- 콘솔 출력 추가 -->
+        <appender-ref ref="CONSOLE"/>
+        <!-- 파일 출력 추가 -->
+        <appender-ref ref="ROLLING_FILE"/>
+    </root>	
 
 </configuration>
