@@ -24,7 +24,7 @@ public class RegisterController {
     
     // 약관 동의 후 회원가입 페이지 이동
     @PostMapping("/register/term")
-    public String TermsAgreement(@ModelAttribute("agree") Boolean agree) {
+    public String TermsAgreement(@ModelAttribute Boolean agree) {
     	if (agree) {
     		// 약관에 동의한 경우, 
     		return "redirect:/users/login/register";
@@ -52,6 +52,6 @@ public class RegisterController {
 
         // 사용자 등록
         userService.registerUser(user);
-        return "redirect:/users/login/login";  // 회원가입 후 로그인 페이지로 리다이렉트
+        return "redirect:/users/login/login-form";  // 회원가입 후 로그인 페이지로 리다이렉트
     }
 }

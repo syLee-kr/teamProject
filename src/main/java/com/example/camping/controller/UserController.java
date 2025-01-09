@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import com.example.camping.entity.Users;
 import com.example.camping.userService.UserService;
 
@@ -39,12 +37,12 @@ public class UserController {
 		Users user = userService.findByUserId(userId);
 		
 		if (user == null) {
-			return "redirect:/users/login/login";
+			return "redirect:/users/login/login-form";
 		}
 		
 		model.addAttribute("user", user);
 		
-		return "users/profile/profile";
+		return "users/profile/profile-form";
 	}
 	// 프로필 수정 폼
 	@GetMapping("/edit")
@@ -55,7 +53,7 @@ public class UserController {
 		Users user = userService.findByUserId(userId);
 		
 		if (user == null) {
-			return "redirect:/users/login/login";
+			return "redirect:/users/login/login-form";
 		}
 		
 		model.addAttribute("user", user);
@@ -92,7 +90,7 @@ public class UserController {
 			// 업데이트 된 정보 DB에 저장
 			userService.save(user);
 		}
-		return "redirect:/users/profile/profile";
+		return "redirect:/users/profile/profile-form";
 
 	}
 	

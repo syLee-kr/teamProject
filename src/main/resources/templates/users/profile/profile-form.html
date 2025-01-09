@@ -8,16 +8,20 @@
 <body>
     <h1>Profile</h1>
     <div>
-        <p>Username: {{user.userId}}</p>
-        <p>Name: {{user.name}}</p>
-        <p>Email: {{user.email}}</p>
-        <p>Phone: {{user.phone}}</p>
-        <p>Address: {{user.address}}</p>
-        <p>Birthday: {{user.birthday}}</p>
-        <p>Gender: {{user.gender}}</p>
+        <p>Username: {{users.userId}}</p>
+        <p>Name: {{users.name}}</p>
+        <p>Email: {{users.email}}</p>
+        <p>Phone: {{users.phone}}</p>
+        <p>Address: {{users.address}}</p>
+        <p>Birthday: {{users.birthday}}</p>
+        <p>Gender: {{users.gender}}</p>
         <img src="{{user.profileImage}}" alt="Profile Image">
         <a href="/users/profile/profile-edit">Edit Profile</a>
         <a href="/user/change-password">Change Password</a>
+        
+        <form action="/logout" method="POST">
+            <button type="submit">Logout</button>
+        </form>
     </div>
 </body>
 </html>

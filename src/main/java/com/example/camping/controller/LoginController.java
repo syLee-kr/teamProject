@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.camping.entity.Users;
 import com.example.camping.userService.UserService;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
@@ -30,7 +28,7 @@ public class LoginController {
 	// 로그인 폼
 	@GetMapping("/login")
 	public String loginForm() {
-		return "users/login/login";
+		return "users/login/login-form";
 	}
 
 	// 비밀번호 변경 폼
@@ -41,8 +39,8 @@ public class LoginController {
 	
 	// 비밀번호 변경 처리
 	@PostMapping("/change-password")
-	public String changePassword(@RequestParam String oldPassword,
-								 @RequestParam String newPassword,
+	public String changePassword(@RequestParam (required = true) String oldPassword,
+								 @RequestParam (required = true) String newPassword,
 								 @AuthenticationPrincipal User principal) {
 		
 		String userId = principal.getUsername();
@@ -61,7 +59,7 @@ public class LoginController {
 			return "users/login/change-password";
 		}
 		
-		return "redirect:/users/profile/profile";
+		return "redirect:/users/profile/profile-form";
 		
 	}
 	
@@ -89,7 +87,7 @@ public class LoginController {
 	
 	// 현재 로그인된 사용자 정보 로그
 	@GetMapping("/loginSuccess")
-	public String loginSuccess(@RequestParam String userId, Model model) {
+	public String loginSuccess(/*@RequestParam String userId,*/ Model model) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    if (authentication != null) {
 	    	String currentUser = authentication.getName();
@@ -108,17 +106,14 @@ public class LoginController {
 	    	log.warn("로그인된 사용자가 없습니다.");
 	    }
 	     
-	     return "users/profile/profile";
+	     return "users/profile/profile-form";
 	        
 	}
 	
 	@GetMapping("/loginFail")
 	public String loginFail(Model model) {
 		model.addAttribute("error", "로그인 실패");
-		return "users/login/login";
+		return "users/login/login-form";
 	}
-	
-	
-	
-	
+
 }

@@ -53,6 +53,7 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 	 * Spring Security에서 사용하는 UserDetailsService 메서드 구현 = CustomUserDetailsService
 	 * 객체를 따로 구현하지 않고 UserServiceImpl에서 메서드를 통해서 구현가능
 	 */
+	// 사용자 인증
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		

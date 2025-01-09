@@ -42,11 +42,18 @@ dependencies {
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
-
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
 }
+
+tasks.withType(JavaCompile) { // Java 컴파일 시 메소드 파라미터 이름을 유지하도록 설정
+    options.compilerArgs << "-parameters"
+}
+

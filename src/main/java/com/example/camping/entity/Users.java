@@ -30,7 +30,7 @@ public class Users {
 	
 
     @Id
-    @Column(nullable = false)
+    @Column(name = "USER_ID", nullable = false)
     private String userId;          // 유저 아이디(primary key)
     
     private String password;        // 유저 비밀번호
@@ -91,11 +91,11 @@ public class Users {
     
     // Role Enum 추가
     public enum Role {
-        ROLE_USER, ROLE_ADMIN
+        USER, ADMIN
     }
     
     // 유저 상태
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private Role role = Role.ROLE_USER; 
+    private Role role = Role.USER; 
 }

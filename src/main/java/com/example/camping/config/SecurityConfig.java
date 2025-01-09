@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
 import com.example.camping.entity.Users;
 import com.example.camping.repository.UserRepository;
 import com.example.camping.userService.UserServiceImpl;
@@ -16,8 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @Slf4j
 @AllArgsConstructor
@@ -58,30 +58,31 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .authorizeHttpRequests(authorizeRequests -> 
-                	authorizeRequests
-                        	.requestMatchers("/login", "/register","/register/term").permitAll() // 로그인과 회원가입은 모두 접근 가능
-                        	.requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 경로
-                        	.requestMatchers("/users/profile", "/users/edit").authenticated()  // 프로필 조회, 수정 경로
-                        	.anyRequest().authenticated() // 그외 모든 요청 인증
+                .csrf(csrf -> csrf
+                	.requireCsrfProtectionMatcher(new AntPathRequestMatcher("/login", "POST")) // 특정 경로에 대해서만 CSRF 적용 (필요시)
                 )
-                .formLogin(formLogin -> 
-                	formLogin
-                			.loginPage("/login")  // 로그인 페이지 경로
-                        	.loginProcessingUrl("/login") // 로그인 처리 URL
-                        	.defaultSuccessUrl("/loginSuccess", true) // 로그인 성공 시 redirect URL
-                        	.failureUrl("/loginFail")
-                        	.permitAll()
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests
+	                        .requestMatchers("/login", "/register", "/register/term").permitAll() // 로그인과 회원가입은 모두 접근 가능
+	                        .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 경로
+	                        .requestMatchers("/users/profile", "/users/edit").authenticated()  // 프로필 조회, 수정 경로
+	                        .anyRequest().authenticated() // 그외 모든 요청 인증
                 )
-                .logout(logout -> 
-                		logout
-                			.logoutUrl("/logout") // 로그아웃 URL
-                			.logoutSuccessUrl("/login") // 로그아웃 성공 후 URL
-                        	.permitAll()
+                .formLogin(formLogin ->
+                        formLogin
+                            .loginPage("/login")  // 로그인 페이지 경로
+                            .loginProcessingUrl("/login") // 로그인 처리 URL
+                            .defaultSuccessUrl("/loginSuccess", true) // 로그인 성공 시 redirect URL
+                            .failureUrl("/loginFail")
+                            .permitAll()
                 )
-                
-                
-        		.build();
+                .logout(logout ->
+                        logout
+                            .logoutUrl("/logout") // 로그아웃 URL
+                            .logoutSuccessUrl("/login") // 로그아웃 성공 후 URL
+                            .permitAll()
+                )               
+                .build();
     }
     
     
@@ -99,7 +100,7 @@ public class SecurityConfig {
 			adminUser.setUserId("admin");
 			adminUser.setName("관리자");
 			adminUser.setPassword(passwordEncoder.encode("admin")); // 관리자 비밀번호 암호화
-			adminUser.setRole(Users.Role.ROLE_ADMIN); // 관리자 권한 설정
+			adminUser.setRole(Users.Role.ADMIN); // 관리자 권한 설정
 			userRepo.save(adminUser); // DB에 관리자 계정 저장
 			log.info("새로운 관리자 계정이 생성되었습니다. (사용자명: {}, 권한: {})", adminUser.getUserId(), adminUser.getRole());
 		}else {
