@@ -38,6 +38,7 @@ public class Users {
     private String email;           // 유저 이메일
     private String phone;           // 유저 전화번호
     private String address;         // 유저 주소
+    private String resetCode;   	// 비밀번호 재설정 코드
 	
 	// 생일
     @DateTimeFormat(pattern = "yyyy-MM-dd")

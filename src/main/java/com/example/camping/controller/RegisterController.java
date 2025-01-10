@@ -19,7 +19,7 @@ public class RegisterController {
     // 약관 페이지
     @GetMapping("/register/term")
     public String TermPage() {
-    	return "users/login/term";
+    	return "users/register/term";
     }
     
     // 약관 동의 후 회원가입 페이지 이동
@@ -27,7 +27,7 @@ public class RegisterController {
     public String TermsAgreement(@ModelAttribute Boolean agree) {
     	if (agree) {
     		// 약관에 동의한 경우, 
-    		return "redirect:/users/login/register";
+    		return "redirect:/users/register/register-form";
     	}else {
     		// 약관에 동의 하지 않은 경우, 
     		return "redirect:/";
@@ -38,7 +38,7 @@ public class RegisterController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new Users()); // 빈 User 객체를 모델에 추가
-        return "users/login/register";  // 회원가입 양식 페이지 경로
+        return "users/register/register-form";  // 회원가입 양식 페이지 경로
     }
 
     // 회원가입 처리를 수행하는 메서드
@@ -47,7 +47,7 @@ public class RegisterController {
         // 사용자 이름 중복 체크
         if (userService.usernameExists(user.getUserId())) {
             // 중복된 사용자 이름이 있으면 회원가입 페이지로 다시 리다이렉트
-            return "redirect:/users/login/register?error";
+            return "redirect:/users/register/register-form?error";
         }
 
         // 사용자 등록

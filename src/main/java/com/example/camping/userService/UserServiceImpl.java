@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.camping.config.PasswordEmailService;
 import com.example.camping.entity.Users;
 import com.example.camping.repository.UserRepository;
 
@@ -20,8 +21,9 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 	
 	private UserRepository userRepo;
 	private PasswordEncoder passwordEncoder;
+	private PasswordEmailService emailService;
 	
-	
+	// 로그인
 	@Override
 	public Users login(String userId, String password) {
 		Users user = userRepo.findByUserId(userId);
@@ -90,6 +92,32 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 		
 		// 해당 userId가 존재하면 true, 없으면 false로 반환
 		return existingUser != null;
+	}
+	
+	
+	// 인증 코드로 사용자 검색
+	public Users findByResetCode(String resetCode) {
+		Users user = userRepo.findByResetCode(resetCode);
+		return userRepo.findByResetCode(resetCode); // resetCode로 사용자 찾기
+	}
+
+	// 비밀번호 재설정 인증 코드 저장
+	@Override
+	public void saveResetCode(String userId, String resetCode) {
+		Users user = findByUserId(userId);
+		if(user != null) {
+			
+			user.setResetCode(resetCode);	// 사용자 resetCode필드에 코드 저장
+			userRepo.save(user);			// DB에 저장
+		}
+		
+	}
+	
+	// 비밀번호 재설정 인증 코드 검증
+	@Override
+	public Boolean verifyResetCode(String resetCode) {
+		Users user = userRepo.findByUserId(resetCode);
+		return user != null && user.getResetCode().equals(resetCode); // 유효한 코드 검증
 	}
 
 }

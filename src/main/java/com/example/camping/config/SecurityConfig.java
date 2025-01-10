@@ -100,6 +100,7 @@ public class SecurityConfig {
 			adminUser.setUserId("admin");
 			adminUser.setName("관리자");
 			adminUser.setPassword(passwordEncoder.encode("admin")); // 관리자 비밀번호 암호화
+			adminUser.setEmail("fajole4888@xcmexico.com");
 			adminUser.setRole(Users.Role.ADMIN); // 관리자 권한 설정
 			userRepo.save(adminUser); // DB에 관리자 계정 저장
 			log.info("새로운 관리자 계정이 생성되었습니다. (사용자명: {}, 권한: {})", adminUser.getUserId(), adminUser.getRole());
