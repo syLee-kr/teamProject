@@ -6,14 +6,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.camping.entity.Users;
 import com.example.camping.userService.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import com.example.camping.config.PasswordEmailService;
 
 import lombok.AllArgsConstructor;
@@ -28,7 +35,9 @@ public class LoginController {
 	
 	// 비밀번호 찾기 코드 생성
 	private String generateResetCode() {
-		return String.valueOf((int) (Math.random()*100000));
+		String resetCode = String.valueOf((int) (Math.random()*100000));
+		log.debug("비밀번호 찾기 코드 생성: {}", resetCode);
+		return resetCode;
 	}
 	
 	// 로그인 폼
@@ -45,14 +54,23 @@ public class LoginController {
 	
 	// 비밀번호 변경 처리
 	@PostMapping("/change-password")
-	public String changePassword(@RequestParam (required = true) String oldPassword,
-								 @RequestParam (required = true) String newPassword,
-								 @AuthenticationPrincipal User principal) {
+	public String changePassword(@RequestParam(name="oldPassword") String oldPassword,
+								 @RequestParam(name="newPassword") String newPassword,
+								 @AuthenticationPrincipal User principal,
+								 Model model,
+								 HttpServletRequest request, HttpServletResponse response,
+								 RedirectAttributes redirectAttributes) {
 		
 		String userId = principal.getUsername();
+		log.info("비밀번호 변경 요청: 사용자 {}", userId);
 		
 		Users user = userService.findByUserId(userId);
-		
+		if(user == null) {
+			log.warn("사용자를 찾을 수 없음: {}", userId);
+			model.addAttribute("error", "사용자를 찾을수 없습니다.");
+			return "users/login/change-password";
+		}
+
 		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		
 		
@@ -61,11 +79,24 @@ public class LoginController {
 			// 비밀번호 암호화 후 저장
 			user.setPassword(passwordEncoder.encode(newPassword));
 			userService.save(user);
+			log.info("비밀번호 변경 완료: 사용자 {}", userId);
+			
+			// 비밀번호 변경 후 로그아웃 처리
+			SecurityContextHolder.clearContext();
+			
+			// 로그아웃 처리(세션 무효)
+			LogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+			logoutHandler.logout(request, response, 
+					SecurityContextHolder.getContext().getAuthentication());
+			log.info("로그아웃 처리 완료: 사용자 {}", userId);
+			
+			// 리다이렉트 시 메세지 전달
+			redirectAttributes.addFlashAttribute("message", "비밀번호가 변경되었습니다. 다시 로그인해주세요.");
+			return "redirect:/user/login/login-form";
 		}else {
+			model.addAttribute("error", "기존 비밀번호가 맞지 않습니다.");
 			return "users/login/change-password";
 		}
-		
-		return "redirect:/users/profile/profile-form";
 		
 	}
 	
@@ -78,8 +109,8 @@ public class LoginController {
     
     // 비밀번호 찾기 요청 처리
     @PostMapping("/forgot-password")
-    public String forgotPassword(@RequestParam String userId, Model model) {
-
+    public String forgotPassword(@RequestParam(name="username") String userId, Model model) {
+    	log.info("비밀번호 찾기 요청: 사용자 {}", userId);
         Users user = userService.findByUserId(userId);
         
         if (user !=null) {
@@ -92,12 +123,15 @@ public class LoginController {
         	if(isSent) {
         		// 인증코드 저장
         		userService.saveResetCode(userId, resetCode);
+        		log.info("이메일 발송 성공: 사용자 {}", userId);
         		model.addAttribute("message", "비밀번호 재설정 링크를 이메일로 보냈습니다.");
         	} else {
+        		log.error("이메일 발송 실패: 사용자 {}", userId);
         		model.addAttribute("error", "이메일 발송에 실패했습니다.");
         	}
 
         } else {
+        	log.warn("사용자를 찾을 수 없음: {}", userId);
         	model.addAttribute("error", "사용자를 찾을 수 없습니다.");
         }
         
@@ -106,14 +140,18 @@ public class LoginController {
     
     // 비밀번호 재설정 폼
     @GetMapping("/reset-password")
-    public String resetPasswordForm(@RequestParam String resetCode, Model model) {
+    public String resetPasswordForm(@RequestParam(name="resetCode") String resetCode, Model model) {
+    	log.info("비밀번호 재설정 폼 요청: 인증코드 {}", resetCode);
+    	
     	// 코드 검증
     	Boolean isValid = userService.verifyResetCode(resetCode);
     	
     	if(isValid) {
+    		log.info("유효한 인증코드: {}", resetCode);
     		model.addAttribute("resetCode", resetCode);
     		return "users/login/reset-password";
     	}else {
+    		log.warn("유효하지 않은 인증코드: {}", resetCode);
     		model.addAttribute("error", "유효하지 않은 코드 입니다.");
     		return "users/login/forgot-password";
     	}
@@ -121,8 +159,9 @@ public class LoginController {
     
     // 비밀번호 재설정 처리
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam String resetCode, 
-    							@RequestParam String newPassword, Model model) {
+    public String resetPassword(@RequestParam(name="resetCode") String resetCode, 
+    							@RequestParam(name="newPassword") String newPassword, Model model) {
+    	log.info("비밀번호 재설정 요청: 인증코드 {}, 새로운 비밀번호", resetCode);
     	
     	Boolean isValid = userService.verifyResetCode(resetCode);
     	
@@ -132,12 +171,16 @@ public class LoginController {
     			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     			user.setPassword(passwordEncoder.encode(newPassword));
     			userService.save(user);
+    			log.info("비밀번호 재설정 완료: 사용자 {}", user.getUserId());
+    			
     			model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
     			return "redirect:/users/login/login-form";
     		} else {
+    			log.warn("사용자를 찾을 수 없음: 인증코드 {}", resetCode);
     			model.addAttribute("error", "사용자를 찾을 수 없습니다.");
     		}
     	}else {
+    		log.warn("유효하지 않은 인증코드: {}", resetCode);
     		model.addAttribute("error", "유효하지 않는 코드입니다.");
     	}
     	return "users/login/reset-password";
@@ -146,7 +189,7 @@ public class LoginController {
 	
 	// 현재 로그인된 사용자 정보 로그
 	@GetMapping("/loginSuccess")
-	public String loginSuccess(/*@RequestParam String userId,*/ Model model) {
+	public String loginSuccess(Model model) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    if (authentication != null) {
 	    	String currentUser = authentication.getName();
@@ -171,6 +214,7 @@ public class LoginController {
 	
 	@GetMapping("/loginFail")
 	public String loginFail(Model model) {
+		log.warn("로그인 실패");
 		model.addAttribute("error", "로그인 실패");
 		return "users/login/login-form";
 	}

@@ -16,10 +16,10 @@
         <p>Birthday: {{users.birthday}}</p>
         <p>Gender: {{users.gender}}</p>
         <img src="{{user.profileImage}}" alt="Profile Image">
-        <a href="/users/profile/profile-edit">Edit Profile</a>
-        <a href="/user/change-password">Change Password</a>
+        <a href="/profile-edit">Edit Profile</a>
+        <a href="/change-password">Change Password</a>
         
-        <form action="/logout" method="POST">
+        <form th:action="@{/logout}" method="POST">
             <button type="submit">Logout</button>
         </form>
     </div>

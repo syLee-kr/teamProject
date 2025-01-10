@@ -63,7 +63,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-	                        .requestMatchers("/login", "/register", "/register/term").permitAll() // 로그인과 회원가입은 모두 접근 가능
+	                        .requestMatchers("/login", "/register", "/register/term", "/forgot-password").permitAll() // 로그인과 회원가입은 모두 접근 가능
+	                        .requestMatchers("/change-password", "/reset-password").authenticated() // 비밀번호 변경, 재설정은 인증된 사용자만 접근 가능
 	                        .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 경로
 	                        .requestMatchers("/users/profile", "/users/edit").authenticated()  // 프로필 조회, 수정 경로
 	                        .anyRequest().authenticated() // 그외 모든 요청 인증
