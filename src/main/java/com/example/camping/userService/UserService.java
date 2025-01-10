@@ -25,5 +25,8 @@ public interface UserService {
 	// 비밀번호 재설정 코드 검증
 	Boolean verifyResetCode(String resetCode);
 	
+	// 회원탈퇴
+	void delete(Users user);
+	
 
 }

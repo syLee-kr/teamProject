@@ -119,5 +119,12 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 		Users user = userRepo.findByUserId(resetCode);
 		return user != null && user.getResetCode().equals(resetCode); // 유효한 코드 검증
 	}
+	
+	// 회원탈퇴
+	@Override
+	public void delete(Users user) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

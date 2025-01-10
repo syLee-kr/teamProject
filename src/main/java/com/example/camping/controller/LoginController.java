@@ -1,25 +1,16 @@
 package com.example.camping.controller;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.example.camping.entity.Users;
 import com.example.camping.userService.UserService;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import com.example.camping.config.PasswordEmailService;
 
@@ -46,61 +37,7 @@ public class LoginController {
 		return "users/login/login-form";
 	}
 
-	// 비밀번호 변경 폼
-	@GetMapping("/change-password")
-	public String changePasswordForm() {
-		return "users/login/change-password";
-	}
-	
-	// 비밀번호 변경 처리
-	@PostMapping("/change-password")
-	public String changePassword(@RequestParam(name="oldPassword") String oldPassword,
-								 @RequestParam(name="newPassword") String newPassword,
-								 @AuthenticationPrincipal User principal,
-								 Model model,
-								 HttpServletRequest request, HttpServletResponse response,
-								 RedirectAttributes redirectAttributes) {
-		
-		String userId = principal.getUsername();
-		log.info("비밀번호 변경 요청: 사용자 {}", userId);
-		
-		Users user = userService.findByUserId(userId);
-		if(user == null) {
-			log.warn("사용자를 찾을 수 없음: {}", userId);
-			model.addAttribute("error", "사용자를 찾을수 없습니다.");
-			return "users/login/change-password";
-		}
 
-		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		
-		
-		// 기존 비밀번호가 일치하면 비밀번호 변경
-		if(user != null && passwordEncoder.matches(oldPassword, user.getPassword())) {
-			// 비밀번호 암호화 후 저장
-			user.setPassword(passwordEncoder.encode(newPassword));
-			userService.save(user);
-			log.info("비밀번호 변경 완료: 사용자 {}", userId);
-			
-			// 비밀번호 변경 후 로그아웃 처리
-			SecurityContextHolder.clearContext();
-			
-			// 로그아웃 처리(세션 무효)
-			LogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-			logoutHandler.logout(request, response, 
-					SecurityContextHolder.getContext().getAuthentication());
-			log.info("로그아웃 처리 완료: 사용자 {}", userId);
-			
-			// 리다이렉트 시 메세지 전달
-			redirectAttributes.addFlashAttribute("message", "비밀번호가 변경되었습니다. 다시 로그인해주세요.");
-			return "redirect:/user/login/login-form";
-		}else {
-			model.addAttribute("error", "기존 비밀번호가 맞지 않습니다.");
-			return "users/login/change-password";
-		}
-		
-	}
-	
-	
 	// 비밀번호 찾기 폼
     @GetMapping("/forgot-password")
     public String forgotPasswordForm() {
@@ -215,7 +152,6 @@ public class LoginController {
 	@GetMapping("/loginFail")
 	public String loginFail(Model model) {
 		log.warn("로그인 실패");
-		model.addAttribute("error", "로그인 실패");
 		return "users/login/login-form";
 	}
 

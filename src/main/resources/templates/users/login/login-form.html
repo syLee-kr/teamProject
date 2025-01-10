@@ -22,8 +22,8 @@
      
     <p th:if="${param.error}">로그인 실패! 사용자 ID와 비밀번호를 다시 확인해 주세요.</p>
     
-   	<div th:if="${message}" style="color: green;">
-    	<p th:text="${message}"></p>
-    </div>
+	<div th:if="${msg}">
+	    <p th:text="${msg}" style="color: green;"></p>
+	</div>
 </body>
 </html>
