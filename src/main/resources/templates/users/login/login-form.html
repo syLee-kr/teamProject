@@ -18,10 +18,11 @@
         <button type="submit">Login</button>
     </form>
     
-    <a href="/forgot-password">forgot password</a>
+    <a th:href="@{/forgot-password}">forgot password</a>
      
-    <p th:if="${param.error}">로그인 실패! 사용자 ID와 비밀번호를 다시 확인해 주세요.</p>
-    
+    <div th:if="${error}">
+    	<p th:text="${error}" style="color: red;"></p>
+    </div>
 	<div th:if="${msg}">
 	    <p th:text="${msg}" style="color: green;"></p>
 	</div>

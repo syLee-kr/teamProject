@@ -117,8 +117,7 @@ public class UserController {
 								 @RequestParam(name="newPassword") String newPassword,
 								 @AuthenticationPrincipal User principal,
 								 Model model,
-								 HttpServletRequest request, HttpServletResponse response,
-								 RedirectAttributes rattr) {
+								 HttpServletRequest request, HttpServletResponse response) {
 		
 		String userId = principal.getUsername();
 		log.info("비밀번호 변경 요청: 사용자 {}", userId);
@@ -149,11 +148,11 @@ public class UserController {
 					SecurityContextHolder.getContext().getAuthentication());
 			log.info("로그아웃 처리 완료: 사용자 {}", userId);
 			
-			// 리다이렉트 시 메세지 전달
+			// 메세지 전달
 			String msg = "비밀번호가 변경되었습니다. 다시 로그인해주세요.";
-			rattr.addFlashAttribute("msg", msg);
+			model.addAttribute("msg", msg);
 			
-			return "redirect:/user/login/login-form";
+			return "users/login/login-form";
 		}else {
 			log.warn("기존 비밀번호가 맞지 않음: 사용자 {}", userId);
 			model.addAttribute("error", "기존 비밀번호가 맞지 않습니다.");

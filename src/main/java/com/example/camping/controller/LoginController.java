@@ -46,9 +46,9 @@ public class LoginController {
     
     // 비밀번호 찾기 요청 처리
     @PostMapping("/forgot-password")
-    public String forgotPassword(@RequestParam(name="username") String userId, Model model) {
-    	log.info("비밀번호 찾기 요청: 사용자 {}", userId);
-        Users user = userService.findByUserId(userId);
+    public String forgotPassword(@RequestParam(name="username") String username, Model model) {
+    	log.info("비밀번호 찾기 요청: 사용자 {}", username);
+        Users user = userService.findByUserId(username);
         
         if (user !=null) {
         	// 인증코드 생성
@@ -59,16 +59,16 @@ public class LoginController {
         	
         	if(isSent) {
         		// 인증코드 저장
-        		userService.saveResetCode(userId, resetCode);
-        		log.info("이메일 발송 성공: 사용자 {}", userId);
+        		userService.saveResetCode(username, resetCode);
+        		log.info("이메일 발송 성공: 사용자 {}", username);
         		model.addAttribute("message", "비밀번호 재설정 링크를 이메일로 보냈습니다.");
         	} else {
-        		log.error("이메일 발송 실패: 사용자 {}", userId);
+        		log.error("이메일 발송 실패: 사용자 {}", username);
         		model.addAttribute("error", "이메일 발송에 실패했습니다.");
         	}
 
         } else {
-        	log.warn("사용자를 찾을 수 없음: {}", userId);
+        	log.warn("사용자를 찾을 수 없음: {}", username);
         	model.addAttribute("error", "사용자를 찾을 수 없습니다.");
         }
         
@@ -151,6 +151,8 @@ public class LoginController {
 	
 	@GetMapping("/loginFail")
 	public String loginFail(Model model) {
+		String error = "로그인 실패, 아이디와 비밀번호를 확인해주세요!!";
+		model.addAttribute("error" , error);
 		log.warn("로그인 실패");
 		return "users/login/login-form";
 	}
