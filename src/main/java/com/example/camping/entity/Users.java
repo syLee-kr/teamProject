@@ -1,6 +1,7 @@
 package com.example.camping.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.Period;
 
@@ -99,4 +100,8 @@ public class Users {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Role role = Role.USER; 
+    
+    @Column(nullable = true)
+    private LocalDateTime resetCodeGeneratedTime;
+
 }
