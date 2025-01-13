@@ -1,4 +1,4 @@
-package com.example.camping.config;
+package com.example.camping.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

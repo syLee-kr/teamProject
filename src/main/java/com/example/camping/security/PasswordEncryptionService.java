@@ -1,4 +1,4 @@
-package com.example.camping.config;
+package com.example.camping.security;
 
 import com.example.camping.entity.Users;
 import com.example.camping.repository.UserRepository;

@@ -7,10 +7,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.camping.config.PasswordEmailService;
 import com.example.camping.entity.Users;
 import com.example.camping.repository.UserRepository;
-
+import com.example.camping.security.PasswordEmailService;
 
 import lombok.AllArgsConstructor;
 
