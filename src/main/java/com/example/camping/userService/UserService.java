@@ -28,5 +28,6 @@ public interface UserService {
 	// 회원탈퇴
 	void delete(Users user);
 	
+	
 
 }

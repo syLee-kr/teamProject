@@ -20,7 +20,6 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 	
 	private UserRepository userRepo;
 	private PasswordEncoder passwordEncoder;
-	private PasswordEmailService emailService;
 	
 	// 로그인
 	@Override
@@ -125,5 +124,7 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 		// TODO Auto-generated method stub
 		
 	}
+
+
 
 }

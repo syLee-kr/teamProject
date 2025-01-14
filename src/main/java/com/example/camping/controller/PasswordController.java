@@ -1,6 +1,8 @@
 package com.example.camping.controller;
 
 import java.time.LocalDateTime;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -33,19 +36,7 @@ public class PasswordController {
 	private UserService userService;
 	private PasswordEmailService emailService;
 	
-	// 비밀번호 찾기 코드 생성
-	private String generateResetCode(String username) {
-		String resetCode = String.valueOf((int) (Math.random()*100000));
-		log.debug("비밀번호 찾기 코드 생성: {}", resetCode);
-		
-		// 인증 코드 생성 시간 저장
-		Users user = userService.findByUserId(username);
-		user.setResetCodeGeneratedTime(LocalDateTime.now());
-		userService.save(user);
-		
-		return resetCode;
-	}
-	
+
 	// 비밀번호 유효성 검사
 	private Boolean isPasswordValid(String password) {
 		// 비밀번호 최소 길이 6자 이상(개발단계에는 4자 이상으로)
@@ -69,8 +60,8 @@ public class PasswordController {
 	
 	// 비밀번호 변경 처리
 	@PostMapping("/change-password")
-	public String changePassword(@RequestParam(name="oldPassword") String oldPassword,
-								 @RequestParam(name="newPassword") String newPassword,
+	public String changePassword(@RequestParam("oldPassword") String oldPassword,
+								 @RequestParam("newPassword") String newPassword,
 								 @AuthenticationPrincipal User principal,
 								 Model model,
 								 HttpServletRequest request, HttpServletResponse response) {
@@ -137,8 +128,8 @@ public class PasswordController {
     
     // 비밀번호 찾기 인증코드 발송 처리
     @PostMapping("/forgot-password")
-    public String forgotPassword(@RequestParam(name="username") String username, 
-    							 @RequestParam(name="email") String email,
+    public String forgotPassword(@RequestParam("username") String username, 
+    							 @RequestParam("email") String email,
     							 Model model) {
     	log.info("비밀번호 찾기 요청: 아이디 {}, 이메일 {}", username, email);
         
@@ -149,17 +140,11 @@ public class PasswordController {
         	
         	// 아이디가 존재하면 이메일 확인
         	if (user.getEmail().equals(email)) {
-	        	// 인증코드 생성
-	        	String resetCode = generateResetCode(username);
 	        	
-	        	// 이메일 발송
-	        	Boolean isSent = emailService.sendResetCodeEmail(user.getEmail(), resetCode);
+	        	// 인증코드 이메일 발송
+	        	Boolean isSent = emailService.sendCodeEmail(username, email);
 	        	
 	        	if (isSent) {
-	        		// 인증코드 저장
-	        		userService.saveResetCode(username, resetCode);
-	        		log.info("이메일 발송 성공: 아이디 {}", username);
-	        		
 	        		String message = "비밀번호 재설정 링크를 이메일로 보냈습니다."; 
 	        		model.addAttribute("message", message);
 	        		model.addAttribute("resetCodeSent", true); 	// 인증코드 입력란 표시
@@ -184,21 +169,10 @@ public class PasswordController {
 
     }
     
-    // 인증코드 검증 처리
-    @PostMapping("/verifyCode")
-    @ResponseBody
-    public ResponseEntity<Boolean> verifyCode(@RequestParam("resetCode") String resetCode) {
-        log.info("인증코드 확인 요청: {}", resetCode);
-        
-        // 인증코드 검증 로직
-        Boolean isValid = userService.verifyResetCode(resetCode);
-        
-        return ResponseEntity.ok(isValid);  // isValid 값만 보내기
-    }
 
     // 비밀번호 재설정 폼
     @GetMapping("/reset-password")
-    public String resetPasswordForm(@RequestParam(name="resetCode") String resetCode, Model model) {
+    public String resetPasswordForm(@RequestParam("resetCode") String resetCode, Model model) {
     	log.info("비밀번호 재설정 폼 요청: 인증코드 {}", resetCode);
     	
     	// 코드 검증
@@ -226,9 +200,9 @@ public class PasswordController {
     
     // 비밀번호 재설정 처리
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam(name="resetCode") String resetCode, 
-    							@RequestParam(name="newPassword") String newPassword,
-    							@RequestParam(name="confirmPassword") String confirmPassword, Model model) {
+    public String resetPassword(@RequestParam("resetCode") String resetCode, 
+    							@RequestParam("newPassword") String newPassword,
+    							@RequestParam("confirmPassword") String confirmPassword, Model model) {
     	log.info("비밀번호 재설정 요청: 인증코드 {}, 새로운 비밀번호", resetCode);
     	
         // 비밀번호 유효성 검사
@@ -268,5 +242,79 @@ public class PasswordController {
     	return "users/password/reset-password";
     }
     
-	
+    // 인증코드 검증 처리
+    @PostMapping("/verifyCode")
+    @ResponseBody
+    public ResponseEntity<Boolean> verifyCode(@RequestBody Map<String, String> request) {
+        
+    	String resetCode = request.get("resetCode"); // JSON에서 resetCode 값 가져오기
+    	log.info("인증코드 확인 요청: {}", resetCode);
+        
+        // 인증코드 검증 로직
+        Boolean isValid = userService.verifyResetCode(resetCode);
+        
+        return ResponseEntity.ok(isValid);  // isValid 값만 보내기
+    }
+    
+    //인증코드 발송 처리
+    @PostMapping("/sendCode")
+    public ResponseEntity<?> sendCode(@RequestParam("username") String username,
+    								  @RequestParam("email") String email){
+    	Boolean isSuccess = emailService.sendCodeEmail(username, email);
+    	
+    	if (isSuccess) {
+    		return ResponseEntity.ok().body("{\"success\":true}");
+    	} else {
+    		return ResponseEntity.status(400).body("{\"success\":false}");
+    	}
+    }
+    
+    
+	// 인증코드 재발송 처리
+    @PostMapping("resend-Code")
+    public String resendCode(@RequestParam("username") String username,
+    						 @RequestParam("emamil") String email,
+    						 Model model) {
+    	log.info("인증코드 재발송 요청: 아이디 {}, 이메일 {}", username, email);
+    	
+    	// 사용자 정보 조회
+    	Users user = userService.findByUserId(username);
+    	
+    	if(user != null) {
+    		if(user.getEmail().equals(email)) {
+    			// 인증코드 만료 확인
+    			LocalDateTime  codeGeneratedTime = user.getResetCodeGeneratedTime();
+    			LocalDateTime now = LocalDateTime.now();
+    			
+                // 기존 인증코드가 아직 유효한지 체크
+                if (codeGeneratedTime != null && now.isBefore(codeGeneratedTime.plusMinutes(5))) {
+                    model.addAttribute("error", "인증코드 유효 기간이 남아 있습니다. 만료된 후 재시도 해주세요.");
+                    return "users/password/forgot-password";
+                }
+
+                // 새로운 인증코드 발송
+                Boolean isSent = emailService.sendCodeEmail(username, email);
+
+                if (isSent) {
+                    String message = "새로운 인증코드를 이메일로 보냈습니다.";
+                    model.addAttribute("message", message);
+                    model.addAttribute("resetCodeSent", true);  // 인증코드 입력란 표시
+                    model.addAttribute("username", username);  // 아이디 유지
+                    model.addAttribute("email", email);        // 이메일 유지
+                } else {
+                    log.error("이메일 발송 실패: 사용자 {}", username);
+                    model.addAttribute("error", "이메일 발송에 실패했습니다.");
+                }
+            } else {
+                log.warn("이메일 불일치: 아이디: {}, 입력된 이메일 {}", username, email);
+                String error = "입력된 이메일과 아이디가 일치하지않습니다.";
+                model.addAttribute("error", error);
+            }
+        } else {
+            log.warn("사용자를 찾을 수 없음: {}", username);
+            model.addAttribute("error", "사용자를 찾을 수 없습니다.");
+        }
+
+        return "users/password/forgot-password";
+    }
 }
