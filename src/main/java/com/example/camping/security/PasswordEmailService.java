@@ -66,7 +66,6 @@ public class PasswordEmailService {
 		
 		// 인증 코드 생성 시간 저장
 		Users user = userService.findByUserId(username);
-		user.setResetCodeGeneratedTime(LocalDateTime.now());
 		userService.save(user);
 		
 		return resetCode;

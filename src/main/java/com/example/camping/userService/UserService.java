@@ -19,12 +19,9 @@ public interface UserService {
 	// 회원가입 시 사용자ID 중복체크
 	Boolean usernameExists(String userId);
 	
-	// 비밀번호 재설정 저장
+	// 인증코드로 비밀번호 변경 저장
 	void saveResetCode(String userId, String resetCode);
-	
-	// 비밀번호 재설정 코드 검증
-	Boolean verifyResetCode(String resetCode);
-	
+
 	// 회원탈퇴
 	void delete(Users user);
 	

@@ -93,35 +93,22 @@ public class UserServiceImpl implements UserService, UserDetailsService{
 	}
 	
 	
-	// 인증 코드로 사용자 검색
-	public Users findByResetCode(String resetCode) {
-		Users user = userRepo.findByResetCode(resetCode);
-		return userRepo.findByResetCode(resetCode); // resetCode로 사용자 찾기
-	}
-
 	// 비밀번호 재설정 인증 코드 저장
 	@Override
 	public void saveResetCode(String userId, String resetCode) {
 		Users user = findByUserId(userId);
 		if(user != null) {
-			
-			user.setResetCode(resetCode);	// 사용자 resetCode필드에 코드 저장
+			// 인증코드를 새 비밀번호로 설정
+			user.setPassword(passwordEncoder.encode(resetCode)); // 비밀번호 암호화 후 저장
 			userRepo.save(user);			// DB에 저장
 		}
 		
 	}
-	
-	// 비밀번호 재설정 인증 코드 검증
-	@Override
-	public Boolean verifyResetCode(String resetCode) {
-		Users user = userRepo.findByUserId(resetCode);
-		return user != null && user.getResetCode().equals(resetCode); // 유효한 코드 검증
-	}
-	
+		
 	// 회원탈퇴
 	@Override
 	public void delete(Users user) {
-		// TODO Auto-generated method stub
+		userRepo.delete(user);
 		
 	}
 

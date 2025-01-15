@@ -145,8 +145,6 @@ public class PasswordController {
 	        	Boolean isSent = emailService.sendCodeEmail(username, email);
 	        	
 	        	if (isSent) {
-	        		String message = "비밀번호 재설정 링크를 이메일로 보냈습니다."; 
-	        		model.addAttribute("message", message);
 	        		model.addAttribute("resetCodeSent", true); 	// 인증코드 입력란 표시
 	        		model.addAttribute("username", username);	// 아이디 유지
 	        		model.addAttribute("email", email);			// 이메일 유지
@@ -169,92 +167,36 @@ public class PasswordController {
 
     }
     
-
-    // 비밀번호 재설정 폼
-    @GetMapping("/reset-password")
-    public String resetPasswordForm(@RequestParam("resetCode") String resetCode, Model model) {
-    	log.info("비밀번호 재설정 폼 요청: 인증코드 {}", resetCode);
-    	
-    	// 코드 검증
-    	Boolean isValid = userService.verifyResetCode(resetCode);
-    	
-    	if (isValid) {
-    		Users user = userService.findByUserId(resetCode);
-    		//  인증코드 유효시간
-    		if (user != null) {
-    			LocalDateTime codeGeneratedTime = user.getResetCodeGeneratedTime();
-    			LocalDateTime expirationTime = codeGeneratedTime.plusMinutes(5);
-    		
-    			// 인증코드 유효시간 표시
-    			model.addAttribute("resetCode", resetCode);
-    			model.addAttribute("expirationTime", expirationTime);
-    			return "users/password/reset-password";
-    		}
-    	} else {
-    		log.warn("유효하지 않은 인증코드: {}", resetCode);
-    		model.addAttribute("error", "유효하지 않은 코드 입니다.");
-    		return "users/password/forgot-password";
-    	}
-    	return "users/password/reset-password";
-    }
-    
-    // 비밀번호 재설정 처리
+    // 인증코드로 비밀번호 변경 처리
     @PostMapping("/reset-password")
     public String resetPassword(@RequestParam("resetCode") String resetCode, 
     							@RequestParam("newPassword") String newPassword,
-    							@RequestParam("confirmPassword") String confirmPassword, Model model) {
+    						     Model model) {
     	log.info("비밀번호 재설정 요청: 인증코드 {}, 새로운 비밀번호", resetCode);
     	
         // 비밀번호 유효성 검사
         if (!isPasswordValid(newPassword)) {
-            //model.addAttribute("error", "비밀번호는 최소 6자 이상이어야 하며, 숫자, 대소문자, 특수문자가 포함되어야 합니다.");
-        	String error = "비밀번호는 최소 4자 이상이어야 합니다.";
-        	model.addAttribute("error", error);
-            return "users/password/reset-password";
+            //resetPassword.js 코드에서 메세지 처리("비밀번호는 최소 6자 이상이어야 하며, 숫자, 대소문자, 특수문자가 포함되어야 합니다.")
+
+            return "users/password/forgot-password";
         }
         
-        if (!newPassword.equals(confirmPassword)) {
-            String error = "새로운 비밀번호와 비밀번호 확인이 일치하지 않습니다.";
-        	model.addAttribute("error", error);
-            return "users/password/reset-password";
+        // 인증코드로 비밀번호 찾는 부분만 처리
+        Users user = userService.findByUserId(resetCode); // 사용자가 인증코드로 식별된다면
+        if (user != null) {
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            user.setPassword(passwordEncoder.encode(newPassword)); // 새 비밀번호로 업데이트
+            userService.save(user); // 사용자 정보 저장
+            log.info("비밀번호 변경 완료: 사용자 {}", user.getUserId());
+
+            return "redirect:/users/login/login-form"; // 로그인 페이지로 리디렉션
+        } else {
+            log.warn("사용자를 찾을 수 없음: 인증코드 {}", resetCode);
+            
+            return "users/password/forgot-password"; // 다시 비밀번호 변경 페이지로
         }
-        
-    	Boolean isValid = userService.verifyResetCode(resetCode);
-    	
-    	if (isValid) {
-    		Users user = userService.findByUserId(resetCode);
-    		if (user != null) {
-    			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    			user.setPassword(passwordEncoder.encode(newPassword));
-    			userService.save(user);
-    			log.info("비밀번호 재설정 완료: 사용자 {}", user.getUserId());
-    			
-    			model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
-    			return "redirect:/users/login/login-form";
-    		} else {
-    			log.warn("사용자를 찾을 수 없음: 인증코드 {}", resetCode);
-    			model.addAttribute("error", "사용자를 찾을 수 없습니다.");
-    		}
-    	} else {
-    		log.warn("유효하지 않은 인증코드: {}", resetCode);
-    		model.addAttribute("error", "유효하지 않는 코드입니다.");
-    	}
-    	return "users/password/reset-password";
     }
-    
-    // 인증코드 검증 처리
-    @PostMapping("/verifyCode")
-    @ResponseBody
-    public ResponseEntity<Boolean> verifyCode(@RequestBody Map<String, String> request) {
-        
-    	String resetCode = request.get("resetCode"); // JSON에서 resetCode 값 가져오기
-    	log.info("인증코드 확인 요청: {}", resetCode);
-        
-        // 인증코드 검증 로직
-        Boolean isValid = userService.verifyResetCode(resetCode);
-        
-        return ResponseEntity.ok(isValid);  // isValid 값만 보내기
-    }
+
     
     //인증코드 발송 처리
     @PostMapping("/sendCode")
@@ -268,53 +210,5 @@ public class PasswordController {
     		return ResponseEntity.status(400).body("{\"success\":false}");
     	}
     }
-    
-    
-	// 인증코드 재발송 처리
-    @PostMapping("resend-Code")
-    public String resendCode(@RequestParam("username") String username,
-    						 @RequestParam("emamil") String email,
-    						 Model model) {
-    	log.info("인증코드 재발송 요청: 아이디 {}, 이메일 {}", username, email);
-    	
-    	// 사용자 정보 조회
-    	Users user = userService.findByUserId(username);
-    	
-    	if(user != null) {
-    		if(user.getEmail().equals(email)) {
-    			// 인증코드 만료 확인
-    			LocalDateTime  codeGeneratedTime = user.getResetCodeGeneratedTime();
-    			LocalDateTime now = LocalDateTime.now();
-    			
-                // 기존 인증코드가 아직 유효한지 체크
-                if (codeGeneratedTime != null && now.isBefore(codeGeneratedTime.plusMinutes(5))) {
-                    model.addAttribute("error", "인증코드 유효 기간이 남아 있습니다. 만료된 후 재시도 해주세요.");
-                    return "users/password/forgot-password";
-                }
 
-                // 새로운 인증코드 발송
-                Boolean isSent = emailService.sendCodeEmail(username, email);
-
-                if (isSent) {
-                    String message = "새로운 인증코드를 이메일로 보냈습니다.";
-                    model.addAttribute("message", message);
-                    model.addAttribute("resetCodeSent", true);  // 인증코드 입력란 표시
-                    model.addAttribute("username", username);  // 아이디 유지
-                    model.addAttribute("email", email);        // 이메일 유지
-                } else {
-                    log.error("이메일 발송 실패: 사용자 {}", username);
-                    model.addAttribute("error", "이메일 발송에 실패했습니다.");
-                }
-            } else {
-                log.warn("이메일 불일치: 아이디: {}, 입력된 이메일 {}", username, email);
-                String error = "입력된 이메일과 아이디가 일치하지않습니다.";
-                model.addAttribute("error", error);
-            }
-        } else {
-            log.warn("사용자를 찾을 수 없음: {}", username);
-            model.addAttribute("error", "사용자를 찾을 수 없습니다.");
-        }
-
-        return "users/password/forgot-password";
-    }
 }
